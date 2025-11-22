@@ -11,7 +11,6 @@ import { ChatComponent } from './components/chat-component/chat-component';
 import { ProfilePage } from './components/profile-page/profile-page';
 import { EditProfilePage } from './components/edit-profile-page/edit-profile-page'; 
 import { EditListingPage } from './components/edit-listing-page/edit-listing-page';
-import { ProductTest } from './components/product-test/product-test';
 
 export const routes: Routes = [
   { path: '', component: HomePage },

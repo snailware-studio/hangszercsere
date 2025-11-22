@@ -5,6 +5,7 @@ import { ChatService } from '../../services/chat-service/chat-service';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user-service/user-service';
 import { CartService } from '../../services/cart-service/cart-service';
+import { NotifService } from '../../services/notif-service/notif-service';
 
 @Component({
   selector: 'app-listing-page',
@@ -21,6 +22,7 @@ export class ListingPage {
     private router: Router,
     private user: UserService,
     private cart: CartService,
+    private NotifService: NotifService
   ) { }
 
   GotoProfile(id: number) {
@@ -33,7 +35,7 @@ export class ListingPage {
 
   AddToCart(listing_id: number): void {
     if (!this.user.isLoggedIn()) {
-      alert("You must be logged in!");
+      this.NotifService.show('error',"You must be logged in!");
       this.router.navigate(['/login']);
       return;
     }
@@ -55,11 +57,11 @@ export class ListingPage {
   RemoveListing(id: number): void {
     this.listingService.RemoveListing(id).subscribe({
       next: (res) => {
-        alert('Removed');
+        this.NotifService.show('success',"Removed listing.");
         this.router.navigate(['/']);
       },
       error: (err) => {
-        alert('failed to remove');
+        this.NotifService.show('error',"Failed to remove listing.");
         console.error('failed to remove', err);
       }
     });
@@ -72,7 +74,7 @@ export class ListingPage {
 
   StartChat(listing: Listing) {
     if (!this.user.isLoggedIn()) {
-      alert("You must be logged in!");
+      this.NotifService.show('error',"You must be logged in!");
       this.router.navigate(['/login']);
       return
     }

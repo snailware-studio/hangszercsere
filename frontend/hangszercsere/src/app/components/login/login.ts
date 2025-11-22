@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { UserService } from '../../services/user-service/user-service';
 import { Router } from '@angular/router';
-import { NotifService } from '../../services/notif-service';
+import { NotifService } from '../../services/notif-service/notif-service';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +18,7 @@ export class Login {
   constructor(
     private userService: UserService,
     private router: Router,
-    private notifService: NotifService
+    private NotifService: NotifService
   ) {};
 
   name: string = '';
@@ -37,8 +37,7 @@ export class Login {
     this.userService.LoginUser(this.name,this.password).subscribe({
 
       next: (res: any) => {
-            //alert("Login successful!");
-            this.notifService.show('success', 'Login successful!');
+            this.NotifService.show('success',"Login successful!");
             this.userService.setUser(res.id,res.name);
             this.router.navigate(['/']);
             if (this.isMenu) this.closeMenu();

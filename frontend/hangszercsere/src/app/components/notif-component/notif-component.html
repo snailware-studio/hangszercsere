@@ -1,0 +1,13 @@
+<div
+  *ngIf="visible"
+  class="fixed bottom-8 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md font-semibold flex items-center shadow-lg transition-all border"
+  [ngClass]="{
+    'bg-green-100 text-green-800 border-green-500 dark:bg-green-900 dark:text-green-200 dark:border-green-700': type === 'success',
+    'bg-red-100 text-red-800 border-red-500 dark:bg-red-900 dark:text-red-200 dark:border-red-700': type === 'error'
+  }"
+>
+  <span class="mr-2">
+    <i [class]="type === 'success' ? 'nf nf-md-check' : 'nf nf-oct-alert'"></i>
+  </span>
+  {{ message }}
+</div>

@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { CartService } from '../../services/cart-service/cart-service';
 import { UserService } from '../../services/user-service/user-service';
 import { Filter } from '../filter/filter';
+import { NotifService } from '../../services/notif-service/notif-service';
+import { th } from 'date-fns/locale';
 
 @Component({
   selector: 'app-home-page',
@@ -20,6 +22,7 @@ export class HomePage {
     private router: Router,
     private cart: CartService,
     private user: UserService,
+    private NotifService: NotifService
   ) {}
 
   viewListing(id: number) {

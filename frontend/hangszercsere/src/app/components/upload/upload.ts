@@ -3,6 +3,7 @@ import { ListingService } from '../../services/listing-service/listing-service';
 import { UserService } from '../../services/user-service/user-service';
 import { Router} from '@angular/router';
 import { HttpEventType } from '@angular/common/http';
+import { NotifService } from '../../services/notif-service/notif-service';
 
 @Component({
   selector: 'app-upload',
@@ -15,12 +16,13 @@ export class Upload {
     private ListingService: ListingService,
     private userService: UserService,
     private router: Router,
+    private NotifService: NotifService
   ) {}
 
   ngOnInit(): void
   { 
     if (!this.userService.isLoggedIn()) {
-      alert("You must be logged in!");
+      this.NotifService.show('error',"You must be logged in!");
       this.router.navigate(['/login']);
     }
   }
@@ -90,13 +92,14 @@ AddMedia(listingId: number): void {
 
       if (event.type === HttpEventType.Response) {
         console.log('Media upload successful', event.body);
-        alert('Upload successful! 🎉');
+        this.NotifService.show('success',"Upload successful 🎉");
         this.router.navigate(['/listing', listingId]);
       }
     },
     error: (err) => {
       console.error('Media upload failed', err);
-      alert('Upload failed: ' + (err.error?.error || 'Unknown error'));
+      this.NotifService.show('error','Upload failed: ' + (err.error?.error || 'Unknown error'));
+
     }
   });
 }
@@ -129,7 +132,7 @@ AddMedia(listingId: number): void {
     },
     error: (err) => {
       console.error('Listing upload failed', err);
-      alert('Upload failed: ' + (err.error?.error || 'Unknown error'));
+      this.NotifService.show('error',"Upload failed: " + (err.error?.error || 'Unknown error'));
     }
   });
 }

@@ -1,0 +1,40 @@
+-- Listings
+INSERT INTO LISTINGS (
+    id, user_id, title, description, price, status, created_at,
+    category_id, condition, brand, model, ai_rating, ai_reviewed, ai_feedback
+) VALUES
+(1, 1, 'Stratocaster', 'black ssh strat.', 35000, 'active', '2025-11-02 15:52:52', 1, 'Very Good', 'Harley Benton', 'ST-20HSS', NULL, 0, NULL),
+(2, 1, 'Yamaha Keyboard', 'yamaha', 60000, 'active', '2025-11-02 15:54:00', 3, 'Very Good', 'Yamaha', '', NULL, 0, NULL),
+(3, 1, 'Fender Guitar', 'acoustic guitar', 40000, 'active', '2025-11-02 15:54:25', 1, 'Very Good', 'Fender', '', NULL, 0, NULL),
+(4, 1, 'Capo', '', 2500, 'active', '2025-11-04 15:21:26', 0, 'Very Good', '', '', NULL, 0, NULL),
+(5, 1, 'HB-20R Amplifier', 'Elektromos gitár erősítő', 40000, 'active', '2025-11-04 15:23:22', 5, 'Very Good', 'Harley Benton', 'HB-20R', NULL, 0, NULL),
+(6, 1, 'Ernie Ball Super Slinky 2223', 'Ernie Ball Super Slinky 2223 gitár húrok', 4000, 'active', '2025-11-04 15:24:48', 0, 'New', 'Ernie Ball', 'Super Slinky 2223', NULL, 0, NULL),
+(7, 1, 'Behringer Mixer', 'Behringer keverőpult, stúdió minőség, 12 csatornás, nagyon jó állapotban.', 55000, 'active', '2025-11-21 12:00:00', 5, 'Very Good', 'Behringer', 'Xenyx 1202FX', NULL, 0, NULL),
+(8, 1, 'Boss Pedal', 'Boss gitár pedál, jól működik, gyári állapot.', 25000, 'active', '2025-11-21 12:10:00', 6, 'Very Good', 'Boss', 'Unknown', NULL, 0, NULL),
+(9, 1, 'Capo', 'Gitár capo, állítható, karcmentes.', 2500, 'active', '2025-11-21 12:15:00', 1, 'Very Good', '', '', NULL, 0, NULL),
+(10, 1, 'Casio Sustain Pedal', 'Casio sustain pedál, digitális zongorához.', 4000, 'active', '2025-11-21 12:20:00', 3, 'Very Good', 'Casio', 'SP-20', NULL, 0, NULL),
+(11, 1, 'Drum Throne', 'Dobos ülőke, állítható magasság, stabil.', 12000, 'active', '2025-11-21 12:25:00', 2, 'Very Good', 'Unknown', '', NULL, 0, NULL),
+(12, 1, 'Audio Interface', 'USB audio interface, 2 input/2 output, stúdió minőség.', 35000, 'active', '2025-11-21 12:30:00', 5, 'Very Good', 'Focusrite', 'Scarlett 2i2', NULL, 0, NULL),
+(13, 1, 'Jazz Bass', 'Jazz Bass, nagyon szép hang, minimális karc.', 65000, 'active', '2025-11-21 12:35:00', 4, 'Very Good', 'Fender', 'Jazz Bass', NULL, 0, NULL),
+(14, 1, 'MG10G Amplifier', 'Marshall MG10G gitárerősítő, 10W, kompakt.', 22000, 'active', '2025-11-21 12:40:00', 5, 'Very Good', 'Marshall', 'MG10G', NULL, 0, NULL),
+(15, 1, 'Paiste Cymbals', 'Paiste cintányérok, kiváló állapot, stúdió minőség.', 45000, 'active', '2025-11-21 12:45:00', 2, 'Very Good', 'Paiste', '', NULL, 0, NULL),
+(16, 1, 'Shure Microphone', 'Shure SM58 mikrofon, élő fellépéshez és stúdióhoz.', 30000, 'active', '2025-11-21 12:50:00', 5, 'Very Good', 'Shure', 'SM58', NULL, 0, NULL);
+
+-- Media
+INSERT INTO MEDIA (listing_id, url, type) VALUES
+(1, 'stratocaster.png', 'image'),
+(2, 'yamaha_keyboard.png', 'image'),
+(3, 'fender_guitar.png', 'image'),
+(4, 'capo.png', 'image'),
+(5, 'hb-20r_amplifier.png', 'image'),
+(6, 'ernie_ball_super_slinky_2223.png', 'image'),
+(7, 'behringer_mixer.png', 'image'),
+(8, 'boss.png', 'image'),
+(9, 'capo.png', 'image'),
+(10, 'casio_sustain.png', 'image'),
+(11, 'drum_throne.png', 'image'),
+(12, 'interface.png', 'image'),
+(13, 'jazz_bass.png', 'image'),
+(14, 'mg10g.png', 'image'),
+(15, 'paiste.png', 'image'),
+(16, 'shure.png', 'image');
