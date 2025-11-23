@@ -21,6 +21,7 @@ INSERT INTO cart_items (cart_id, listing_id)
 VALUES (1, 3);
 
 
+
 READ(10)
 
 -- Kiírja a felhasználók nevét és értékelését.
@@ -54,6 +55,7 @@ SELECT * FROM listings ORDER BY price DESC LIMIT 5;
 SELECT * FROM users WHERE rating > 5;
 
 
+
 READ join (5)
 
 -- Hirdetések a saját kategórianevükkel.
@@ -85,6 +87,7 @@ JOIN users u1 ON m.sent_from = u1.id
 JOIN users u2 ON m.sent_to = u2.id;
 
 
+
 READ szűrt (5)
 -- 50 000 Ft alatti hirdetések.
 SELECT * FROM listings WHERE price < 50000;
@@ -105,6 +108,8 @@ SELECT title FROM listings WHERE ai_rating > 4.0;
 -- Üzenetek egy adott felhasználótól.
 SELECT content FROM messages WHERE sent_from = 1;
 
+
+
 UPDATE(5)
 
 -- A felhasználó státuszát inaktívra állítja.
@@ -117,10 +122,12 @@ UPDATE listings SET status = 'active' WHERE id = 3;
 UPDATE users SET rating = rating + 0.5 WHERE id = 2;
 
 -- Igazoltnak jelöli az e-mailt.
-UPDATE users SET email_verified = 1 WHERE email = 'marci@example.com';
+UPDATE users SET email_verified = 1 WHERE name = "admin";
 
 -- AI-review késznek jelöl egy hirdetést.
 UPDATE listings SET ai_reviewed = 1 WHERE id = 10;
+
+
 
 DELETE (5)
 
