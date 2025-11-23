@@ -1,0 +1,140 @@
+CREATE(5)
+
+-- Létrehoz egy új felhasználót.
+INSERT INTO users (name, pass_hash, email, location)
+VALUES ('marci', 'hash123', 'marci@example.com', 'Budapest');
+
+-- Új kategóriát rögzít.
+INSERT INTO categories (name)
+VALUES ('Electronics');
+
+-- Hozzáad egy hirdetést egy userhez.
+INSERT INTO listings (user_id, title, description, price, category_id, `condition`)
+VALUES (1, 'test gitár', 'Használt, jó állapotban', 120000, 1, 'Good');
+
+-- Létrehoz egy kosarat egy felhasználónak.
+INSERT INTO carts (user_id)
+VALUES (1);
+
+-- Betesz egy terméket egy kosárba.
+INSERT INTO cart_items (cart_id, listing_id)
+VALUES (1, 3);
+
+
+READ(10)
+
+-- Kiírja a felhasználók nevét és értékelését.
+SELECT name, rating FROM users;
+
+-- Mutatja az összes aktív hirdetést.
+SELECT * FROM listings WHERE status = 'active';
+
+-- Kilistázza a legolcsóbb termékeket.
+SELECT * FROM listings ORDER BY price ASC;
+
+-- Legjobban értékelt userek listája.
+SELECT name, rating FROM users ORDER BY rating DESC;
+
+-- Olyan userek, akik megadták a telefonszámukat.
+SELECT name, phone FROM users WHERE phone IS NOT NULL;
+
+-- Felhasználók száma városonként.
+SELECT location, COUNT(*) FROM users GROUP BY location;
+
+-- Összes kategória ábécérendben.
+SELECT name FROM categories ORDER BY name;
+
+-- Hirdetések, ahol az AI ellenőrzés kész.
+SELECT title FROM listings WHERE ai_reviewed = 1;
+
+-- A 5 legdrágább hirdetés.
+SELECT * FROM listings ORDER BY price DESC LIMIT 5;
+
+-- Felhasználók, akiknek 5 fölötti rating van megadva (hibás adatok).
+SELECT * FROM users WHERE rating > 5;
+
+
+READ join (5)
+
+-- Hirdetések a saját kategórianevükkel.
+SELECT listings.title, categories.name
+FROM listings
+JOIN categories ON listings.category_id = categories.id;
+
+-- Hirdetések tulajdonos neveivel.
+SELECT listings.title, users.name
+FROM listings
+JOIN users ON listings.user_id = users.id;
+
+-- Kosarak és a hozzájuk tartozó felhasználók.
+SELECT carts.id, users.name
+FROM carts
+JOIN users ON carts.user_id = users.id;
+
+-- A kosárban lévő termékek részletes listája.
+SELECT users.name, listings.title, cart_items.added_at
+FROM cart_items
+JOIN carts ON cart_items.cart_id = carts.id
+JOIN users ON carts.user_id = users.id
+JOIN listings ON cart_items.listing_id = listings.id;
+
+-- Üzenetek feladó- és címzettnevekkel.
+SELECT m.content, u1.name AS sender, u2.name AS receiver
+FROM messages m
+JOIN users u1 ON m.sent_from = u1.id
+JOIN users u2 ON m.sent_to = u2.id;
+
+
+READ szűrt (5)
+-- 50 000 Ft alatti hirdetések.
+SELECT * FROM listings WHERE price < 50000;
+
+-- Kategóriák, amelyekhez tartozik legalább 1 hirdetés.
+SELECT categories.name, COUNT(listings.id)
+FROM categories
+JOIN listings ON listings.category_id = categories.id
+GROUP BY categories.id
+HAVING COUNT(listings.id) > 0;
+
+-- Igazolt emaillel rendelkező felhasználók.
+SELECT name FROM users WHERE email_verified = 1;
+
+-- AI által 4 fölött értékelt hirdetések.
+SELECT title FROM listings WHERE ai_rating > 4.0;
+
+-- Üzenetek egy adott felhasználótól.
+SELECT content FROM messages WHERE sent_from = 1;
+
+UPDATE(5)
+
+-- A felhasználó státuszát inaktívra állítja.
+UPDATE users SET status = 'inactive' WHERE id = 1;
+
+-- Aktivál egy hirdetést.
+UPDATE listings SET status = 'active' WHERE id = 3;
+
+-- Növeli egy user értékelését 0.5-tel.
+UPDATE users SET rating = rating + 0.5 WHERE id = 2;
+
+-- Igazoltnak jelöli az e-mailt.
+UPDATE users SET email_verified = 1 WHERE email = 'marci@example.com';
+
+-- AI-review késznek jelöl egy hirdetést.
+UPDATE listings SET ai_reviewed = 1 WHERE id = 10;
+
+DELETE (5)
+
+-- Töröl egy felhasználót.
+DELETE FROM users WHERE id = 5;
+
+-- Töröl egy hirdetést.
+DELETE FROM listings WHERE id = 2;
+
+-- Töröl egy elemet a kosárból.
+DELETE FROM cart_items WHERE id = 8;
+
+-- Töröl egy üzenetet.
+DELETE FROM messages WHERE id = 12;
+
+-- Törli egy törölt user statisztikáját.
+DELETE FROM user_stats WHERE user_id = 5;
