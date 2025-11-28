@@ -1,0 +1,11 @@
+<div
+  *ngIf="visible"
+  class="fixed bottom-8 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md font-semibold flex items-center shadow-lg transition-all"
+  [ngClass]="{
+    'bg-green-100 text-green-800 border border-green-500': type === 'success',
+    'bg-red-100 text-red-800 border border-red-500': type === 'error'
+  }"
+>
+  <span class="mr-2 font-bold">{{ type === 'success' ? '✓' : '!' }}</span>
+  {{ message }}
+</div>

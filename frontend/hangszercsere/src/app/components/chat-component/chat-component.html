@@ -30,7 +30,7 @@
     <div class="flex-1 overflow-y-auto p-3 bg-light-card-bg dark:bg-card-bg rounded-lg shadow-md flex flex-col gap-3 max-h-[70vh]">
       <ng-container *ngIf="messages.length; else noMessages">
         <div *ngFor="let message of messages" class="p-2 rounded hover:bg-light-site-bg/10 dark:hover:bg-site-bg/10 transition">
-          <p><strong>{{ message.sender_name }}</strong>: {{ message.content }}</p>
+          <p><i class="nf nf-weather-time_4"></i> {{message.created_at | timeAgo }}<strong>{{ message.sender_name }}</strong>: {{ message.content }}</p>
           <p class="text-xs text-light-text-secondary dark:text-text-secondary">{{ message.timestamp | date:'medium' }}</p>
         </div>
       </ng-container>

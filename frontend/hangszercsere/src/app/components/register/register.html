@@ -1,14 +1,13 @@
-<div 
+<div
   [ngClass]="{'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50': isMenu, 'block': !isMenu}"
   *ngIf="show">
-  
-  <div 
-    class="bg-light-card-bg dark:bg-card-bg rounded-lg shadow-lg p-6 w-96 max-w-full"
+
+  <div class="bg-light-card-bg dark:bg-card-bg rounded-lg shadow-lg p-6 w-96 max-w-full"
     [ngClass]="{'relative': isMenu, 'm-auto': !isMenu}">
 
-        <!-- only for menu -->
+    <!-- only for menu -->
     <button *ngIf="isMenu" (click)="closeMenu()"
-            class="absolute top-2 right-2 text-light-text-secondary dark:text-text-secondary hover:text-accent transition">
+      class="absolute top-2 right-2 text-light-text-secondary dark:text-text-secondary hover:text-accent transition">
       ✕
     </button>
 
@@ -17,20 +16,30 @@
     <form (ngSubmit)="RegisterUser()" class="flex flex-col gap-3">
 
       <label class="text-light-text-secondary dark:text-text-secondary">Name</label>
-      <input type="text" [(ngModel)]="name"
-             required class="input-field" name="name"/>
+      <input type="text" [(ngModel)]="name" required class="input-field" name="name" />
 
       <label class="text-light-text-secondary dark:text-text-secondary">Password</label>
-      <input type="password" [(ngModel)]="password"
-             required class="input-field" name="password" />
+      <input type="password" [(ngModel)]="password" required class="input-field" name="password" />
 
       <label class="text-light-text-secondary dark:text-text-secondary">Location</label>
       <input type="text" [(ngModel)]="location" required class="input-field" name="location" />
 
-            <label class="text-light-text-secondary dark:text-text-secondary">Email</label>
-      <input type="text" [(ngModel)]="email" required class="input-field" name="email"/>
+      <label class="text-light-text-secondary dark:text-text-secondary">Email</label>
 
-      <button type="submit" class="mt-2 bg-accent text-white font-semibold py-2 rounded hover:bg-accent-hover transition">
+      <input type="email" [(ngModel)]="email" name="email" required email #emailCtrl="ngModel" class="input-field"
+        [ngClass]="{
+        'border-red-500 focus:border-red-500 dark:border-red-400 dark:focus:border-red-400':
+           emailCtrl.invalid && emailCtrl.touched,
+        'border-green-500 focus:border-green-500 dark:border-green-400 dark:focus:border-green-400':
+           emailCtrl.valid && emailCtrl.touched
+      }" />
+
+      <div *ngIf="emailCtrl.invalid && emailCtrl.touched" class="text-red-500 text-sm">
+        Please enter a valid email address.
+      </div>
+
+      <button type="submit" [disabled]="emailCtrl.invalid"
+        class="mt-2 bg-accent text-white font-semibold py-2 rounded hover:bg-accent-hover transition">
         Register
       </button>
 

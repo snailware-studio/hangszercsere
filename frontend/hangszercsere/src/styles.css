@@ -4,8 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer components {
+
+
+.condition-badge {
+  @apply absolute top-2 left-2 px-2 py-0.5 rounded-full font-semibold text-xs border
+         backdrop-blur-sm shadow;
+}
 
   .button {
     @apply h-full px-3 py-1 rounded transition-all
@@ -37,19 +42,10 @@
            hover:-translate-y-1 cursor-pointer flex flex-col overflow-hidden border-solid transition-all duration-200;
   }
 
-  .condition-badge {
-    @apply absolute top-2 left-2 px-3 py-1 rounded-full font-semibold text-xs border
-           backdrop-blur-sm shadow;
-  }
-
   .price-badge {
     @apply absolute top-2 right-2 px-3 py-1 rounded-full font-bold
            text-price-text dark:text-text-primary
            bg-[#1B1226]/30 dark:bg-[#2A1F3B]/50 backdrop-blur-sm shadow-md;
-  }
-
-  .product-container {
-    @apply  grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-10;
   }
 
   .product-title {
