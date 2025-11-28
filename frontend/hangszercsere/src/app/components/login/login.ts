@@ -28,6 +28,7 @@ export class Login {
   {
     if (this.userService.isLoggedIn())
     {
+      this.NotifService.show('error',"You are already logged in!");
       this.router.navigate(['/'])
     }
   }

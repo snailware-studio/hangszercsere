@@ -3,16 +3,18 @@
 </div>
 
 <div class="product-container gap-6 p-4">
-  
+
   <ng-container *ngIf="listings?.length == 0">
     <p class="text-light-text-secondary dark:text-text-secondary">Loading...</p>
   </ng-container>
-  
-  <div *ngFor="let listing of listings" class="product-card" routerLink="/listing" (click)="viewListing(listing.id); SetListing(listing);">
-    
+
+  <div *ngFor="let listing of listings" class="product-card" routerLink="/listing"
+    (click)="viewListing(listing.id); SetListing(listing);">
+
     <!-- Image + Price -->
     <div class="relative">
-      <img [src]="'https://hangszercsere.hu/uploads/' + listing.images[0]" alt="Listing Image" class="w-full h-48 object-cover rounded-t-md">
+      <img [src]="'https://hangszercsere.hu/uploads/' + listing.images[0]" alt="Listing Image"
+        class="w-full h-48 object-cover rounded-t-md">
       <span class="price-badge">{{ listing.price }} Ft</span>
       <span class="condition-badge left-2 top-2" [ngClass]="{
         'text-green-500 border-green-500': listing?.condition === 'New',
@@ -21,29 +23,36 @@
         'text-orange-500 border-orange-500': listing?.condition === 'Satisfactory'
       }">{{ listing?.condition }}</span>
     </div>
-    
+
     <!-- Title -->
     <div class="product-title">
       {{ listing.title }}
     </div>
-    
-    <!-- Description (limited to 2 lines for cleaner UX) -->
+
     <div class="product-description">
-      {{ listing.description }}
+      <ng-container *ngIf="listing.description.length > 30">
+        {{ listing.description.substring(0, 30) }}...
+      </ng-container>
+      <ng-container *ngIf="listing.description.length <= 30">
+        {{ listing.description }}
+      </ng-container>
     </div>
-    
+
     <!-- Meta info -->
     <div class="product-meta">
       <span>Seller: <b>{{ listing.seller }}</b></span>
       <span>Category: <b>{{ listing.category }}</b></span>
     </div>
-    
+
     <!-- Time since posted -->
     <div class="product-date">
-      <span><i class="nf nf-weather-time_2"></i> {{ listing.created_at | timeAgo }}</span> <!-- Angular pipe to convert date to "1 day ago" -->
-      <a class="cart-button">
-        <b><i class="nf nf-md-cart"></i></b>
-      </a>
+      <span><i class="nf nf-weather-time_2"></i> {{ listing.created_at | timeAgo }}</span>
+      <!-- Angular pipe to convert date to "1 day ago" -->
+      <ng-container *ngIf="listing.seller != this.user.getUserName()">
+        <a class="cart-button">
+          <b><i class="nf nf-md-cart"></i></b>
+        </a>
+      </ng-container>
     </div>
   </div>
 </div>

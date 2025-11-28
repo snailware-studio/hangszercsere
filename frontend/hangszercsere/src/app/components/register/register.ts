@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { UserService,user } from '../../services/user-service/user-service';
 import { Route, UrlSegment } from '@angular/router';
 import { Router } from '@angular/router';
+import { NotifService } from '../../services/notif-service/notif-service';
 
 @Component({
   selector: 'app-register',
@@ -18,6 +19,7 @@ export class Register {
   constructor(
     private userservice: UserService,
     private router: Router,
+    private NotifService: NotifService
   ) {};
 
   name:string = '';
@@ -25,6 +27,14 @@ export class Register {
   location: string = '';
   password:string = '';
 
+  ngOnInit(): void
+  {
+    if (this.userservice.isLoggedIn())
+    {
+      this.NotifService.show('error',"You are already logged in!");
+      this.router.navigate(['/'])
+    }
+  }
 
   RegisterUser(): void
   {
