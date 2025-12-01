@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../user-service/user-service';
 import { Router } from '@angular/router';
+import { GlobalService } from '../GlobalService/global-service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,10 @@ export class CartService {
     private http: HttpClient,
     private router: Router,
     private injector: Injector,
+    private global: GlobalService
   ) {
+
+    this.apiUrl = this.global.apiUrl+'cart-items';
 
     const stored = localStorage.getItem('cart');
     if (stored) this.cart = JSON.parse(stored);
@@ -26,7 +30,7 @@ export class CartService {
     });
   };
 
-  private api_url= "https://hangszercsere.hu/api/cart-items";
+  private apiUrl= "https://hangszercsere.hu/api/cart-items";
 
   cart: number[] = [];
 
@@ -57,7 +61,7 @@ export class CartService {
 
   LoadListings(): Observable<any>
   { 
-    return this.http.post(this.api_url,{ids: this.cart});
+    return this.http.post(this.apiUrl,{ids: this.cart});
   }
 
   ClearCart(): void

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Timestamp,of,tap } from 'rxjs';
+import { Observable, Timestamp, of, tap } from 'rxjs';
 import { Filters } from '../../components/filter/filter';
+import { GlobalService } from '../GlobalService/global-service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,26 +10,27 @@ import { Filters } from '../../components/filter/filter';
 export class ListingService {
   private apiUrl = 'https://hangszercsere.hu/api/instruments';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+    private global: GlobalService
+  ) {
+    this.apiUrl = this.global.apiUrl + 'instruments';
+  }
 
   private cachedListing: Listing;
   filters: Filters;
 
   //eltárolja a listinget amire rányomtunk
-  SetListing(data: Listing)
-  {
+  SetListing(data: Listing) {
     this.cachedListing = data;
   }
-    //---- ha már el van tárolva csak visszaadja ha nem akkor sql query. minden page reload = sql query!!! scary
-   //visszaadaja
+  //---- ha már el van tárolva csak visszaadja ha nem akkor sql query. minden page reload = sql query!!! scary
+  //visszaadaja
   getListingById(id: number): Observable<Listing> {
-    if (this.cachedListing?.id === id)
-      {
+    if (this.cachedListing?.id === id) {
       return of(this.cachedListing);
     }
-    else
-      {
-      return this.http.get<Listing>(`https://hangszercsere.hu/api/instrument/${id}`).pipe(tap(data => this.cachedListing = data));
+    else {
+      return this.http.get<Listing>(`${this.apiUrl}/${id}`).pipe(tap(data => this.cachedListing = data));
     }
   };
 
@@ -61,7 +63,7 @@ export class ListingService {
       ai_feedback: null
     };
 
-    return this.http.put(`https://hangszercsere.hu/api/instrument/update/${listing.id}`, newlisting);
+    return this.http.put(`${this.apiUrl}/update/${listing.id}`, newlisting);
   }
 
   AddMedia(images: File[] | null, videos: File[] | null, listingId: number): Observable<any> {
@@ -88,29 +90,53 @@ export class ListingService {
   }
 
   updateMedia(formData: FormData): Observable<any> {
-  return this.http.post(`${this.apiUrl}/media/update`, formData, {
-    reportProgress: true,
-    observe: 'events'
-  });
-}
+    return this.http.post(`${this.apiUrl}/media/update`, formData, {
+      reportProgress: true,
+      observe: 'events'
+    });
+  }
 
-  UploadFilters(filters: Filters): void
-  {
+  UploadFilters(filters: Filters): void {
     this.filters = filters;
   }
 
-  FilterListings(listings: Listing[]){
+  FilterListings(listings: Listing[]) {
     var newlistings: any[] = [];
     listings.forEach(listing => {
-      console.log(listing.price + " " + this.filters.priceType + " " + this.filters.priceValue);
-      if (this.filters.category.toLowerCase() && listing.category.toLowerCase() !== this.filters.category) return;
-      if (this.filters.priceType.toLowerCase() === 'less' && listing.price > this.filters.priceValue) return;
-      if (this.filters.priceType.toLowerCase() === 'more' && listing.price < this.filters.priceValue) return;
+      console.log(this.filters.priceType + " " + listing.condition.toLowerCase().replaceAll(' ', '').trim() + " vs " + this.filters.condition.toLowerCase().replaceAll(' ', '').trim());
+      if (
+        this.filters.category &&
+        listing.category.toLowerCase() !== this.filters.category.toLowerCase()
+      ) return;
 
+      if (
+        this.filters.priceType.toLowerCase() === 'less' &&
+        listing.price > this.filters.priceValue
+      ) return;
+
+      if (
+        this.filters.priceType.toLowerCase() === 'more' &&
+        listing.price < this.filters.priceValue
+      ) return;
+
+      if (
+        this.filters.priceType.toLowerCase() === 'custom' &&
+        (listing.price < this.filters.priceMin || listing.price > this.filters.priceMax)
+      ) return;
+
+      if (
+        this.filters.condition &&
+        listing.condition.toLowerCase().replaceAll(' ', '').trim() !==
+        this.filters.condition.toLowerCase().replaceAll(' ', '').trim()
+      ) return;
 
       newlistings.push(listing);
       console.log(listing);
     });
+    if(newlistings.length === 0)
+    {
+      return null;
+    }
     return newlistings;
   }
 
@@ -127,7 +153,7 @@ export class ListingService {
     aiRating: '',
     dateType: '',      // 'before' or 'after'
     dateValue: ''  
-  */ 
+  */
 }
 
 export interface Listing {

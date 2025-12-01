@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
-const ip = process.env.IP;
-const port = process.env.PORT;
+const ip = process.env.IP || "127.0.0.1";
+const port = process.env.PORT || 3000;
 const db = require("./db");
 const cors = require("cors");
 const path = require("path");

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Listing } from '../listing-service/listing-service';
+import { GlobalService } from '../GlobalService/global-service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,11 @@ current_listing: Listing = null;
 
 apiurl: string = "https://hangszercsere.hu/api/messages";
 
-constructor(private http: HttpClient) {}
+constructor(private http: HttpClient,
+  private global: GlobalService
+) {
+  this.apiurl = this.global.apiUrl+'messages';
+}
 
 GetAllMessages(userId: number): Observable<any> {
   return this.http.get(`${this.apiurl}/${userId}`);

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable,tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { CartService } from '../cart-service/cart-service';
-
+import { GlobalService } from '../GlobalService/global-service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +16,7 @@ export class UserService {
     private http: HttpClient,
     private router: Router,
     private cart: CartService,
+    private global: GlobalService
   ) {
     //load user id
     const stored = localStorage.getItem('currentUserId');
@@ -24,6 +25,8 @@ export class UserService {
       this.currentUserId = Number(stored);
       this.loadUser(this.currentUserId);
     }
+
+    this.apiUrl = this.global.apiUrl+'users';
   }
 
   public currentUserId: number | null = null;

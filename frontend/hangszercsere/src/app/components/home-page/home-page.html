@@ -4,9 +4,15 @@
 
 <div class="product-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-4">
 
-  <ng-container *ngIf="listings?.length == 0">
-    <p class="text-light-text-secondary dark:text-text-secondary">Loading...</p>
-  </ng-container>
+<ng-container *ngIf="!listings">
+  <p class="text-light-text-secondary dark:text-text-secondary">No listings found... :(</p>
+</ng-container>
+
+<ng-container *ngIf="listings?.length === 0">
+  <div class="flex justify-center items-center h-40">
+    <div class="w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+  </div>
+</ng-container>
 
   <div *ngFor="let listing of listings" class="product-card" routerLink="/listing"
     (click)="viewListing(listing.id); SetListing(listing);">

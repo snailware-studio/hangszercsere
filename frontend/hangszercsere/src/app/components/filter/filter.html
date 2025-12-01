@@ -2,12 +2,12 @@
 
   <div class="flex flex-wrap items-center gap-2" (change)="FilterListings()">
     <button (click)="showExtra = !showExtra"
-            class="px-4 py-2 bg-accent text-white rounded hover:bg-accent-dark transition">
+      class="px-4 py-2 bg-accent text-white rounded hover:bg-accent-dark transition">
       Filters
     </button>
 
     <select [(ngModel)]="filters.category"
-            class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg hover:bg-accent hover:text-white transition">
+      class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg hover:bg-accent hover:text-white transition">
       <option value="">Category</option>
       <option value="guitar">Guitar</option>
       <option value="bass">Bass</option>
@@ -15,50 +15,56 @@
       <option value="drums">Drums</option>
     </select>
 
-    <div class="flex gap-2 items-center" >
+    <div class="flex gap-2 items-center">
       <select [(ngModel)]="filters.priceType"
-              class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg hover:bg-accent hover:text-white transition">
+        class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg hover:bg-accent hover:text-white transition">
         <option value="">Price</option>
         <option value="less">Less than</option>
         <option value="more">More than</option>
         <option value="custom">Custom range</option>
       </select>
 
-      <input *ngIf="filters.priceType === 'less' || filters.priceType === 'more'"
-             type="number"
-             placeholder="Price"
-             [(ngModel)]="filters.priceValue"
-             class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition"/>
+      <input *ngIf="filters.priceType === 'less' || filters.priceType === 'more'" type="number" placeholder="Price"
+        [(ngModel)]="filters.priceValue" class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
 
       <div *ngIf="filters.priceType === 'custom'" class="flex gap-1">
         <input type="number" placeholder="Min" [(ngModel)]="filters.priceMin"
-               class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition"/>
+          class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
         <input type="number" placeholder="Max" [(ngModel)]="filters.priceMax"
-               class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition"/>
+          class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
       </div>
     </div>
 
-    <select [(ngModel)]="filters.condition"
-            class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg hover:bg-accent hover:text-white transition">
-      <option value="">Condition</option>
-      <option value="new">New</option>
-      <option value="used">Used</option>
+    <select [(ngModel)]="filters.condition" [ngClass]="{
+                            'text-green-500 border-green-500 focus:border-green-500': filters.condition === 'New',
+                            'text-emerald-400 border-emerald-400 focus:border-emerald-400': filters.condition === 'Very Good',
+                            'text-yellow-500 border-yellow-500 focus:border-yellow-500': filters.condition === 'Good',
+                            'text-orange-500 border-orange-500 focus:border-orange-500': filters.condition === 'Satisfactory'
+                        }"
+      class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg hover:bg-accent hover:text-white transition">
+
+      <option value="" disabled class="text-gray-400 dark:bg-gray-800">Select condition</option>
+      <option value="New" class="text-green-500 font-semibold dark:bg-gray-800">New</option>
+      <option value="Very Good" class="text-emerald-400 font-semibold dark:bg-gray-800">Very Good
+      </option>
+      <option value="Good" class="text-yellow-500 font-semibold dark:bg-gray-800">Good</option>
+      <option value="Satisfactory" class="text-orange-500 font-semibold dark:bg-gray-800">
+        Satisfactory</option>
     </select>
   </div>
 
   <div *ngIf="showExtra" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 
     <input [(ngModel)]="filters.brand" placeholder="Brand"
-           class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition"/>
+      class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
 
     <input [(ngModel)]="filters.model" placeholder="Model"
-           class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition"/>
+      class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
 
     <input [(ngModel)]="filters.location" placeholder="Location"
-           class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition"/>
+      class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
 
-    <select [(ngModel)]="filters.aiRating"
-            class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition">
+    <select [(ngModel)]="filters.aiRating" class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition">
       <option value="">AI Rating</option>
       <option value="1">1 ⭐</option>
       <option value="2">2 ⭐</option>
@@ -68,14 +74,13 @@
     </select>
 
     <div class="flex gap-2 items-center">
-      <select [(ngModel)]="filters.dateType"
-              class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition">
+      <select [(ngModel)]="filters.dateType" class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition">
         <option value="">Date Added</option>
         <option value="before">Before</option>
         <option value="after">After</option>
       </select>
       <input type="date" [(ngModel)]="filters.dateValue"
-             class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition"/>
+        class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
     </div>
 
   </div>
