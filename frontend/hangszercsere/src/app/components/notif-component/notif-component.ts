@@ -13,7 +13,6 @@ export class NotifComponent {
   type: 'success' | 'error' = 'success';
 
   constructor(private notifService: NotifService) {
-    // register this component instance in the service
     this.notifService.register(this);
   }
 

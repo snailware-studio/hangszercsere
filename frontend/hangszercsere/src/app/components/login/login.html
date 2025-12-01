@@ -1,14 +1,13 @@
-<div 
+<div
   [ngClass]="{'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50': isMenu, 'block': !isMenu}"
   *ngIf="show">
-  
-  <div 
-    class="bg-light-card-bg dark:bg-card-bg rounded-lg shadow-lg p-6 w-96 max-w-full"
+
+  <div class="bg-light-card-bg dark:bg-card-bg rounded-lg shadow-lg p-6 w-96 max-w-full"
     [ngClass]="{'relative': isMenu, 'm-auto': !isMenu}">
 
     <!-- only for menu -->
     <button *ngIf="isMenu" (click)="closeMenu()"
-            class="absolute top-2 right-2 text-light-text-secondary dark:text-text-secondary hover:text-accent transition">
+      class="absolute top-2 right-2 text-light-text-secondary dark:text-text-secondary hover:text-accent transition">
       ✕
     </button>
 
@@ -17,14 +16,27 @@
     <form (ngSubmit)="LoginUser()" class="flex flex-col gap-3">
 
       <label class="text-light-text-secondary dark:text-text-secondary">Name</label>
-      <input type="text" [(ngModel)]="name" name="name"
-             required class="input-field" />
+      <input type="text" [(ngModel)]="name" name="name" required class="input-field" (input)="this.disabled = false"
+        [ngClass]="{
+        'border-red-500 focus:border-red-500 dark:border-red-400 dark:focus:border-red-400':
+          this.alertmsg != '',
+      }" />
+
 
       <label class="text-light-text-secondary dark:text-text-secondary">Password</label>
-      <input type="password" [(ngModel)]="password" name="password"
-             required class="input-field" />
+      <input type="password" [(ngModel)]="password" name="password" required class="input-field"
+        (input)="this.disabled = false" [ngClass]="{
+              'border-red-500 focus:border-red-500 dark:border-red-400 dark:focus:border-red-400':
+                this.alertmsg != '',
+            }" />
 
-      <button type="submit" class="mt-2 bg-accent text-white font-semibold py-2 rounded hover:bg-accent-hover transition">
+      <div *ngIf="this.alertmsg != ''" class="text-red-500 text-sm mt-1">
+        {{ this.alertmsg }}
+      </div>
+
+      <button type="submit"
+        class="mt-2 bg-accent text-white font-semibold py-2 rounded hover:bg-accent-hover transition disabled:bg-gray-400 disabled:cursor-not-allowed disabled:text-gray-200"
+        (click)="this.disabled = true" [disabled]="this.disabled">
         Login
       </button>
 

@@ -23,6 +23,8 @@ export class Login {
 
   name: string = '';
   password: string = '';
+  alertmsg: string = '';
+  disabled: boolean = false;
 
   ngOnInit(): void
   {
@@ -48,7 +50,7 @@ export class Login {
             if (err && err.error && err.error.error) {
               msg = err.error.error;
             }
-            alert(msg);
+            this.alertmsg = msg;
           }
         });
   }
