@@ -1,7 +1,8 @@
-import { Component,OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat-service/chat-service';
 import { UserService } from '../../services/user-service/user-service';
-import { ListingService,Listing } from '../../services/listing-service/listing-service';
+import { ListingService, Listing } from '../../services/listing-service/listing-service';
+import { WSservice } from '../../services/WSservice/wsservice';
 
 @Component({
   selector: 'app-chat-component',
@@ -11,11 +12,12 @@ import { ListingService,Listing } from '../../services/listing-service/listing-s
 })
 export class ChatComponent {
 
-constructor(
-  private ChatService: ChatService,
-  private user: UserService,
-  private ListingService: ListingService,
-) {}
+  constructor(
+    private ChatService: ChatService,
+    private user: UserService,
+    private ListingService: ListingService,
+    private ws: WSservice
+  ) { }
 
   chatter_id: number = 0;
   messages: any[] = [];
@@ -26,11 +28,19 @@ constructor(
 
   ngOnInit(): void {
 
-    if(this.ChatService.current_listing != null)
-    {
-     this.listing = this.ChatService.current_listing;
-     this.chatter_id = this.ChatService.current_listing.user_id;
-     this.listing_id = this.ChatService.current_listing.id;
+    this.ws.message.subscribe(data => {
+      const message = JSON.parse(data);
+      console.log(message);
+      if (message?.action == 'message') {
+
+        this.GetMessages(this.listing_id);
+      }
+    });
+
+    if (this.ChatService.current_listing != null) {
+      this.listing = this.ChatService.current_listing;
+      this.chatter_id = this.ChatService.current_listing.user_id;
+      this.listing_id = this.ChatService.current_listing.id;
     }
 
     this.ChatService.GetAllMessages(this.user.currentUserId).subscribe(
@@ -43,45 +53,39 @@ constructor(
 
   }
 
-SendMessage(): void {
-
-  if (this.msg_content == '') return;
-
-  this.ChatService.SendMessage(
-    this.user.currentUserId,
-    this.chatter_id,
-    this.msg_content,
-    this.listing_id
-  ).subscribe({
-    next: () => {
-      this.msg_content = "";
+  SendMessage(): void {
 
 
-      this.GetMessages(this.listing_id);
-    },
-    error: (err) => console.error(err)
-  });
-}
+    if (this.msg_content == '') return;
 
-SetInfo(thread: any): void {
-  this.chatter_id = thread.other_user_id;
-  this.listing_id = thread.listing_id;
-}
+    this.ChatService.SendMessage(
+      this.user.currentUserId,
+      this.chatter_id,
+      this.msg_content,
+      this.listing_id
+    )
+
+    this.msg_content = "";
+  }
+
+  SetInfo(thread: any): void {
+    this.chatter_id = thread.other_user_id;
+    this.listing_id = thread.listing_id;
+  }
 
 
-GetMessages(listing_id: number): void {
+  GetMessages(listing_id: number): void {
 
-  this.ListingService.getListingById(listing_id).subscribe(data =>
-  {
-    this.listing = data;
-  });
+    this.ListingService.getListingById(listing_id).subscribe(data => {
+      this.listing = data;
+    });
 
-  this.ChatService.GetMessages(
-    listing_id,            
-    this.user.currentUserId
-  ).subscribe(data => {
-    this.messages = data;
-  });
-}
+    this.ChatService.GetMessages(
+      listing_id,
+      this.user.currentUserId
+    ).subscribe(data => {
+      this.messages = data;
+    });
+  }
 
 }

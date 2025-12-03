@@ -1,6 +1,5 @@
 <div class="min-h-screen bg-light-site-bg dark:bg-site-bg text-light-text-primary dark:text-text-primary flex flex-col sm:flex-row">
 
-  <!-- Sidebar: Threads -->
   <div class="w-full sm:w-1/4 md:w-1/5 bg-light-card-bg dark:bg-card-bg p-4 overflow-y-auto border-b sm:border-b-0 sm:border-r border-gray-300 dark:border-gray-700">
     <h2 class="text-lg font-bold mb-3">Conversations</h2>
     <ng-container *ngIf="threads.length == 0">
@@ -27,7 +26,7 @@
     </h3>
 
     <!-- Messages container -->
-    <div class="flex-1 overflow-y-auto p-3 bg-light-card-bg dark:bg-card-bg rounded-lg shadow-md flex flex-col gap-3 max-h-[70vh]">
+    <div #messagescontainer class="flex-1 overflow-y-auto p-3 bg-light-card-bg dark:bg-card-bg rounded-lg shadow-md flex flex-col gap-3 max-h-[70vh]">
       <ng-container *ngIf="messages.length; else noMessages">
         <div *ngFor="let message of messages" class="p-2 rounded hover:bg-light-site-bg/10 dark:hover:bg-site-bg/10 transition">
           <p><i class="nf nf-weather-time_4"></i> {{message.created_at | timeAgo }}<strong>{{ message.sender_name }}</strong>: {{ message.content }}</p>

@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { UserService } from '../user-service/user-service';
 import { Router } from '@angular/router';
 import { GlobalService } from '../GlobalService/global-service';
+import { NotifService } from '../notif-service/notif-service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class CartService {
     private http: HttpClient,
     private router: Router,
     private injector: Injector,
-    private global: GlobalService
+    private global: GlobalService,
+    private notif: NotifService
   ) {
 
     this.apiUrl = this.global.apiUrl+'cart-items';
@@ -37,7 +39,7 @@ export class CartService {
   AddToCart(listing_id: number): void { 
 
     if (!this.user.isLoggedIn()) {
-      alert("You must be logged in!")
+      this.notif.show("error", "You must be logged in!");
       this.router.navigate(['/login'])
     return;
     }
@@ -45,7 +47,7 @@ export class CartService {
     if (!this.cart.includes(listing_id)) {
       this.cart.push(listing_id);
       this.saveCart();
-      alert("added to cart!")
+      this.notif.show("success", "Added to cart!");
     }
     else
     {

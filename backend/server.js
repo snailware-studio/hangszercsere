@@ -9,6 +9,8 @@ const bcrypt = require("bcrypt");
 const multer = require('multer');
 const { create } = require("domain");
 const fs = require('fs');
+const WebSocket = require('ws');
+
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +18,89 @@ app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
 app.use(express.static(path.join(__dirname, "public")));
+
+const server = require('http').createServer(app);
+const wss = new WebSocket.Server({ server });
+
+const users = new Map(); //map of users connected
+
+wss.on('connection',(ws) => {
+
+  ws.on('message',(message) => {
+    const {action,userID} = JSON.parse(message);
+
+    if(action === 'register')
+    {
+      users.set(userID,ws);
+      console.log(`User ${userID} connected`);
+    }
+
+    if(action === 'message')
+    {
+     // console.log(JSON.parse(message));
+      const {toUserID,message: msgContent,listing} = JSON.parse(message);
+      Sendmessage(userID,toUserID,msgContent,listing);
+    }
+
+  });
+
+  function Sendmessage(userID,toUserID,message,listing)
+  {
+    const touser = users.get(toUserID);
+    if(touser && touser.readyState === WebSocket.OPEN)
+    {
+      touser.send(JSON.stringify({action: 'message',from: 'server',user: userID,toUser: toUserID,message: message,listing: listing}));
+      //console.log(`Message sent to user ${toUserID}`);
+    }
+    else
+    {
+     // console.log(`tried to send message to ${toUserID} but they arent connected.`)
+    }
+
+    const user = users.get(userID);
+    if(user && user.readyState === WebSocket.OPEN)
+    {
+      user.send(JSON.stringify({action: 'message',from: 'server',user: userID,toUser: toUserID,message: message,listing: listing}));
+    }
+
+      const sql = `
+    INSERT INTO messages (sent_from, sent_to, content, listing_id)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.run(sql, [userID, toUserID, message, listing], function(err) {
+    if (err) {
+      console.error("INSERT ERROR:", err.message);
+    }
+    else
+    {
+      
+    }
+
+    const messageid = this.lastID;
+    //console.log(messageid);
+
+    // update last login/active
+    db.run("UPDATE user_stats SET last_login = CURRENT_TIMESTAMP WHERE user_id = ?", [userID]);
+  });
+
+  }
+
+  ws.on('close',() => {
+    users.forEach((socket,userID) =>{
+      if(socket === ws)
+      {
+        users.delete(userID);
+        console.log(`User ${userID} disconnected`);
+      }
+    });
+  });
+
+
+});
+
+
+
 
 const uploadDir = path.join(__dirname, 'public/uploads'); // Folder with media
 
@@ -181,7 +266,7 @@ app.post('/api/instruments/media/update', upload.fields([
 });
 
 
-// message send
+// send message
 app.post("/api/messages/send", (req, res) => {
   
   const { sent_from, sent_to, content, listing_id } = req.body;
@@ -729,6 +814,11 @@ app.get("/api", (req, res) => {
 
 app.get('/*splat', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
+});
+
+
+server.listen(port, ip, () => {
+  console.log('Websocket server running...');
 });
 
 

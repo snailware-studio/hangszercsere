@@ -9,7 +9,7 @@ export class GlobalService {
   apiUrl = "https://hangszercsere.hu/api/";
 
   //set to on if you want to use localhost as the api
-  dev = false;
+  public dev = false;
 
   constructor() {
     if (this.dev)

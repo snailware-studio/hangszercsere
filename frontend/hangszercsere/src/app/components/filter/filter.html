@@ -1,6 +1,6 @@
-<div class="w-full space-y-4">
+<div class="w-full space-y-4" (change)="FilterListings()" (input)="FilterListings()">
 
-  <div class="flex flex-wrap items-center gap-2" (change)="FilterListings()">
+  <div class="flex flex-wrap items-center gap-2" >
     <button (click)="showExtra = !showExtra"
       class="px-4 py-2 bg-accent text-white rounded hover:bg-accent-dark transition">
       Filters

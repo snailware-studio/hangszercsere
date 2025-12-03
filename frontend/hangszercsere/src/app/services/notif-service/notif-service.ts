@@ -11,7 +11,7 @@ export class NotifService {
     this.notifComponent = component;
   }
 
-  show(type: 'success' | 'error', message: string, duration: number = 3000) {
+  show(type: 'success' | 'error' | 'message', message: string, duration: number = 3000) {
     if (this.notifComponent) {
       this.notifComponent.show(type, message, duration);
     } else {

@@ -7,6 +7,7 @@ import { GlobalService } from '../GlobalService/global-service';
 @Injectable({
   providedIn: 'root',
 })
+
 export class ListingService {
   private apiUrl = 'https://hangszercsere.hu/api/instruments';
 
@@ -30,7 +31,8 @@ export class ListingService {
       return of(this.cachedListing);
     }
     else {
-      return this.http.get<Listing>(`${this.apiUrl}/${id}`).pipe(tap(data => this.cachedListing = data));
+      
+      return this.http.get<Listing>(`${this.apiUrl.substring(0, this.apiUrl.length - 1)}/${id}`).pipe(tap(data => this.cachedListing = data));
     }
   };
 
@@ -103,7 +105,7 @@ export class ListingService {
   FilterListings(listings: Listing[]) {
     var newlistings: any[] = [];
     listings.forEach(listing => {
-      console.log(this.filters.priceType + " " + listing.condition.toLowerCase().replaceAll(' ', '').trim() + " vs " + this.filters.condition.toLowerCase().replaceAll(' ', '').trim());
+      console.log(this.filters.brand + "vs" + listing.brand);
       if (
         this.filters.category &&
         listing.category.toLowerCase() !== this.filters.category.toLowerCase()
@@ -130,11 +132,22 @@ export class ListingService {
         this.filters.condition.toLowerCase().replaceAll(' ', '').trim()
       ) return;
 
+      if (this.filters.brand &&
+        listing.brand.toLowerCase().replaceAll(' ', '').trim()
+          .includes(this.filters.brand.toLowerCase().replaceAll(' ', '').trim()) == false
+      )
+        return;
+
+      if (this.filters.model &&
+        listing.model.toLowerCase().replaceAll(' ', '').trim()
+          .includes(this.filters.model.toLowerCase().replaceAll(' ', '').trim()) == false
+      )
+        return;
+
       newlistings.push(listing);
       console.log(listing);
     });
-    if(newlistings.length === 0)
-    {
+    if (newlistings.length === 0) {
       return null;
     }
     return newlistings;

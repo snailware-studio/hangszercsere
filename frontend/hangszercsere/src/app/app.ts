@@ -1,5 +1,7 @@
 import { Component, signal } from '@angular/core';
-
+import { WSservice } from './services/WSservice/wsservice';
+import { NotifService } from './services/notif-service/notif-service';
+import { UserService } from './services/user-service/user-service';
 
 @Component({
   selector: 'app-root',
@@ -10,14 +12,31 @@ import { Component, signal } from '@angular/core';
 export class App {
   protected readonly title = signal('hangszercsere');
 
-menu: 'none' | 'login' | 'register' = 'none';
+  constructor(private ws: WSservice,
+    private notif: NotifService,
+    private user: UserService
+  ) {
+  }
 
-openMenu(type: 'login' | 'register') {
-  this.menu = type;
-}
+  ngOnInit(): void {
+    this.ws.message.subscribe(data => {
+      const message = JSON.parse(data);
+      console.log(`ws-service: ${message}`);
+      if(message?.action == 'message' && message.user != this.user.currentUserId)
+      {
+        this.notif.show("message", `New message!`);
+      }
+    });
+  }
 
-closeMenu() {
-  this.menu = 'none';
-}
+  menu: 'none' | 'login' | 'register' = 'none';
+
+  openMenu(type: 'login' | 'register') {
+    this.menu = type;
+  }
+
+  closeMenu() {
+    this.menu = 'none';
+  }
 
 }

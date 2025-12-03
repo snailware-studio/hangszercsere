@@ -20,19 +20,22 @@ export class Cart {
 
   ngOnInit(): void
   {
-    this.cart.LoadListings().subscribe(data =>{
+    this.LoadListings();
 
-      this.listings = data;
-      console.log(this.listings)
-          this.calculateTotal();
+  }
+
+  LoadListings(): void
+  {
+    this.cart.LoadListings().subscribe(listings => {
+      this.listings = listings;
+      this.calculateTotal();
     });
-
-
   }
   
   removeFromCart(listing_id: number): void
   {
     this.cart.RemoveFromCart(listing_id);
+    this.LoadListings();
   }
 
   calculateTotal() {

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Listing } from '../listing-service/listing-service';
 import { GlobalService } from '../GlobalService/global-service';
+import { WSservice } from '../WSservice/wsservice';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,8 @@ current_listing: Listing = null;
 apiurl: string = "https://hangszercsere.hu/api/messages";
 
 constructor(private http: HttpClient,
-  private global: GlobalService
+  private global: GlobalService,
+  private ws: WSservice
 ) {
   this.apiurl = this.global.apiUrl+'messages';
 }
@@ -27,13 +29,8 @@ GetMessages(listingId: number, userId: number): Observable<any> {
   return this.http.get(`${this.apiurl}/${listingId}/${userId}`);
 }
 
-SendMessage(sent_from: number, sent_to: number, content: string, listing_id: number): Observable<any> {
-  return this.http.post(`${this.apiurl}/send`, {
-    sent_from,
-    sent_to,
-    content,
-    listing_id
-  });
+SendMessage(sent_from: number, sent_to: number, content: string, listing_id: number) {
+  this.ws.sendMessage(sent_from, sent_to, content, listing_id);
 }
 
 }

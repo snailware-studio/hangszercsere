@@ -10,13 +10,14 @@ import { NotifService } from '../../services/notif-service/notif-service';
 export class NotifComponent {
   visible = false;
   message = '';
-  type: 'success' | 'error' = 'success';
+  type: 'success' | 'error' | 'message' = 'success';
 
   constructor(private notifService: NotifService) {
     this.notifService.register(this);
   }
 
-  show(type: 'success' | 'error', message: string, duration: number = 3000) {
+  show(type: 'success' | 'error' | 'message', message: string, duration: number = 3000) {
+    this.visible = false;
     this.type = type;
     this.message = message;
     this.visible = true;
