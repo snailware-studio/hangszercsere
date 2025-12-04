@@ -24,6 +24,14 @@ export class Cart {
 
   }
 
+  Purchase(): void
+  {
+    this.cart.Purchase().subscribe(
+      {
+        next: () => this.LoadListings()
+      });
+  }
+
   LoadListings(): void
   {
     this.cart.LoadListings().subscribe(listings => {
