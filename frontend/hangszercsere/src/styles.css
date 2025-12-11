@@ -90,7 +90,7 @@
 
   .footer {
     @apply border-t-2 border-accent-hover dark:border-transparent bg-light-card-bg dark:bg-card-bg text-light-text-secondary dark:text-text-secondary
-               text-center py-2 shadow-md sm:fixed sm:bottom-0 sm:w-full
+               text-center py-2 shadow-md sm:bottom-0 sm:w-full
   }
 
   body {

@@ -51,8 +51,8 @@ export class UserService {
     return this.currentUser?.name;
   }
 
-  DeleteAccount(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/delete`, {}, { withCredentials: true });
+  DeleteAccount(userId:number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/delete`, {userId}, { withCredentials: true });
   };
 
   LoginUser(name: string, password: string): Observable<any> {

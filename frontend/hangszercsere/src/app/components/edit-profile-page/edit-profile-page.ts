@@ -55,10 +55,18 @@ export class EditProfilePage {
     const userId = Number(this.route.snapshot.paramMap.get('id'));
     if (!userId) return;
 
+    if(!this.userService.isLoggedIn())
+    {
+          this.notif.show("error", "You can't edit someone else's profile!");
+          this.router.navigate(['/']);
+      return;
+    }
+
     this.userService.GetUser(userId).subscribe({
       next: (data) => {
         if (data.id !== this.userService.getUserId()) {
           this.notif.show("error", "You can't edit someone else's profile!");
+          this.router.navigate(['/']);
           return;
         }
         this.user = data;
@@ -77,7 +85,7 @@ export class EditProfilePage {
   }
 
   DeleteAccount() {
-    this.userService.DeleteAccount().subscribe({
+    this.userService.DeleteAccount(this.userService.getUserId()).subscribe({ 
       next: (res) => {
         this.notif.show("success", "Confirmation email sent!");
       },

@@ -15,36 +15,40 @@ export class WSservice {
   ) {
     console.log('=== wsservice started ===');
 
-      if (this.global.dev) {
-        this.socket = new WebSocket('ws://localhost:3000');
+    if (this.global.dev) {
+      this.socket = new WebSocket('ws://localhost:3000');
+    }
+    else {
+      this.socket = new WebSocket('wss://hangszercsere.hu');
+    }
+
+
+
+    this.socket.onopen = () => {
+
+      if (!this.user.isLoggedIn()) {
+        return;
       }
-      else {
-        this.socket = new WebSocket('wss://hangszercsere.hu');
+      console.log('ws-service: connected');
+      this.socket.send(JSON.stringify({ action: 'register', userID: this.user.getUserId() }));
+    };
+
+    this.socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log(`ws-service: ${JSON.stringify(data)}`);
+      this.messagesubject.next(event.data);
+      if (data.action === 'message') {
+
       }
+    };
 
+    this.socket.onclose = () => {
+      console.log('ws-service: disconnected');
+    };
 
-
-      this.socket.onopen = () => {
-        console.log('ws-service: connected');
-        this.socket.send(JSON.stringify({ action: 'register', userID: this.user.getUserId() }));
-      };
-
-      this.socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        console.log(`ws-service: ${JSON.stringify(data)}`);
-        this.messagesubject.next(event.data);
-        if (data.action === 'message') {
-
-        }
-      };
-
-      this.socket.onclose = () => {
-        console.log('ws-service: disconnected');
-      };
-
-      this.socket.onerror = (error) => {
-        console.log('ws-service: error', error);
-      };
+    this.socket.onerror = (error) => {
+      console.log('ws-service: error', error);
+    };
 
   }
   public message = this.messagesubject.asObservable();
