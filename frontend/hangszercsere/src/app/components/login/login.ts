@@ -41,7 +41,6 @@ export class Login {
 
       next: (res: any) => {
             this.NotifService.show('success',"Login successful!");
-            this.userService.setUser(res.id,res.name);
             this.router.navigate(['/']);
             if (this.isMenu) this.closeMenu();
           },

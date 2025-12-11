@@ -49,7 +49,7 @@ export class Register {
       this.userservice.RegisterUser(newUser).subscribe({
         next: (res) => {
           console.log('Registration successful', res);
-          alert('Registration successful! 🎉');
+          this.NotifService.show('success',"Registration successful! 🎉");
           this.name = '';
           this.email = '';
           this.password = '';
@@ -64,7 +64,8 @@ export class Register {
         },
         error: (err) => {
           console.error('Registration failed', err);
-          alert('Registration failed: ' + (err.error?.error || 'Unknown error'));
+          //alert('Registration failed: ' + (err.error?.error || 'Unknown error'));
+          this.NotifService.show('error',"Registration failed!");
         }});
   }
 

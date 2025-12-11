@@ -10,21 +10,24 @@ import { NotifService } from '../../services/notif-service/notif-service';
 export class NotifComponent {
   visible = false;
   message = '';
-  type: 'success' | 'error' | 'message' = 'success';
+  type: 'success' | 'error' | 'message' | 'warning' = 'success';
 
-  constructor(private notifService: NotifService) {
+  constructor(private notifService: NotifService) { 
     this.notifService.register(this);
   }
 
-  show(type: 'success' | 'error' | 'message', message: string, duration: number = 3000) {
+  show(type: 'success' | 'error' | 'message' | 'warning', message: string, button1: string = '', button2: string = '',buttin1_function: Function | null = null, buttin2_function: Function | null = null, duration: number = 3000) {
     this.visible = false;
     this.type = type;
     this.message = message;
     this.visible = true;
 
-    setTimeout(() => {
-      this.visible = false;
-    }, duration);
+    if (duration > 0) {
+      setTimeout(() => {
+        this.visible = false;
+      }, duration);
+    }
+
   }
 
   test(message: string) {

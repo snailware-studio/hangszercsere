@@ -10,9 +10,16 @@ const multer = require('multer');
 const { create } = require("domain");
 const fs = require('fs');
 const WebSocket = require('ws');
+const emailservice = require("./emailservice");
+const crypto = require('crypto');
+const cookieParser = require('cookie-parser');
 
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:4200',
+  credentials: true                
+}));
+app.use(cookieParser());
 app.use(express.json());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -24,6 +31,35 @@ const server = require('http').createServer(app);
 const wss = new WebSocket.Server({ server });
 
 const users = new Map(); //map of users connected
+
+let tokens = new Map(); // map of valid tokens with id, expiration and Token type
+
+const TokenType = Object.freeze({
+  EMAIL_VERIFICATION: 'email_verification',
+  DELETE_PROFILE: 'delete_profile',
+});
+
+function AddToken(userID, type) {
+  const expires_at = Date.now() + (5 * 60 * 1000);
+  const token = crypto.randomBytes(4).toString('hex');
+
+  tokens.set(token, { userID, expires_at, type });
+  return token;
+}
+
+if (tokens.length > 0) {
+  setInterval(() => {
+    for (const [token, user] of tokens) {
+      if (user.expires_at < Date.now()) {
+        tokens.delete(token);
+        console.log(`Token ${token} expired`);
+      }
+    }
+    console.log(`Tokens: ${tokens.size}`);
+
+  }, 5 * 60 * 1000);
+}
+
 
 wss.on('connection', (ws) => {
 
@@ -92,6 +128,50 @@ wss.on('connection', (ws) => {
 
 });
 
+
+app.post("/api/users/logout", auth, (req, res) => {
+  db.run("DELETE FROM sessions WHERE session_id = ?", [req.cookies.session]);
+  res.clearCookie("session");
+  res.json({ message: "Logged out" });
+});
+
+
+app.get("/api/users/me", auth, (req, res) => {
+  db.get("SELECT id, name, email, profile_url  FROM users WHERE id = ?", [req.userId], (err, user) => {
+    if (err) 
+    {
+      console.log(err);
+            return res.status(500).json({ error: "DB error" });
+    }
+    res.json(user);
+  });
+});
+
+
+//middleware
+function auth(req, res, next) {
+  const sessionId = req.cookies.session;
+  if (!sessionId) return res.status(401).json({ error: "Not authenticated" });
+
+  db.get("SELECT * FROM sessions WHERE session_id = ?", [sessionId], (err, session) => {
+    if (err) return res.status(500).json({ error: "DB error" });
+    if (!session || new Date(session.expires) < new Date()) {
+      return res.status(401).json({ error: "Session expired" });
+    }
+
+    const newExpires = new Date(Date.now() + 7*24*60*60*1000).toISOString();
+    db.run(
+      "UPDATE sessions SET expires = ? WHERE session_id = ?",
+      [newExpires, sessionId],
+      (err) => {
+        if (err) console.error("Failed to refresh session:", err.message);
+      }
+    );
+
+    req.userId = session.user_id;
+    next();
+  });
+}
 
 
 
@@ -505,6 +585,11 @@ app.post("/api/buy", (req, res) => {
               status: "success",
               message: "Transaction created and listing sold"
             });
+            //send email here 
+            sql = 'SELECT email,name,id FROM users WHERE id = ?';
+            db.get(sql, [userID], (err, row) => {
+              emailservice.sendListingSoldEmail(row.email, row.name, listing.id);
+            });
           }
 
           checkDone();
@@ -514,6 +599,7 @@ app.post("/api/buy", (req, res) => {
       function checkDone() {
         processedCount++;
         if (processedCount === listings.length) {
+
           res.json({ message: `Payment of $${totalPrice} completed`, results });
         }
       }
@@ -763,8 +849,70 @@ app.delete("/api/instruments/:id", (req, res) => {
   });
 });
 
+//confirms token
+app.get('/confirm/:token', async (req, res) => {
+  const token = req.params.token;
+
+  if (!tokens.has(token)) {
+    return res.json({ success: false, error: 'Invalid or expired token' });
+  }
+
+  const tokenData = tokens.get(token);
+  tokens.delete(token);
+
+  const { userID, type } = tokenData;
+
+  console.log('Token type:', type);
+  console.log('TokenType.EMAIL_VERIFICATION:', TokenType.EMAIL_VERIFICATION);
+
+  try {
+    switch (type.trim()) {
+      case TokenType.EMAIL_VERIFICATION:
+        db.run('UPDATE users SET email_verified = true WHERE id = ?', [userID], function (err) {
+          if (err) {
+            console.error('UPDATE ERROR:', err.message);
+            return res.json({ success: false, error: 'Database error' });
+          }
+          console.log(`UserID: ${userID} verified`);
+          res.redirect('https://hangszercsere.hu/login');
+          //res.json({ success: true, message: 'Email verified' });
+        });
+        break;
+
+      case TokenType.DELETE_PROFILE:
+        db.run('DELETE FROM users WHERE id = ?', [userID], function (err) {
+          if (err) {
+            console.error('DELETE ERROR:', err.message);
+            return res.json({ success: false, error: 'Database error' });
+          }
+
+          db.run('DELETE FROM user_stats WHERE user_id = ?', [userID], function (err) {
+            if (err) {
+              console.error('DELETE ERROR:', err.message);
+              return res.json({ success: false, error: 'Database error' });
+            }
+          });
+
+          console.log(`UserID: ${userID} deleted`);
+          res.redirect('https://hangszercsere.hu');
+          //return res.json({ success: true, message: 'Profile deleted' });
+        });
+        break;
+
+      default:
+        console.log('Unknown token type:', type);
+        res.json({ success: false, error: 'Unknown token type' });
+    }
+  } catch (err) {
+    console.error('ERROR:', err);
+    res.json({ success: false, error: 'Server error' });
+  }
+});
+
+
 // register user
 app.post('/api/users', async (req, res) => {
+
   const { name, email, location, password } = req.body;
 
   if (!name || !email || !location || !password) {
@@ -774,7 +922,7 @@ app.post('/api/users', async (req, res) => {
   try {
     const pass_hash = await bcrypt.hash(password, 10);
 
-    const sql = 'INSERT INTO users (name, email, location, pass_hash) VALUES (?, ?, ?, ?)';
+    const sql = 'INSERT INTO users (name, email, location, pass_hash,email_verified) VALUES (?, ?, ?, ?,false)';
     db.run(sql, [name, email, location, pass_hash], function (err) {
       if (err) {
         if (err.message.includes('UNIQUE')) {
@@ -787,10 +935,12 @@ app.post('/api/users', async (req, res) => {
 
       // empty stats
       const statsSql = 'INSERT INTO user_stats (user_id, total_listings, active_listings, total_sold, rating_count, total_reviews) VALUES (?, 0, 0, 0, 0, 0)';
-      db.run(statsSql, [userId], (err2) => {
+      db.run(statsSql, [userId], async (err2) => {
         if (err2) {
           return res.status(500).json({ error: err2.message });
         }
+
+        await emailservice.sendWelcomeEmail(email, name, AddToken(userId, TokenType.EMAIL_VERIFICATION));
 
         res.json({ success: true, userId });
       });
@@ -798,9 +948,27 @@ app.post('/api/users', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+
 });
 
-//login user
+//delete user
+app.post('/api/users/delete', (req, res) => {
+  const userId = req.body.userId;
+
+  sql = 'SELECT email,name FROM users WHERE id = ?';
+  db.get(sql, [userId], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!row) return res.status(404).json({ error: "User not found" });
+
+    const email = row.email;
+    const name = row.name;
+
+    emailservice.sendProfileDeleteEmail(email, name, AddToken(userId, TokenType.DELETE_PROFILE));
+    res.json({ success: true });
+  });
+});
+
+// Login user
 app.post("/api/users/login", (req, res) => {
   const { name, password } = req.body;
 
@@ -808,27 +976,48 @@ app.post("/api/users/login", (req, res) => {
     return res.status(400).json({ error: "name and password required" });
   }
 
-  db.get("SELECT id, name, pass_hash FROM users WHERE name = ?", [name], (err, user) => {
-    if (err) return res.status(500).json({ error: err.message });
-
-    if (!user) {
-      return res.status(401).json({ error: "Invalid name or password" });
-    }
-
-    bcrypt.compare(password, user.pass_hash, (err, result) => {
+  db.get(
+    "SELECT id, name, pass_hash FROM users WHERE name = ?",
+    [name],
+    (err, user) => {
       if (err) return res.status(500).json({ error: err.message });
+      if (!user) return res.status(401).json({ error: "Invalid name or password" });
 
-      if (!result) {
-        return res.status(401).json({ error: "Invalid name or password" });
-      }
+      // bcrypt ellenőrzés
+      bcrypt.compare(password, user.pass_hash, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!result) return res.status(401).json({ error: "Invalid name or password" });
 
-      //send back user ID IMPORTANT!!!!!!!!!
-      res.json({ success: true, id: user.id, name: user.name });
+        // session id generálás
+        const sessionId = crypto.randomUUID();
+        const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 nap
 
-      // update last login
-      db.run("UPDATE user_stats SET last_login = CURRENT_TIMESTAMP WHERE user_id = ?", [user.id]);
-    });
-  });
+        db.run(
+          "INSERT INTO sessions (session_id, user_id, expires) VALUES (?, ?, ?)",
+          [sessionId, user.id, expires],
+          (err) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            
+            res.cookie("session", sessionId, {
+              httpOnly: true,
+              secure: true, 
+              sameSite: "strict",
+              maxAge: 7 * 24 * 60 * 60 * 1000,
+            });
+
+            res.json({ success: true, name: user.name, id: user.id });
+
+            // update last login
+            db.run(
+              "UPDATE user_stats SET last_login = CURRENT_TIMESTAMP WHERE user_id = ?",
+              [user.id]
+            );
+          }
+        );
+      });
+    }
+  );
 });
 
 
