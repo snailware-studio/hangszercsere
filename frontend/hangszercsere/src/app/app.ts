@@ -21,7 +21,6 @@ export class App {
   ngOnInit(): void {
     this.ws.message.subscribe(data => {
       const message = JSON.parse(data);
-      console.log(`ws-service: ${message}`);
       if(message?.action == 'message' && message.user != this.user.currentUserId)
       {
         this.notif.show("message", `New message!`);
