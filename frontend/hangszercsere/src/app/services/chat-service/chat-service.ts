@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Listing } from '../listing-service/listing-service';
 import { GlobalService } from '../GlobalService/global-service';
 import { WSservice } from '../WSservice/wsservice';
+import { UserService } from '../user-service/user-service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,13 +17,15 @@ apiurl: string = "https://hangszercsere.hu/api/messages";
 
 constructor(private http: HttpClient,
   private global: GlobalService,
-  private ws: WSservice
+  private ws: WSservice,
+  private user: UserService
+  
 ) {
   this.apiurl = this.global.apiUrl+'messages';
 }
 
-GetAllMessages(userId: number): Observable<any> {
-  return this.http.get(`${this.apiurl}/${userId}`);
+GetAllMessages(): Observable<any> {
+  return this.http.get(`${this.apiurl}/${this.user.getUserId()}`);
 }
 
 GetMessages(listingId: number, userId: number): Observable<any> {

@@ -1,4 +1,8 @@
 import nodemailer from 'nodemailer';
+import env from 'dotenv';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 //Configure transporter
 const transporter = nodemailer.createTransport({
@@ -6,8 +10,8 @@ const transporter = nodemailer.createTransport({
   port: 587,                  
   secure: false,              
   auth: {
-    user: 'support@hangszercsere.hu',
-    pass: 'LassanJanos'           
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 

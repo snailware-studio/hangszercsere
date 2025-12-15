@@ -13,7 +13,7 @@ export class UserService {
 
   private apiUrl = 'https://hangszercsere.hu/api/users';
 
-  public currentUserId: number | null = null;
+  public currentUserId: number;
   public currentUser: any = null;
 
   constructor(
@@ -24,6 +24,8 @@ export class UserService {
   ) {
     this.apiUrl = this.global.apiUrl + 'users';
     this.loadCurrentUser();
+    console.log("running user service");
+    console.log("id: " + this.currentUserId);
   }
 
   getUserId() {

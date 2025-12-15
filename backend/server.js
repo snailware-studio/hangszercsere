@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const ip = process.env.IP || "127.0.0.1";
 const port = process.env.PORT || 3000;
-const db = require("./db");
 const cors = require("cors");
 const path = require("path");
 const bcrypt = require("bcrypt");
@@ -12,17 +11,17 @@ const WebSocket = require('ws');
 const emailservice = require("./emailservice");
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
-
+const sqlite3 = require("sqlite3").verbose();
+const db = require("./db");
 
 app.use(cors({
-  origin: 'http://localhost:4200',
-  credentials: true                
+  origin: 'https://hangszercsere.hu', //localhost:4200
+  credentials: true
 }));
 app.use(cookieParser());
 app.use(express.json());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
 
 app.use(express.static(path.join(__dirname, "../frontend")));
 
@@ -107,10 +106,6 @@ wss.on('connection', (ws) => {
       }
 
       const messageid = this.lastID;
-      //console.log(messageid);
-
-      // update last login/active
-      db.run("UPDATE user_stats SET last_login = CURRENT_TIMESTAMP WHERE user_id = ?", [userID]);
     });
 
   }
@@ -127,7 +122,6 @@ wss.on('connection', (ws) => {
 
 });
 
-
 app.post("/api/users/logout", auth, (req, res) => {
   db.run("DELETE FROM sessions WHERE session_id = ?", [req.cookies.session]);
   res.clearCookie("session");
@@ -137,10 +131,9 @@ app.post("/api/users/logout", auth, (req, res) => {
 
 app.get("/api/users/me", auth, (req, res) => {
   db.get("SELECT id, name, email, profile_url  FROM users WHERE id = ?", [req.userId], (err, user) => {
-    if (err) 
-    {
+    if (err) {
       console.log(err);
-            return res.status(500).json({ error: "DB error" });
+      return res.status(500).json({ error: "DB error" });
     }
     res.json(user);
   });
@@ -158,7 +151,7 @@ function auth(req, res, next) {
       return res.status(401).json({ error: "Session expired" });
     }
 
-    const newExpires = new Date(Date.now() + 7*24*60*60*1000).toISOString();
+    const newExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     db.run(
       "UPDATE sessions SET expires = ? WHERE session_id = ?",
       [newExpires, sessionId],
@@ -171,8 +164,6 @@ function auth(req, res, next) {
     next();
   });
 }
-
-
 
 const uploadDir = path.join(__dirname, 'public/uploads'); // Folder with media
 
@@ -192,12 +183,16 @@ const upload = multer({
 });
 
 // upload media
-app.post('/api/instruments/media', upload.fields([
+app.post('/api/instruments/media', auth, upload.fields([
   { name: 'images', maxCount: 5 },
   { name: 'videos', maxCount: 5 }
 ]), (req, res) => {
   const listingId = req.body.listingId;
   if (!listingId) return res.status(400).json({ error: 'No listing ID provided!' });
+
+  if (!(req.body.userId == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   const files = [];
   if (req.files['images']) files.push(...req.files['images'].map(f => ({ ...f, type: 'image' })));
@@ -219,10 +214,11 @@ app.post('/api/instruments/media', upload.fields([
 });
 
 // upload avatar
-app.post('/api/users/avatar', upload.single('avatar'), (req, res) => {
+app.post('/api/users/avatar', auth, upload.single('avatar'), (req, res) => {
   const userId = req.body.userId;
   if (!userId) return res.status(400).json({ error: 'User ID required' });
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  if (!(userId == req.userId)) return res.status(403).json({ error: "Not authorized" });
 
   const filename = req.file.filename;
 
@@ -251,13 +247,15 @@ app.post('/api/users/avatar', upload.single('avatar'), (req, res) => {
 });
 
 // update media
-app.post('/api/instruments/media/update', upload.fields([
+app.post('/api/instruments/media/update', auth, upload.fields([
   { name: 'newImages', maxCount: 5 },
   { name: 'newVideos', maxCount: 5 }
 ]), (req, res) => {
   const { listingId, userId, existingImages, existingVideos } = req.body;
-
   if (!listingId || !userId) return res.status(400).json({ error: 'Listing ID and User ID required' });
+  if (!(listing.user_id == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   // Parse existing arrays
   let existingImagesArr = [];
@@ -337,10 +335,8 @@ app.post('/api/instruments/media/update', upload.fields([
   });
 });
 
-
-
 // send message
-app.post("/api/messages/send", (req, res) => {
+app.post("/api/messages/send", auth, (req, res) => {
 
   const { sent_from, sent_to, content, listing_id } = req.body;
 
@@ -349,6 +345,9 @@ app.post("/api/messages/send", (req, res) => {
       error: "Missing fields",
       received: { sent_from, sent_to, content, listing_id }
     });
+  }
+  if (!(sent_from == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
   }
 
   const sql = `
@@ -370,8 +369,13 @@ app.post("/api/messages/send", (req, res) => {
 });
 
 //messages of userID
-app.get("/api/messages/:userId", (req, res) => {
+app.get("/api/messages/:userId", auth, (req, res) => {
   const userId = req.params.userId;
+  if (!userId) return res.status(400).json({ error: "User ID required" });
+  if (!(userId == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
+
 
   const sql = `
     SELECT 
@@ -401,8 +405,13 @@ app.get("/api/messages/:userId", (req, res) => {
 });
 
 // Messages between 2 users tied to a listing
-app.get("/api/messages/:listingId/:userId", (req, res) => {
+app.get("/api/messages/:listingId/:userId", auth, (req, res) => {
   const { listingId, userId } = req.params;
+  if (!listingId) return res.status(400).json({ error: "Listing ID required" });
+  if (!userId) return res.status(400).json({ error: "User ID required" });
+  if (!(userId == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   const sql = `
     SELECT 
@@ -426,8 +435,12 @@ app.get("/api/messages/:listingId/:userId", (req, res) => {
 });
 
 // * of listings
-app.get("/api/listings", (req, res) => {
+app.get("/api/listings", auth, (req, res) => {
   const sql = `SELECT * FROM listings`;
+
+  if (!(req.userId == 1)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -438,8 +451,12 @@ app.get("/api/listings", (req, res) => {
 });
 
 // * of media
-app.get("/api/media", (req, res) => {
+app.get("/api/media", auth, (req, res) => {
   const sql = `SELECT * FROM media`;
+  console.log("cookie id: " + req.userId);
+  if (!(req.userId == 1)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -462,8 +479,11 @@ app.get("/api/categories", (req, res) => {
 });
 
 // * of users
-app.get("/api/users", (req, res) => {
+app.get("/api/users", auth, (req, res) => {
   const sql = `SELECT * FROM users`;
+  if (!(req.userId == 1)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -474,7 +494,7 @@ app.get("/api/users", (req, res) => {
 });
 
 //GET specific user by id
-app.get("/api/users/:userID",auth, (req, res) => {
+app.get("/api/users/:userID", (req, res) => {
   const sql = `
     SELECT 
       u.id,
@@ -509,8 +529,12 @@ app.get("/api/users/:userID",auth, (req, res) => {
 });
 
 // * of messages
-app.get("/api/messages", (req, res) => {
+app.get("/api/messages", auth, (req, res) => {
   const sql = `SELECT * FROM messages`;
+
+  if (!(req.userId == 1)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -521,8 +545,11 @@ app.get("/api/messages", (req, res) => {
 });
 
 //transactions
-app.post("/api/buy", (req, res) => {
+app.post("/api/buy", auth, (req, res) => {
   const { listingIDs, userID } = req.body;
+  if (!(userID == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   if (!Array.isArray(listingIDs) || listingIDs.length === 0) {
     return res.status(400).json({ error: "listingIDs must be a non-empty array" });
@@ -540,7 +567,7 @@ app.post("/api/buy", (req, res) => {
 
     // validate listings
     for (let listing of listings) {
-      if (listing.user_id === userID) {
+      if (listing.user_id === req.userId) {
         return res.status(403).json({ error: "Cannot buy your own listing", listingID: listing.id });
       }
       if (listing.status === "sold") {
@@ -609,7 +636,10 @@ app.post("/api/buy", (req, res) => {
 });
 
 //get all transactions
-app.get("/api/transactions", (req, res) => {
+app.get("/api/transactions", auth, (req, res) => {
+  if (!(req.userId == 1)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
   db.all("SELECT * FROM transactions", [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
@@ -617,17 +647,25 @@ app.get("/api/transactions", (req, res) => {
 });
 
 //get transaction by id
-app.get("/api/transactions/:id", (req, res) => {
+app.get("/api/transactions/:id", auth, (req, res) => {
   const id = req.params.id;
-  db.all("SELECT * FROM transactions WHERE id = ?", [id], (err, rows) => {
+
+  db.all("SELECT * FROM transactions WHERE id = ?", [id], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    if (!row) return res.status(404).json({ error: "Transaction not found" });
+    if (!(row.sent_from == req.userId)) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+    res.json(row);
   });
 });
 
 //get all transactions by user
-app.get("/api/transactions/:userID", (req, res) => {
+app.get("/api/transactions/user/:userID", auth, (req, res) => {
   const userID = req.params.userID;
+  if (!(userID == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
   db.all("SELECT * FROM transactions WHERE sent_from = ?", [userID], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
@@ -635,10 +673,12 @@ app.get("/api/transactions/:userID", (req, res) => {
 });
 
 //update user
-app.post('/api/users/update', async (req, res) => {
+app.post('/api/users/update', auth, async (req, res) => {
   const { id, name, email, bio, location, password } = req.body;
-
   if (!id) return res.status(400).json({ error: 'User ID is required' });
+  if (!(id == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   // current user
   db.get('SELECT * FROM users WHERE id = ?', [id], async (err, user) => {
@@ -675,8 +715,13 @@ app.post('/api/users/update', async (req, res) => {
 });
 
 //update listing
-app.put("/api/instrument/update/:id", (req, res) => {
+app.put("/api/instrument/update/:id", auth, (req, res) => {
   const listingId = req.params.id;
+  if (!listingId) return res.status(400).json({ error: "Listing ID required" });
+  
+  if (!(req.body.user_id == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   // Fetch current listing
   db.get("SELECT * FROM listings WHERE id = ?", [listingId], (err, listing) => {
@@ -802,8 +847,12 @@ l.id, l.title, l.price, l.description, l.status, l.created_at, l.user_id, l.bran
 });
 
 // delete listing
-app.delete("/api/instruments/:id", (req, res) => {
+app.delete("/api/instruments/:id", auth, (req, res) => {
   const listingId = req.params.id;
+
+  if (!(listing.user_id == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   if (!listingId) {
     return res.status(400).json({ error: "Listing ID is required" });
@@ -858,9 +907,9 @@ app.get('/confirm/:token', async (req, res) => {
   }
 
   const tokenData = tokens.get(token);
-  tokens.delete(token);
-
   const { userID, type } = tokenData;
+
+  tokens.delete(token);
 
   console.log('Token type:', type);
   console.log('TokenType.EMAIL_VERIFICATION:', TokenType.EMAIL_VERIFICATION);
@@ -952,7 +1001,7 @@ app.post('/api/users', async (req, res) => {
 });
 
 //delete user
-app.post('/api/users/delete', (req, res) => {
+app.post('/api/users/delete', auth, (req, res) => {
   const userId = req.body.userId;
 
   sql = 'SELECT email,name FROM users WHERE id = ?';
@@ -998,10 +1047,10 @@ app.post("/api/users/login", (req, res) => {
           (err) => {
             if (err) return res.status(500).json({ error: err.message });
 
-            
+
             res.cookie("session", sessionId, {
               httpOnly: true,
-              secure: true, 
+              secure: true,
               sameSite: "strict",
               maxAge: 7 * 24 * 60 * 60 * 1000,
             });
@@ -1022,8 +1071,11 @@ app.post("/api/users/login", (req, res) => {
 
 
 // add/upload listing
-app.post("/api/instruments", (req, res) => {
+app.post("/api/instruments", auth, (req, res) => {
   const { user_id, title, price, description, status, category_id, brand, model, condition, ai_rating } = req.body;
+  if (!(user_id == req.userId)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
 
   const sql = `
     INSERT INTO listings(title, price, description, status, user_id, category_id, brand, model, condition, ai_rating)
@@ -1040,63 +1092,6 @@ VALUES(?, ?, ?, ?, ?, ?,?,?,?,?)
   });
 });
 
-// add listing to cart
-app.post("/api/cart-items", async (req, res) => {
-  const ids = req.body.ids;
-
-  if (!ids || ids.length === 0) {
-    return res.json([]);
-  }
-
-  try {
-    const rows = await new Promise((resolve, reject) => {
-      const placeholders = ids.map(() => '?').join(',');
-      const sql = `
-SELECT
-l.id,
-  l.title,
-  l.price,
-  l.description,
-  l.status,
-  l.created_at,
-  l.user_id,
-  l.brand,
-  l.model,
-  l.condition,
-  l.ai_rating,
-  u.name AS seller,
-    (
-      SELECT GROUP_CONCAT(m.url)
-            FROM media m
-            WHERE m.listing_id = l.id AND m.type = 'image'
-          ) AS images,
-  (
-    SELECT GROUP_CONCAT(m.url)
-            FROM media m
-            WHERE m.listing_id = l.id AND m.type = 'video'
-          ) AS videos
-        FROM listings l
-        JOIN users u ON u.id = l.user_id
-        WHERE l.id IN(${placeholders});
-`;
-
-      db.all(sql, ids, (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    });
-
-    const listings = rows.map(row => ({
-      ...row,
-      images: row.images ? row.images.split(',') : [],
-      videos: row.videos ? row.videos.split(',') : []
-    }));
-
-    res.json(listings);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 app.get("/api", (req, res) => {
   res.send("Welcome to Hangszercsere API!");
@@ -1109,10 +1104,6 @@ app.get('/*splat', (req, res) => {
 
 
 server.listen(port, ip, () => {
-  console.log('Websocket server running...');
-});
-
-
-app.listen(port, ip, () => {
   console.log(`Server running at http://${ip}:${port}`);
 });
+

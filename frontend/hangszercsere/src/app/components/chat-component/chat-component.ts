@@ -43,7 +43,7 @@ export class ChatComponent {
       this.listing_id = this.ChatService.current_listing.id;
     }
 
-    this.ChatService.GetAllMessages(this.user.currentUserId).subscribe(
+    this.ChatService.GetAllMessages().subscribe(
       (data) => this.threads = data
     );
 
