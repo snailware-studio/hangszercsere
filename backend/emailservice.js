@@ -22,7 +22,7 @@ export async function sendWelcomeEmail(toEmail, name,token) {
       from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
       to: toEmail,
       subject: 'Welcome to Hangszercsere!',
-      html: `<h2>Hello ${name}!</h2><p>Thank you for registering at Hangszercsere!.</p><p>Please click the link below to confirm your email address:</p><a href="https://hangszercsere.hu/confirm/${token}">Confirm email</a>`
+      html: `<h2>Hello ${name}!</h2><p>Thank you for registering at Hangszercsere!.</p><p>Please click the link below to confirm your email address:</p><a href="${process.env.ORIGIN}/api/confirm/${token}">Confirm email</a>`
     });
     console.log('Email sent:', info.messageId);
   } catch (err) {
@@ -38,7 +38,7 @@ export async function sendProfileDeleteEmail(toEmail, name,token)
         from: '"Hangszercsere Support" <support@hangszercsere.hu>',
         to: toEmail,
         subject: 'Confirm account deletion',
-        html: `<h2>Hello ${name}!</h2><p>Please click the link below to confirm your account deletion:</p><a href="https://hangszercsere.hu/confirm/${token}">Delete account</a>`
+        html: `<h2>Hello ${name}!</h2><p>Please click the link below to confirm your account deletion:</p><a href="${process.env.ORIGIN}/api/confirm/${token}">Delete account</a>`
       });
       console.log('Email sent:', info.messageId);
     } catch (err) {
@@ -54,7 +54,7 @@ export async function sendListingSoldEmail(toEmail, name,listing_id)
         from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
         to: toEmail,
         subject: 'Your listing was sold!',
-        html: `<h2>Hello ${name}!</h2><p>Your listing was sold! You can view it here: <a href="https://hangszercsere.hu/listing/${listing_id}">View listing</a></p>`
+        html: `<h2>Hello ${name}!</h2><p>Your listing was sold! You can view it here: <a href="${process.env.ORIGIN}/listing/${listing_id}">View listing</a></p>`
       });
       console.log('Email sent:', info.messageId);
     } catch (err) {
@@ -70,7 +70,7 @@ export async function sendWantedListingSoldEmail(toEmail, name,listing_id)
         from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
         to: toEmail,
         subject: 'A Listing you wanted has been sold to someone else!',
-        html: `<h2>Hello ${name}!</h2><p>A listing you wanted has been sold to someone else! You can view it here: <a href="https://hangszercsere.hu/listing/${listing_id}">View listing</a></p>`
+        html: `<h2>Hello ${name}!</h2><p>A listing you wanted has been sold to someone else! You can view it here: <a href="${process.env.ORIGIN}/listing/${listing_id}">View listing</a></p>`
       });
       console.log('Email sent:', info.messageId);
     } catch (err) {

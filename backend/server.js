@@ -11,13 +11,16 @@ const WebSocket = require('ws');
 const emailservice = require("./emailservice");
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
-const sqlite3 = require("sqlite3").verbose();
 const db = require("./db");
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 app.use(cors({
-  origin: 'https://hangszercsere.hu', //localhost:4200
+  origin: process.env.ORIGIN, //localhost:4200
   credentials: true
 }));
+
 app.use(cookieParser());
 app.use(express.json());
 
@@ -899,10 +902,11 @@ app.delete("/api/instruments/:id", auth, (req, res) => {
 });
 
 //confirms token
-app.get('/confirm/:token', async (req, res) => {
+app.get('/api/confirm/:token', async (req, res) => {
   const token = req.params.token;
 
   if (!tokens.has(token)) {
+    res.redirect(`${process.env.ORIGIN}/confirm/fail/unkown`);
     return res.json({ success: false, error: 'Invalid or expired token' });
   }
 
@@ -920,10 +924,10 @@ app.get('/confirm/:token', async (req, res) => {
         db.run('UPDATE users SET email_verified = true WHERE id = ?', [userID], function (err) {
           if (err) {
             console.error('UPDATE ERROR:', err.message);
-            return res.json({ success: false, error: 'Database error' });
+            res.redirect(`${process.env.ORIGIN}/confirm/fail/email`);
           }
           console.log(`UserID: ${userID} verified`);
-          res.redirect('https://hangszercsere.hu/login');
+          res.redirect(`${process.env.ORIGIN}/confirm/success/email`);
           //res.json({ success: true, message: 'Email verified' });
         });
         break;
@@ -932,24 +936,27 @@ app.get('/confirm/:token', async (req, res) => {
         db.run('DELETE FROM users WHERE id = ?', [userID], function (err) {
           if (err) {
             console.error('DELETE ERROR:', err.message);
+            res.redirect(`${process.env.ORIGIN}/confirm/fail/delete`);
             return res.json({ success: false, error: 'Database error' });
           }
 
           db.run('DELETE FROM user_stats WHERE user_id = ?', [userID], function (err) {
             if (err) {
               console.error('DELETE ERROR:', err.message);
+              res.redirect(`${process.env.ORIGIN}/confirm/fail/delete`);
               return res.json({ success: false, error: 'Database error' });
             }
           });
 
           console.log(`UserID: ${userID} deleted`);
-          res.redirect('https://hangszercsere.hu');
+          res.redirect(`${process.env.ORIGIN}/confirm/success/delete`);
           //return res.json({ success: true, message: 'Profile deleted' });
         });
         break;
 
       default:
         console.log('Unknown token type:', type);
+        res.redirect(`${process.env.ORIGIN}/confirm/fail/unkown`);
         res.json({ success: false, error: 'Unknown token type' });
     }
   } catch (err) {
@@ -989,6 +996,7 @@ app.post('/api/users', async (req, res) => {
           return res.status(500).json({ error: err2.message });
         }
 
+        console.log("sending")
         await emailservice.sendWelcomeEmail(email, name, AddToken(userId, TokenType.EMAIL_VERIFICATION));
 
         res.json({ success: true, userId });

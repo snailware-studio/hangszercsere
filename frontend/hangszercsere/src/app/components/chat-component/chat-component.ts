@@ -30,7 +30,6 @@ export class ChatComponent {
 
     this.ws.message.subscribe(data => {
       const message = JSON.parse(data);
-      console.log(message);
       if (message?.action == 'message') {
 
         this.GetMessages(this.listing_id);
@@ -43,9 +42,17 @@ export class ChatComponent {
       this.listing_id = this.ChatService.current_listing.id;
     }
 
-    this.ChatService.GetAllMessages().subscribe(
-      (data) => this.threads = data
-    );
+    this.user.GetCurrentUser().subscribe({
+      next: user => {
+        this.ChatService.GetAllMessages().subscribe(
+          (data) => this.threads = data
+        );
+      },
+      error: err => {
+        console.error('Failed to load user info', err);
+      }
+    });
+
 
     if (this.chatter_id && this.listing_id) {
       this.GetMessages(this.listing_id);

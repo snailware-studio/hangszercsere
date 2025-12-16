@@ -1,0 +1,41 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+  <div
+    class="max-w-md w-full px-8 py-10 rounded-lg shadow-lg border"
+    [ngClass]="{
+      'bg-green-100 text-green-800 border-green-500 dark:bg-green-900 dark:text-green-200 dark:border-green-700': status === 'success',
+      'bg-red-100 text-red-800 border-red-500 dark:bg-red-900 dark:text-red-200 dark:border-red-700': status === 'fail'
+    }"
+  >
+    <div class="flex flex-col items-center text-center">
+      <div class="mb-4 text-5xl">
+        <i
+          [class]="
+            status === 'success'
+              ? 'nf nf-md-check_circle'
+              : 'nf nf-md-close_circle'
+          "
+        ></i>
+      </div>
+
+      <h1 class="text-2xl font-bold mb-2">
+        {{ title }}
+      </h1>
+
+      <p class="font-semibold">
+        {{ message }}
+      </p>
+
+      <button
+        *ngIf="showReturnButton"
+        class="mt-6 px-6 py-2 rounded-md font-semibold transition-colors bg-white dark:bg-gray-800 border-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+        [ngClass]="{
+          'border-green-800 dark:border-green-200': status === 'success',
+          'border-red-800 dark:border-red-200': status === 'fail'
+        }"
+        (click)="navigateHome()"
+      >
+        Return to Home
+      </button>
+    </div>
+  </div>
+</div>

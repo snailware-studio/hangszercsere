@@ -24,8 +24,6 @@ export class UserService {
   ) {
     this.apiUrl = this.global.apiUrl + 'users';
     this.loadCurrentUser();
-    console.log("running user service");
-    console.log("id: " + this.currentUserId);
   }
 
   getUserId() {
@@ -44,6 +42,8 @@ export class UserService {
       }
     });
   }
+
+  
 
   RegisterUser(user: user): Observable<any> {
     return this.http.post(this.apiUrl, user);

@@ -1,12 +1,10 @@
 import { Injectable, Injector } from '@angular/core';
-import { ListingService, Listing } from '../listing-service/listing-service';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../user-service/user-service';
 import { Router } from '@angular/router';
 import { GlobalService } from '../GlobalService/global-service';
 import { NotifService } from '../notif-service/notif-service';
-import { joinAllInternals } from 'rxjs/internal/operators/joinAllInternals';
 import { tap, pipe } from 'rxjs';
 
 @Injectable({
@@ -78,7 +76,10 @@ export class CartService {
       userID: this.user.getUserId()
     };
 
-    return this.http.post<any>(`${this.apiUrl}buy`, payload).pipe(
+    return this.http.post<any>(`${this.apiUrl}buy`, payload, {
+      withCredentials: true
+    }).pipe(
+      
       tap(response => {
 
         this.notif.show("success", `Payment completed!`);
@@ -102,7 +103,9 @@ export class CartService {
 
 
   LoadListings(): Observable<any> {
-    return this.http.post(`${this.apiUrl}cart-items/`, { ids: this.cart });
+    return this.http.post(`${this.apiUrl}cart-items/`, { ids: this.cart }, {
+      withCredentials: true
+    });
   }
 
   ClearCart(): void {

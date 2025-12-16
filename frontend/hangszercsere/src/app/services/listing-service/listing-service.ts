@@ -32,20 +32,28 @@ export class ListingService {
     }
     else {
       
-      return this.http.get<Listing>(`${this.apiUrl.substring(0, this.apiUrl.length - 1)}/${id}`).pipe(tap(data => this.cachedListing = data));
+      return this.http.get<Listing>(`${this.apiUrl.substring(0, this.apiUrl.length - 1)}/${id}`, {
+        withCredentials: true 
+      }).pipe(tap(data => this.cachedListing = data));
     }
   };
 
   GetListings(): Observable<any> {
-    return this.http.get(this.apiUrl);
+    return this.http.get(this.apiUrl, {
+      withCredentials: true 
+    });
   }
 
   AddListing(listing: Listing): Observable<any> {
-    return this.http.post(this.apiUrl, listing);
+    return this.http.post(this.apiUrl, listing, {
+      withCredentials: true  
+    });
   }
 
   RemoveListing(id: number) {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(`${this.apiUrl}/${id}`, {
+      withCredentials: true  
+    });
   }
 
   UpdateListing(listing: Listing): Observable<any> {
@@ -65,7 +73,9 @@ export class ListingService {
       ai_feedback: null
     };
 
-    return this.http.put(`${this.apiUrl}/update/${listing.id}`, newlisting);
+    return this.http.put(`${this.apiUrl}/update/${listing.id}`, newlisting, {
+      withCredentials: true  
+    });
   }
 
   AddMedia(images: File[] | null, videos: File[] | null, listingId: number): Observable<any> {
@@ -87,14 +97,16 @@ export class ListingService {
 
     return this.http.post(`${this.apiUrl}/media`, formData, {
       reportProgress: true,
-      observe: 'events'
+      observe: 'events',
+      withCredentials: true 
     });
   }
 
   updateMedia(formData: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/media/update`, formData, {
       reportProgress: true,
-      observe: 'events'
+      observe: 'events',
+      withCredentials: true 
     });
   }
 

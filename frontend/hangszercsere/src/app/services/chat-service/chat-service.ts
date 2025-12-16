@@ -25,15 +25,21 @@ constructor(private http: HttpClient,
 }
 
 GetAllMessages(): Observable<any> {
-  return this.http.get(`${this.apiurl}/${this.user.getUserId()}`);
+  return this.http.get(`${this.apiurl}/${this.user.getUserId()}`, {
+    withCredentials: true
+  });
 }
 
 GetMessages(listingId: number, userId: number): Observable<any> {
-  return this.http.get(`${this.apiurl}/${listingId}/${userId}`);
+  return this.http.get(`${this.apiurl}/${listingId}/${userId}`, {
+    withCredentials: true
+  });
 }
 
 SendMessage(sent_from: number, sent_to: number, content: string, listing_id: number) {
-  this.ws.sendMessage(sent_from, sent_to, content, listing_id);
+  this.ws.sendMessage(sent_from, sent_to, content, listing_id), {
+    withCredentials: true
+  };
 }
 
 }

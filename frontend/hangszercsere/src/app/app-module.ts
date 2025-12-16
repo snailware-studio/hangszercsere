@@ -22,6 +22,7 @@ import { EditListingPage } from './components/edit-listing-page/edit-listing-pag
 import { Filter } from './components/filter/filter';
 import { TimeAgoPipe } from './pipes/timeAgo/time-ago-pipe';
 import { NotifComponent } from './components/notif-component/notif-component';
+import { ConfirmComponent } from './components/confirm-component/confirm-component';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { NotifComponent } from './components/notif-component/notif-component';
     Filter,
     TimeAgoPipe,
     NotifComponent,
+    ConfirmComponent,
   ],
   imports: [
     BrowserModule,
