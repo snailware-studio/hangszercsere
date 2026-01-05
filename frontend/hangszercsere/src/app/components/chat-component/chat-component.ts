@@ -3,6 +3,7 @@ import { ChatService } from '../../services/chat-service/chat-service';
 import { UserService } from '../../services/user-service/user-service';
 import { ListingService, Listing } from '../../services/listing-service/listing-service';
 import { WSservice } from '../../services/WSservice/wsservice';
+import { th } from 'date-fns/locale';
 
 @Component({
   selector: 'app-chat-component',
@@ -25,6 +26,7 @@ export class ChatComponent {
   msg_content: string = '';
   listing_id: number = 0;
   listing: Listing = null;
+  thread: any = [];
 
   ngOnInit(): void {
 
@@ -78,6 +80,7 @@ export class ChatComponent {
   SetInfo(thread: any): void {
     this.chatter_id = thread.other_user_id;
     this.listing_id = thread.listing_id;
+    this.thread = thread;
   }
 
 
