@@ -1,0 +1,1 @@
+//kód az ai ratingekhez.

@@ -28,6 +28,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(express.static(path.join(__dirname, "../frontend")));
 
+const ai_queue_time = 10;
+
 const server = require('http').createServer(app);
 const wss = new WebSocket.Server({ server });
 
@@ -751,6 +753,17 @@ app.put("/api/instrument/update/:id", auth, (req, res) => {
         return res.status(500).json({ error: "Failed to update listing" });
       }
 
+      const eligibleAt = new Date(Date.now() + ai_queue_time * 60 * 1000).toISOString();
+
+      const aiSql = `
+        INSERT INTO ai_queue(listing_id, eligible_at)
+        VALUES (?, ?)
+        ON CONFLICT(listing_id) DO UPDATE SET eligible_at = excluded.eligible_at
+      `;
+
+      db.run(aiSql, [listingId, eligibleAt], function (err) {
+        if (err) return res.status(500).json({ error: "Failed to update AI queue" });
+      });
 
       res.json({ success: true, message: "Listing updated successfully" });
     });
@@ -1080,23 +1093,37 @@ app.post("/api/users/login", (req, res) => {
 
 // add/upload listing
 app.post("/api/instruments", auth, (req, res) => {
-  const { user_id, title, price, description, status, category_id, brand, model, condition, ai_rating } = req.body;
+  var { user_id, title, price, description, status, category_id, brand, model, condition, ai_rating } = req.body;
   if (!(user_id == req.userId)) {
-    return res.status(403).json({ error: "Not authorized" });
+    return res.status(403).json({ error: "Not authorized"+"UsersID"+user_id+"req.userId"+req.userId });
   }
-
+  
+  status = "inactive";
+  ai_rating = 0;
+  
   const sql = `
     INSERT INTO listings(title, price, description, status, user_id, category_id, brand, model, condition, ai_rating)
 VALUES(?, ?, ?, ?, ?, ?,?,?,?,?)
   `;
 
   db.run(sql, [title, price, description, status, user_id, category_id, brand, model, condition, ai_rating], function (err) {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) return res.status(500).json({ error: "could not insert: " + err.message });
 
-    // update user stats: increment total_listings and active_listings
-    db.run("UPDATE user_stats SET total_listings = total_listings + 1, active_listings = active_listings + 1 WHERE user_id = ?", [user_id]);
+    const listing_id = this.lastID;
+    const eligible_at = new Date(Date.now() + (ai_queue_time * 60 * 1000)).toISOString();;
 
-    res.json({ success: true, id: this.lastID });
+    const aisql = `
+      INSERT INTO ai_queue(listing_id, eligible_at)
+      VALUES (?, ?)
+    `
+    db.run(aisql, [listing_id, eligible_at], function (err) {
+      if (err) return res.status(500).json({ error: "Could not add to AI queue: " + err.message });
+    
+      res.json({ success: true, id: this.lastID });
+    });
+
+    // update user stats
+    //db.run("UPDATE user_stats SET total_listings = total_listings + 1, active_listings = active_listings + 1 WHERE user_id = ?", [user_id]);
   });
 });
 

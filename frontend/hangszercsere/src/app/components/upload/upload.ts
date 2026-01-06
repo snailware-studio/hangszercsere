@@ -31,7 +31,7 @@ export class Upload {
   price: number | null = null;
   description: string = '';
   seller: string = '';
-  status: string = 'active';
+  status: string = 'inactive';
   category_id: number = null;
   condition: string = '';
   brand: string = '';

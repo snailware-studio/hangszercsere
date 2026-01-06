@@ -137,9 +137,10 @@ CREATE TABLE IF NOT EXISTS user_stats (
 CREATE TABLE IF NOT EXISTS ai_queue (
     id INTEGER PRIMARY KEY,
     listing_id INTEGER NOT NULL UNIQUE,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    eligible_at DATETIME NOT NULL,
     FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE
 );
+
 
 `);
 
