@@ -168,7 +168,7 @@ function auth(req, res, next) {
   });
 }
 
-const uploadDir = path.join(__dirname, 'public/uploads'); // Folder with media
+const uploadDir = path.join(__dirname, 'uploads'); // Folder with media
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -260,7 +260,6 @@ app.post('/api/instruments/media/update', auth, upload.fields([
     return res.status(403).json({ error: "Not authorized" });
   }
 
-  // Parse existing arrays
   let existingImagesArr = [];
   let existingVideosArr = [];
   try {
@@ -270,13 +269,13 @@ app.post('/api/instruments/media/update', auth, upload.fields([
     return res.status(400).json({ error: 'Invalid existing files data' });
   }
 
-  // Get listing and check ownership
+  // Get listing and ownership
   db.get('SELECT * FROM listings WHERE id = ?', [listingId], (err, listing) => {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (!listing) return res.status(404).json({ error: 'Listing not found' });
     if (listing.user_id != userId) return res.status(403).json({ error: 'Not authorized' });
 
-    // Get current media from DB
+    // Get current media
     db.all('SELECT * FROM media WHERE listing_id = ?', [listingId], (err, rows) => {
       if (err) return res.status(500).json({ error: 'Database error fetching media' });
 
@@ -287,7 +286,7 @@ app.post('/api/instruments/media/update', auth, upload.fields([
       const imagesToDelete = currentImages.filter(img => !existingImagesArr.includes(img));
       const videosToDelete = currentVideos.filter(vid => !existingVideosArr.includes(vid));
 
-      // Delete files from uploads
+      // dlete files from uploads
       imagesToDelete.forEach(f => {
         const filePath = path.join(uploadDir, f);
         fs.unlink(filePath, err => { if (err) console.warn('Failed to delete image:', f); });
@@ -297,7 +296,7 @@ app.post('/api/instruments/media/update', auth, upload.fields([
         fs.unlink(filePath, err => { if (err) console.warn('Failed to delete video:', f); });
       });
 
-      // Delete from DB
+      // delete from db
       const allToDelete = [...imagesToDelete, ...videosToDelete];
       if (allToDelete.length > 0) {
         const placeholders = allToDelete.map(() => '?').join(',');
@@ -306,7 +305,7 @@ app.post('/api/instruments/media/update', auth, upload.fields([
         });
       }
 
-      // Process new files
+      // new files
       const filesToInsert = [];
       if (req.files['newImages']) {
         filesToInsert.push(...req.files['newImages'].map(f => ({ filename: f.filename, type: 'image' })));
@@ -315,7 +314,7 @@ app.post('/api/instruments/media/update', auth, upload.fields([
         filesToInsert.push(...req.files['newVideos'].map(f => ({ filename: f.filename, type: 'video' })));
       }
 
-      // Insert new files into DB
+      // upload new
       if (filesToInsert.length > 0) {
         const placeholders = filesToInsert.map(() => '(?, ?, ?)').join(',');
         const values = [];
@@ -331,7 +330,7 @@ app.post('/api/instruments/media/update', auth, upload.fields([
           });
         });
       } else {
-        // Nothing new uploaded, still return success
+        //nothing uploaded : success
         res.json({ success: true, newImages: [], newVideos: [] });
       }
     });
@@ -568,7 +567,7 @@ app.post("/api/buy", auth, (req, res) => {
       return res.status(404).json({ error: "Some listings not found", missing });
     }
 
-    // validate listings
+    // validate
     for (let listing of listings) {
       if (listing.user_id === req.userId) {
         return res.status(403).json({ error: "Cannot buy your own listing", listingID: listing.id });
@@ -578,10 +577,8 @@ app.post("/api/buy", auth, (req, res) => {
       }
     }
 
-    // calculate total price
     const totalPrice = listings.reduce((sum, l) => sum + l.price, 0);
 
-    // simulate payment once
     const paymentStatus = "completed";
     console.log(`Charged user ${userID} a total of ${totalPrice}FT`);
 
@@ -643,17 +640,17 @@ app.get("/api/transactions", auth, (req, res) => {
   if (!(req.userId == 1)) {
     return res.status(403).json({ error: "Not authorized" });
   }
-  db.all("SELECT * FROM transactions", [], (err, rows) => {
+  db.get("SELECT * FROM transactions", [], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    res.json(row);
   });
 });
 
 //get transaction by id
-app.get("/api/transactions/:id", auth, (req, res) => {
+app.get("/api/transactions/id/:id", auth, (req, res) => {
   const id = req.params.id;
 
-  db.all("SELECT * FROM transactions WHERE id = ?", [id], (err, row) => {
+  db.get("SELECT * FROM transactions WHERE id = ?", [id], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!row) return res.status(404).json({ error: "Transaction not found" });
     if (!(row.sent_from == req.userId)) {
@@ -853,9 +850,7 @@ l.id, l.title, l.price, l.description, l.status, l.created_at, l.user_id, l.bran
 app.delete("/api/instruments/:id", auth, (req, res) => {
   const listingId = req.params.id;
 
-  if (!(listing.user_id == req.userId)) {
-    return res.status(403).json({ error: "Not authorized" });
-  }
+
 
   if (!listingId) {
     return res.status(400).json({ error: "Listing ID is required" });
@@ -867,6 +862,11 @@ app.delete("/api/instruments/:id", auth, (req, res) => {
     if (!row) return res.status(404).json({ error: "Listing not found" });
 
     const userId = row.user_id;
+
+    if(!(userId == req.userId)) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
 
     // get files
     const getMediaSql = `SELECT url FROM media WHERE listing_id = ? `;
