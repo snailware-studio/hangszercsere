@@ -93,6 +93,15 @@
                text-center py-2 shadow-md sm:bottom-0 sm:w-full
   }
 
+  .cookie-banner {
+    @apply fixed bottom-8 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md font-semibold flex items-center shadow-lg transition-all border
+           bg-light-card-bg dark:bg-card-bg dark:border-accent text-light-text-secondary dark:text-text-secondary;
+  }
+
+  .cookie-banner button {
+    @apply px-3 py-1 rounded bg-accent text-white hover:bg-accent-hover transition-all;
+  }
+
   body {
     background-color: #110F1B; /* dark so browser doesnt flash you on page reload */
   }
