@@ -10,6 +10,7 @@ export class GlobalService {
 
   //set to on if you want to use localhost as the api
   public dev = true;
+  public show_cookie = true; // default true, and when users clicks ok then false
 
   constructor() {
     if (this.dev)

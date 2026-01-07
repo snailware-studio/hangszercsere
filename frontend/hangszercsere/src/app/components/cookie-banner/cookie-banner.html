@@ -1,0 +1,13 @@
+<div
+  *ngIf="visible"
+  class="cookie-banner fixed bottom-8 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md font-semibold flex items-center shadow-lg transition-all border"
+>
+
+  <span class="mr-2">
+    <i class="nf nf-md-cookie"></i>
+  </span>
+  <span class="p-1">
+    {{ message }}
+  </span>
+  <button (click)="cookie_ok()">OK</button>
+</div>

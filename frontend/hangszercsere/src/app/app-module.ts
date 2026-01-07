@@ -23,6 +23,7 @@ import { Filter } from './components/filter/filter';
 import { TimeAgoPipe } from './pipes/timeAgo/time-ago-pipe';
 import { NotifComponent } from './components/notif-component/notif-component';
 import { ConfirmComponent } from './components/confirm-component/confirm-component';
+import { CookieBanner } from './components/cookie-banner/cookie-banner';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { ConfirmComponent } from './components/confirm-component/confirm-compone
     TimeAgoPipe,
     NotifComponent,
     ConfirmComponent,
+    CookieBanner,
   ],
   imports: [
     BrowserModule,
