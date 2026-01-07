@@ -13,6 +13,7 @@ const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const db = require("./db");
 const dotenv = require('dotenv');
+require("./ai");
 
 dotenv.config();
 
