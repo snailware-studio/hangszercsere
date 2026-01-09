@@ -1,4 +1,5 @@
 import { Component,Input } from '@angular/core';
+import { GlobalService } from '../../services/GlobalService/global-service';
 
 @Component({
   selector: 'app-lightbox',
@@ -7,6 +8,12 @@ import { Component,Input } from '@angular/core';
   styleUrl: './lightbox.css'
 })
 export class Lightbox {
+  constructor(private global: GlobalService) {
+    this.rootUrl = this.global.rootUrl;
+  }
+
+  rootUrl: string;
+
   @Input() images: string[] = [];  //url array
   isOpen: boolean = false;
   currentIndex: number = 0;

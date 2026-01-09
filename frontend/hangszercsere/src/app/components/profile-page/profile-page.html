@@ -3,7 +3,7 @@
     class="max-w-4xl mx-auto bg-light-card-bg dark:bg-card-bg rounded-xl shadow-lg p-8 flex flex-col items-center gap-6">
 
     <!-- Avatar + Name -->
-    <img [src]="'https://hangszercsere.hu/uploads/' + user?.profile_url" alt="{{ user?.name }}'s avatar"
+    <img [src]="rootUrl+'/uploads/' + user?.profile_url" alt="{{ user?.name }}'s avatar"
       class="w-32 h-32 rounded-full object-cover shadow-md">
 
     <h1 class="text-3xl font-bold text-light-text-primary dark:text-text-primary">

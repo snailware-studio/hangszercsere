@@ -2,6 +2,7 @@ import { Component,OnInit } from '@angular/core';
 import { UserService } from '../../services/user-service/user-service';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
+import { GlobalService } from '../../services/GlobalService/global-service';
 
 @Component({
   selector: 'app-profile-page',
@@ -17,7 +18,12 @@ constructor(
   private userService: UserService,
   private route: ActivatedRoute,
   private router: Router,
-){}
+  private global: GlobalService
+){
+  this.rootUrl = this.global.rootUrl;
+}
+
+rootUrl: string;
 
 ngOnInit(): void {
 

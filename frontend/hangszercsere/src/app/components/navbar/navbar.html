@@ -38,7 +38,7 @@
                        text-light-text-secondary dark:text-text-secondary
                        hover:bg-accent hover:text-text-primary dark:hover:bg-accent dark:hover:text-text-primary
                        flex items-center gap-1 transition-all">
-                    <img [src]="'https://hangszercsere.hu/uploads/' + userService.currentUser?.profile_url" 
+                    <img [src]="rootUrl+'/uploads/' + userService.currentUser?.profile_url" 
                 alt="" 
                 class="w-8 h-8 rounded-full">
             <span>{{ userService.currentUser?.name }}</span>

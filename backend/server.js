@@ -13,6 +13,7 @@ const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const db = require("./db");
 const dotenv = require('dotenv');
+const sharp = require('sharp');
 require("./ai");
 
 dotenv.config();
@@ -37,6 +38,13 @@ const wss = new WebSocket.Server({ server });
 const users = new Map(); //map of users connected
 
 let tokens = new Map(); // map of valid tokens with id, expiration and Token type
+
+function compress(buffer)
+{
+  return sharp(buffer).
+  webp({ quality: 70 }).
+  toBuffer();
+}
 
 const TokenType = Object.freeze({
   EMAIL_VERIFICATION: 'email_verification',
@@ -184,73 +192,159 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({
-  storage: storage,
-  limits: { fileSize: 100 * 1024 * 1024 } // 100 MB max per file
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10 MB max per file
 });
 
 // upload media
-app.post('/api/instruments/media', auth, upload.fields([
-  { name: 'images', maxCount: 5 },
-  { name: 'videos', maxCount: 5 }
-]), (req, res) => {
-  const listingId = req.body.listingId;
-  if (!listingId) return res.status(400).json({ error: 'No listing ID provided!' });
+app.post(
+  '/api/instruments/media',auth,
+  upload.fields([
+    { name: 'images', maxCount: 5 },
+    { name: 'videos', maxCount: 5 }
+  ]),
+  async (req, res) => {
+    console.log('req.body:', req.body);
+console.log('req.files:', req.files);
 
-  if (!(req.body.userId == req.userId)) {
-    return res.status(403).json({ error: `Not authorized expecred: ${req.body.userId} actual: ${req.userId}` });
+    try {
+      const listingId = req.body.listing.id;
+      if (!listingId) {
+        return res.status(400).json({ error: 'No listing ID provided!' });
+      }
+
+      /*
+      if (req.body.userId != req.userId) {
+        return res.status(403).json({
+          error: `Not authorized expected: ${req.body.userId} actual: ${req.userId}`
+        });
+      }*/
+
+      const files = [];
+
+      // ---------- IMAGES ----------
+      if (req.files?.images) {
+        for (const file of req.files.images) {
+          if (!file.mimetype.startsWith('image/')) continue;
+
+          const webpBuffer = await compress(file.buffer);
+
+          const filename =
+            Date.now() +
+            '-' +
+            path.parse(file.originalname).name +
+            '.webp';
+
+          fs.writeFileSync(
+            path.join(uploadDir, filename),
+            webpBuffer
+          );
+
+          files.push({
+            filename,
+            type: 'image'
+          });
+        }
+      }
+
+      // ---------- VIDEOS ----------
+      if (req.files?.videos) {
+        for (const file of req.files.videos) {
+          const filename =
+            Date.now() +
+            '-' +
+            file.originalname;
+
+          fs.writeFileSync(
+            path.join(uploadDir, filename),
+            file.buffer
+          );
+
+          files.push({
+            filename,
+            type: 'video'
+          });
+        }
+      }
+
+      if (files.length === 0) {
+        return res.status(400).json({ error: 'No files uploaded!' });
+      }
+
+      // ---------- DB INSERT ----------
+      const placeholders = files.map(() => '(?, ?, ?)').join(', ');
+      const values = [];
+
+      files.forEach(f => {
+        values.push(listingId, f.filename, f.type);
+      });
+
+      const sql = `
+        INSERT INTO media (listing_id, url, type)
+        VALUES ${placeholders}
+      `;
+
+      db.run(sql, values, function (err) {
+        if (err) {
+          return res.status(500).json({ error: "db error"+err.message });
+        }
+
+        res.json({
+          message: 'Upload successful',
+          filenames: files.map(f => f.filename)
+        });
+      });
+
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Server error' });
+    }
   }
+);
 
-  const files = [];
-  if (req.files['images']) files.push(...req.files['images'].map(f => ({ ...f, type: 'image' })));
-  if (req.files['videos']) files.push(...req.files['videos'].map(f => ({ ...f, type: 'video' })));
-
-  if (files.length === 0) return res.status(400).json({ error: 'No files uploaded!' });
-
-  const placeholders = files.map(() => '(?, ?, ?)').join(', ');
-  const values = [];
-  files.forEach(f => values.push(listingId, f.filename, f.type));
-
-  const sql = `INSERT INTO media (listing_id, url, type) VALUES ${placeholders}`;
-
-  db.run(sql, values, function (err) {
-    if (err) return res.status(500).json({ error: err.message });
-    const filenames = files.map(f => f.filename);
-    res.json({ message: 'Upload successful', filenames });
-  });
-});
-
-// upload avatar
-app.post('/api/users/avatar', auth, upload.single('avatar'), (req, res) => {
+app.post('/api/users/avatar', auth, upload.single('avatar'), async (req, res) => {
   const userId = req.body.userId;
   if (!userId) return res.status(400).json({ error: 'User ID required' });
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
   if (!(userId == req.userId)) return res.status(403).json({ error: "Not authorized" });
 
-  const filename = req.file.filename;
+  try {
+    // Convert avatar to WebP
+    const webpBuffer = await compress(req.file.buffer);
 
-  // get current profile_url
-  db.get('SELECT profile_url FROM users WHERE id = ?', [userId], (err, row) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
+    const filename =
+      Date.now() + '-' + path.parse(req.file.originalname).name + '.webp';
 
-    // delete old file if exists and !empty and !default
-    if (row?.profile_url && row.profile_url !== 'default_avatar.png') {
-      const oldFilePath = path.join(__dirname, 'public/uploads', row.profile_url);
-      fs.unlink(oldFilePath, (err) => {
-        if (err) console.warn('Old avatar not deleted:', err.message);
-      });
-    }
+    fs.writeFileSync(path.join(uploadDir, filename), webpBuffer);
 
-    //new avatar
-    db.run(
-      'UPDATE users SET profile_url = ? WHERE id = ?',
-      [filename, userId],
-      function (err) {
-        if (err) return res.status(500).json({ error: 'Failed to update profile' });
-        res.json({ message: 'Avatar updated', filename });
+    // get current profile_url
+    db.get('SELECT profile_url FROM users WHERE id = ?', [userId], (err, row) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+
+      // delete old file if exists and !empty and !default
+      if (row?.profile_url && row.profile_url !== 'default_avatar.png') {
+        const oldFilePath = path.join(uploadDir, row.profile_url);
+        fs.unlink(oldFilePath, (err) => {
+          if (err) console.warn('Old avatar not deleted:', err.message);
+        });
       }
-    );
-  });
+
+      // update DB with new avatar
+      db.run(
+        'UPDATE users SET profile_url = ? WHERE id = ?',
+        [filename, userId],
+        function (err) {
+          if (err) return res.status(500).json({ error: 'Failed to update profile' });
+          res.json({ message: 'Avatar updated', filename });
+        }
+      );
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Image processing failed' });
+  }
 });
+
 
 // update media
 app.post('/api/instruments/media/update', auth, upload.fields([

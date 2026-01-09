@@ -12,7 +12,7 @@
   <button (click)="next()" class="absolute right-2 text-white text-3xl font-bold hover:text-accent">&rarr;</button>
 
   <!-- Current Image -->
-<img [src]="'https://hangszercsere.hu/uploads/' + images[currentIndex]"
+<img [src]="rootUrl+ '/uploads/' + images[currentIndex]"
      class="max-h-[90%] max-w-[90%] rounded shadow-lg">
 
 </div>

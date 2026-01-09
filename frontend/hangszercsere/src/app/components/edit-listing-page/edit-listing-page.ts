@@ -4,6 +4,7 @@ import { UserService } from '../../services/user-service/user-service';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { HttpEventType } from '@angular/common/http';
+import { GlobalService } from '../../services/GlobalService/global-service';
 
 @Component({
   selector: 'app-edit-listing-page',
@@ -17,9 +18,13 @@ export class EditListingPage {
     private listingService: ListingService,
     private route: ActivatedRoute,
     private userService: UserService,
-    private router: Router
-  ){}
+    private router: Router,
+    private global: GlobalService
+  ){
+    this.rootUrl = this.global.rootUrl;
+  }
 
+  rootUrl: string;
   listing: any = null;
 
   selectedImages: File[]| null = [];

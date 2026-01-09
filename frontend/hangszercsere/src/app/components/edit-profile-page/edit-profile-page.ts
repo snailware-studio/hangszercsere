@@ -3,6 +3,7 @@ import { UserService } from '../../services/user-service/user-service';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { NotifService } from '../../services/notif-service/notif-service';
+import { GlobalService } from '../../services/GlobalService/global-service';
 
 @Component({
   selector: 'app-edit-profile-page',
@@ -11,6 +12,18 @@ import { NotifService } from '../../services/notif-service/notif-service';
   styleUrl: './edit-profile-page.css'
 })
 export class EditProfilePage {
+
+    constructor(
+    private userService: UserService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private notif: NotifService,
+    private global: GlobalService
+  ) {
+    this.rootUrl = this.global.rootUrl;
+  }
+
+  rootUrl: string;
 
   user: any | null = null;
   currentPassword: string = '';
@@ -42,13 +55,6 @@ export class EditProfilePage {
       }
     });
   }
-
-  constructor(
-    private userService: UserService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private notif: NotifService
-  ) { }
 
   ngOnInit(): void {
 

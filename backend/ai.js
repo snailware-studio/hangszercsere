@@ -114,6 +114,7 @@ function rateListing(listing) {
 
             if (!rating || !feedback) {
                 console.log("No response from ai");
+                console.log("message: " + JSON.stringify(data.choices[0].message.content))
                 return;
             }
 
