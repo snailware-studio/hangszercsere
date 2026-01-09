@@ -21,7 +21,7 @@
         <div *ngIf="listing?.images?.length" class="flex flex-col gap-3">
           <div class="grid grid-cols-2 gap-3">
             <ng-container *ngFor="let img of listing?.images; let i = index">
-              <img [src]="'https://hangszercsere.hu/uploads/' + img"
+              <img [src]="rootUrl + '/uploads/' + img"
                 class="cursor-pointer w-64 h-64 object-cover rounded" (click)="lightbox.show(i)">
             </ng-container>
           </div>
@@ -31,7 +31,7 @@
         <div *ngIf="listing?.videos?.length" class="flex flex-col gap-4">
           <ng-container *ngFor="let video of listing?.videos">
             <video controls class="rounded-lg shadow-md w-full">
-              <source [src]="'https://hangszercsere.hu/uploads/' + video" type="video/mp4">
+              <source [src]="rootUrl + '/uploads/' + video" type="video/mp4">
             </video>
           </ng-container>
         </div>
@@ -65,7 +65,7 @@
 
           <p><span class="font-semibold">Rating:</span>
             <ng-container *ngIf="listing?.ai_rating !== null && listing?.ai_rating !== undefined">
-              {{ listing?.rating }}/5 ⭐
+              {{ listing?.ai_rating }}/5 ⭐
             </ng-container>
             <ng-container *ngIf="listing?.ai_rating === null || listing?.ai_rating === undefined">
               No rating

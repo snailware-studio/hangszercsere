@@ -73,7 +73,7 @@ export class ListingService {
       ai_feedback: null
     };
 
-    return this.http.put(`${this.apiUrl}/update/${listing.id}`, newlisting, {
+    return this.http.put(`${this.apiUrl.substring(0, this.apiUrl.length - 1)}/update/${listing.id}`, newlisting, {
       withCredentials: true  
     });
   }

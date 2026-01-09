@@ -197,7 +197,7 @@ app.post('/api/instruments/media', auth, upload.fields([
   if (!listingId) return res.status(400).json({ error: 'No listing ID provided!' });
 
   if (!(req.body.userId == req.userId)) {
-    return res.status(403).json({ error: "Not authorized" });
+    return res.status(403).json({ error: `Not authorized expecred: ${req.body.userId} actual: ${req.userId}` });
   }
 
   const files = [];
@@ -259,7 +259,7 @@ app.post('/api/instruments/media/update', auth, upload.fields([
 ]), (req, res) => {
   const { listingId, userId, existingImages, existingVideos } = req.body;
   if (!listingId || !userId) return res.status(400).json({ error: 'Listing ID and User ID required' });
-  if (!(listing.user_id == req.userId)) {
+  if (!(userId == req.userId)) {
     return res.status(403).json({ error: "Not authorized" });
   }
 
@@ -741,7 +741,8 @@ app.put("/api/instrument/update/:id", auth, (req, res) => {
       brand: req.body.brand ?? listing.brand,
       model: req.body.model ?? listing.model,
       condition: req.body.condition ?? listing.condition,
-      ai_rating: req.body.ai_rating ?? listing.ai_rating
+      ai_rating: req.body.ai_rating ?? listing.ai_rating,
+      status: "inactive"
     };
 
     const setClause = Object.keys(updatedFields).map(key => `${key} = ? `).join(", ");

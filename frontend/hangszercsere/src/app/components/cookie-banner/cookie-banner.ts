@@ -11,7 +11,7 @@ export class CookieBanner {
   token = localStorage.getItem('cookie');
   visible = false;
   
-  message = 'This site uses cookies, by using the website you agree to our use of cookies.';
+  message = 'Ez a weboldal kizárólag a működéshez szükséges sütiket használ.';
 
   constructor(private globalService: GlobalService) {
     if (this.token != "ok")

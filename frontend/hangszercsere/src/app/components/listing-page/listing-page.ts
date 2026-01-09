@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../../services/user-service/user-service';
 import { CartService } from '../../services/cart-service/cart-service';
 import { NotifService } from '../../services/notif-service/notif-service';
+import { GlobalService } from '../../services/GlobalService/global-service';
 
 @Component({
   selector: 'app-listing-page',
@@ -22,8 +23,15 @@ export class ListingPage {
     private router: Router,
     private user: UserService,
     private cart: CartService,
-    private NotifService: NotifService
-  ) { }
+    private NotifService: NotifService,
+    private global: GlobalService
+  ) {
+    
+    this.rootUrl = this.global.rootUrl;
+
+   }
+
+   rootUrl: string;
 
   GotoProfile(id: number) {
     this.router.navigate(['/profile', id]);

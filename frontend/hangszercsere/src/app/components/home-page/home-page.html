@@ -19,7 +19,7 @@
 
     <!-- Image + Price -->
     <div class="relative">
-      <img [src]="'https://hangszercsere.hu/uploads/' + listing.images[0]" alt="Listing Image"
+      <img [src]="rootUrl+'/uploads/' + listing.images[0]" alt="Listing Image"
         class="w-full h-48 object-cover rounded-t-md">
       <span class="price-badge">{{ listing.price }} Ft</span>
       <span class="condition-badge left-2 top-2" [ngClass]="{

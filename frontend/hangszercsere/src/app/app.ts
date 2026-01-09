@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { WSservice } from './services/WSservice/wsservice';
 import { NotifService } from './services/notif-service/notif-service';
 import { UserService } from './services/user-service/user-service';
+import { PopupService } from './services/popup-service/popup-service';
 
 @Component({
   selector: 'app-root',
@@ -14,28 +15,24 @@ export class App {
 
   constructor(private ws: WSservice,
     private notif: NotifService,
-    private user: UserService
+    private user: UserService,
+    private popup: PopupService
   ) {
   }
 
   ngOnInit(): void {
+ // this.popup.Show('test', ['close','google'], [() => this.popup.close(), () => window.open('https://google.com')]);
+    this.popup.Show('test', ['close'], [() => this.popup.close()]);
+
     this.ws.message.subscribe(data => {
       const message = JSON.parse(data);
-      if(message?.action == 'message' && message.user != this.user.currentUserId)
-      {
+      if (message?.action == 'message' && message.user != this.user.currentUserId) {
         this.notif.show("message", `New message!`);
       }
     });
+
+   
   }
 
-  menu: 'none' | 'login' | 'register' = 'none';
-
-  openMenu(type: 'login' | 'register') {
-    this.menu = type;
-  }
-
-  closeMenu() {
-    this.menu = 'none';
-  }
 
 }

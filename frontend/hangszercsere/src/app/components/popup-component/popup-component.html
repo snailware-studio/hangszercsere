@@ -1,0 +1,6 @@
+<ng-container *ngIf="show">
+    <p>{{ text }}</p>
+    <button *ngFor="let button of buttons" (click)="functions[button]()">
+        {{ button }}
+    </button>
+</ng-container>

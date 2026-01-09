@@ -6,6 +6,7 @@ import { UserService } from '../../services/user-service/user-service';
 import { Filter } from '../filter/filter';
 import { NotifService } from '../../services/notif-service/notif-service';
 import { th } from 'date-fns/locale';
+import { GlobalService } from '../../services/GlobalService/global-service';
 
 @Component({
   selector: 'app-home-page',
@@ -22,8 +23,13 @@ export class HomePage {
     private router: Router,
     private cart: CartService,
     private user: UserService,
-    private NotifService: NotifService
-  ) {}
+    private NotifService: NotifService,
+    private global: GlobalService
+  ) {
+    this.rootUrl = this.global.rootUrl;
+  }
+
+  rootUrl: string;
 
   viewListing(id: number) {
     this.router.navigate(['/listing', id]);
