@@ -154,16 +154,19 @@ BEGIN
   WHERE user_id = NEW.user_id;
 END;
 
-
-DROP TRIGGER IF EXISTS listings_after_status_update;
-CREATE TRIGGER listings_after_status_update
-AFTER UPDATE OF status ON listings
-WHEN OLD.user_id IS NOT NULL AND OLD.status != NEW.status
+DROP TRIGGER IF EXISTS transactions_after_insert;
+CREATE TRIGGER transactions_after_insert
+AFTER INSERT ON transactions
+WHEN NEW.sent_from IS NOT NULL AND NEW.sent_to IS NOT NULL
 BEGIN
   UPDATE user_stats
-  SET active_listings = active_listings - (OLD.status='active') + (NEW.status='active'),
-      total_sold = total_sold + (NEW.status='sold') - (OLD.status='sold')
-  WHERE user_id = OLD.user_id;
+  SET total_spent = total_spent + NEW.price
+  WHERE user_id = NEW.sent_from;
+
+  UPDATE user_stats
+  SET total_earned = total_earned + NEW.price,
+  total_sold = total_sold + 1
+  WHERE user_id = NEW.sent_to;
 END;
 
 DROP TRIGGER IF EXISTS listings_after_delete;

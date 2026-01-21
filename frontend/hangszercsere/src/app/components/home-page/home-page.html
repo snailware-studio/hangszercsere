@@ -54,11 +54,7 @@
     <div class="product-date">
       <span><i class="nf nf-weather-time_2"></i> {{ listing.created_at | timeAgo }}</span>
       <!-- Angular pipe to convert date to "1 day ago" -->
-      <ng-container *ngIf="listing.seller != this.user.getUserName()">
-        <a class="cart-button">
-          <b><i class="nf nf-md-cart"></i></b>
-        </a>
-      </ng-container>
+
     </div>
   </div>
 </div>

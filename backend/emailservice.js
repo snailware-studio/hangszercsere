@@ -77,3 +77,19 @@ export async function sendWantedListingSoldEmail(toEmail, name,listing_id)
       console.error('Error sending email:', err);
     }
 }
+
+//listing bought
+export async function sendListingBoughtEmail(toEmail, name,listing_id)
+{
+    try {
+      const info = await transporter.sendMail({
+        from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
+        to: toEmail,
+        subject: 'Listing bought!',
+        html: `<h2>Hello ${name}!</h2><p>Thank you for your purchase! You can view it here: <a href="${process.env.ORIGIN}/listing/${listing_id}">View listing</a></p>`
+      });
+      console.log('Email sent:', info.messageId);
+    } catch (err) {
+      console.error('Error sending email:', err);
+    }
+}

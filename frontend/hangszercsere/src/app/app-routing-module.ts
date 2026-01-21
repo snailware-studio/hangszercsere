@@ -12,6 +12,9 @@ import { ProfilePage } from './components/profile-page/profile-page';
 import { EditProfilePage } from './components/edit-profile-page/edit-profile-page';
 import { EditListingPage } from './components/edit-listing-page/edit-listing-page';
 import { ConfirmComponent } from './components/confirm-component/confirm-component';
+import { AdatvedelemComponent } from './components/adatvedelem-component/adatvedelem-component';
+import { AszfComponent } from './components/aszf-component/aszf-component';
+import { ImpresszumComponent } from './components/impresszum-component/impresszum-component';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
@@ -25,7 +28,10 @@ export const routes: Routes = [
   { path: 'profile/:id', component: ProfilePage },
   { path: 'profile/edit/:id', component: EditProfilePage },
   { path: 'listing/edit/:id', component: EditListingPage },
-  { path: 'confirm/:status/:type', component: ConfirmComponent }
+  { path: 'confirm/:status/:type', component: ConfirmComponent },
+  { path: 'adatvedelem', component: AdatvedelemComponent },
+  { path: 'aszf', component: AszfComponent },
+  { path: 'impresszum', component: ImpresszumComponent }
 ];
 
 @NgModule({

@@ -10,8 +10,6 @@ import { GlobalService } from '../../services/GlobalService/global-service';
 export class CookieBanner {
   token = localStorage.getItem('cookie');
   visible = false;
-  
-  message = 'Ez a weboldal kizárólag a működéshez szükséges sütiket használ.';
 
   constructor(private globalService: GlobalService) {
     if (this.token != "ok")

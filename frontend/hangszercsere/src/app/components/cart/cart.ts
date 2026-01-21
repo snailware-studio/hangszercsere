@@ -38,6 +38,8 @@ export class Cart {
       this.listings = listings;
       this.calculateTotal();
     });
+
+
   }
   
   removeFromCart(listing_id: number): void

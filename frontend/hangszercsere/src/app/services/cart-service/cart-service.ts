@@ -24,8 +24,9 @@ export class CartService {
 
     this.apiUrl = this.global.apiUrl;
 
-    const stored = localStorage.getItem('cart');
-    if (stored) this.cart = JSON.parse(stored);
+    this.LoadListings().subscribe(data => {
+      this.cart = data;
+    });
 
     setTimeout(() => {
       this.user = this.injector.get(UserService);
@@ -45,9 +46,18 @@ export class CartService {
     }
 
     if (!this.cart.includes(listing_id)) {
-      this.cart.push(listing_id);
-      this.saveCart();
-      this.notif.show("success", "Added to cart!");
+      this.http.post(`${this.apiUrl}cart-items`, { id: listing_id }, {
+        withCredentials: true
+      }).subscribe({
+        next: (res) => {
+          this.notif.show("success", "Added to cart!");
+          this.cart.push(listing_id);
+        },
+        error: (err) => {
+          this.notif.show("error", "Failed to add to cart!");
+          console.error('failed to add to cart', err);
+        }
+      });
     }
     else {
       alert("item already in cart!")
@@ -55,8 +65,17 @@ export class CartService {
   }
 
   RemoveFromCart(listing_id: number): void {
-    this.cart = this.cart.filter(item => item !== listing_id);
-    this.saveCart();
+    this.http.delete(`${this.apiUrl}cart-items`, { withCredentials: true }).subscribe({
+      next: (res) => {
+        this.notif.show("success", "Removed from cart!");
+        this.cart = this.cart.filter(item => item !== listing_id);
+      },
+      error: (err) => {
+        this.notif.show("error", "Failed to remove from cart!");
+        console.error('failed to remove from cart', err);
+      }
+    });
+
   }
 
   Purchase(): Observable<any> {
@@ -71,15 +90,10 @@ export class CartService {
       return;
     }
 
-    const payload = {
-      listingIDs: this.cart.map(item => item),
-      userID: this.user.getUserId()
-    };
-
-    return this.http.post<any>(`${this.apiUrl}buy`, payload, {
+    return this.http.post<any>(`${this.apiUrl}buy`,{}, {
       withCredentials: true
     }).pipe(
-      
+
       tap(response => {
 
         this.notif.show("success", `Payment completed!`);
@@ -102,18 +116,25 @@ export class CartService {
   }
 
 
-  LoadListings(): Observable<any> {
-    return this.http.post(`${this.apiUrl}cart-items/`, { ids: this.cart }, {
-      withCredentials: true
-    });
-  }
+LoadListings(): Observable<any> {
+  return this.http.get(`${this.apiUrl}cart-items`, {
+    withCredentials: true 
+  });
+}
+
 
   ClearCart(): void {
-    this.cart = [];
-    localStorage.removeItem('cart');
-  }
-
-  private saveCart(): void {
-    localStorage.setItem('cart', JSON.stringify(this.cart));
+    this.http.delete(`${this.apiUrl}cart-items`, {
+      withCredentials: true
+    }).subscribe({
+      next: (res) => {
+        this.notif.show("success", "Cart cleared!");
+        this.cart = [];
+      },
+      error: (err) => {
+        this.notif.show("error", "Failed to clear cart!");
+        console.error('failed to clear cart', err);
+      }
+    });
   }
 }

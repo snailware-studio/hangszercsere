@@ -38,7 +38,7 @@ export class EditProfilePage {
   }
 
   uploadAvatar() {
-    if (!this.selectedAvatar) return alert('Select a file!');
+    if (!this.selectedAvatar) return this.notif.show("error", "No file selected!");
 
     const formData = new FormData();
     formData.append('avatar', this.selectedAvatar);
@@ -51,7 +51,7 @@ export class EditProfilePage {
       },
       error: (err) => {
         console.error('Upload failed', err);
-        alert('Upload failed: ' + (err.error?.error || 'Unknown error'));
+        this.notif.show("error", err.error.error);
       }
     });
   }
@@ -116,7 +116,7 @@ export class EditProfilePage {
           if (err && err.error && err.error.error) {
             msg = err.error.error;
           }
-          alert("Login failed: " + msg);
+          this.notif.show("error", msg);
           return;
         }
       });
@@ -126,12 +126,12 @@ export class EditProfilePage {
     this.userService.UpdateUser(this.user.id, this.user.name, this.user.email, this.user.bio, this.user.location, this.newPassword).subscribe({
       next: (res) => {
         console.log('Profile updated', res);
-        alert('🎉Profile updated!');
-        window.location.reload();
+        this.notif.show("success", "Profile updated! 🎉");
+        this.router.navigate(['/profile', this.user.id]);
       },
       error: (err) => {
         console.error('Profile update failed', err);
-        alert('failed: ' + (err.error?.error || 'Unknown error'));
+        this.notif.show("error", err.error.error);
       }
     });
   }

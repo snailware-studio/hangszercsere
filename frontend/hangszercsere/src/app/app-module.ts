@@ -25,6 +25,9 @@ import { NotifComponent } from './components/notif-component/notif-component';
 import { ConfirmComponent } from './components/confirm-component/confirm-component';
 import { CookieBanner } from './components/cookie-banner/cookie-banner';
 import { PopupComponent } from './components/popup-component/popup-component';
+import { AdatvedelemComponent } from './components/adatvedelem-component/adatvedelem-component';
+import { AszfComponent } from './components/aszf-component/aszf-component';
+import { ImpresszumComponent } from './components/impresszum-component/impresszum-component';
 
 @NgModule({
   declarations: [
@@ -49,6 +52,9 @@ import { PopupComponent } from './components/popup-component/popup-component';
     ConfirmComponent,
     CookieBanner,
     PopupComponent,
+    AdatvedelemComponent,
+    AszfComponent,
+    ImpresszumComponent,
   ],
   imports: [
     BrowserModule,

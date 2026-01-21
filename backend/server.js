@@ -588,7 +588,7 @@ app.get("/api/users", auth, (req, res) => {
   });
 });
 
-//GET specific user by id
+//GET user by id
 app.get("/api/users/:userID", (req, res) => {
   const sql = `
     SELECT 
@@ -604,7 +604,8 @@ app.get("/api/users/:userID", (req, res) => {
       s.active_listings,
       s.total_sold,
       s.rating_count,
-      s.total_reviews
+      s.total_reviews,
+      s.last_login
     FROM users u
     JOIN user_stats s ON u.id = s.user_id
     WHERE u.id = ?;
@@ -638,28 +639,24 @@ app.get("/api/messages", auth, (req, res) => {
 
 //transactions
 app.post("/api/buy", auth, (req, res) => {
-  const { listingIDs, userID } = req.body;
-  if (!(userID == req.userId)) {
-    return res.status(403).json({ error: "Not authorized" });
-  }
+  const userID = req.userId;
 
-  if (!Array.isArray(listingIDs) || listingIDs.length === 0) {
-    return res.status(400).json({ error: "listingIDs must be a non-empty array" });
-  }
-
-  // get all listings
-  const placeholders = listingIDs.map(() => "?").join(",");
-  db.all(`SELECT * FROM listings WHERE id IN (${placeholders})`, listingIDs, (err, listings) => {
+  const sql = `
+    SELECT l.id, l.user_id, l.price, l.status
+    FROM cart_items 
+    JOIN listings l ON l.id = cart_items.listing_id
+    WHERE cart_items.cart_id = ?
+  `;
+  
+  db.all(sql, [userID], (err, rows) => {
     if (err) return res.status(500).json({ error: "Database error" });
-    if (listings.length !== listingIDs.length) {
-      const foundIDs = listings.map(l => l.id);
-      const missing = listingIDs.filter(id => !foundIDs.includes(id));
-      return res.status(404).json({ error: "Some listings not found", missing });
-    }
+    if (rows.length === 0) return res.status(404).json({ error: "Cart is empty" });
 
-    // validate
+    const listings = rows;
+
+    // validate listings
     for (let listing of listings) {
-      if (listing.user_id === req.userId) {
+      if (listing.user_id === userID) {
         return res.status(403).json({ error: "Cannot buy your own listing", listingID: listing.id });
       }
       if (listing.status === "sold") {
@@ -668,7 +665,6 @@ app.post("/api/buy", auth, (req, res) => {
     }
 
     const totalPrice = listings.reduce((sum, l) => sum + l.price, 0);
-
     const paymentStatus = "completed";
     console.log(`Charged user ${userID} a total of ${totalPrice}FT`);
 
@@ -676,7 +672,10 @@ app.post("/api/buy", auth, (req, res) => {
     let results = [];
 
     listings.forEach((listing) => {
-      const sqlInsert = `INSERT INTO transactions (sent_from, sent_to, listing_id, status, price) VALUES (?,?,?,?,?)`;
+      const sqlInsert = `
+        INSERT INTO transactions (sent_from, sent_to, listing_id, status, price)
+        VALUES (?, ?, ?, ?, ?)
+      `;
       db.run(sqlInsert, [userID, listing.user_id, listing.id, paymentStatus, listing.price], function (err) {
         if (err) {
           results.push({
@@ -684,8 +683,7 @@ app.post("/api/buy", auth, (req, res) => {
             status: "error",
             message: "Failed to create transaction"
           });
-          checkDone();
-          return;
+          return checkDone();
         }
 
         const sqlUpdate = `UPDATE listings SET status = 'sold' WHERE id = ?`;
@@ -702,28 +700,38 @@ app.post("/api/buy", auth, (req, res) => {
               status: "success",
               message: "Transaction created and listing sold"
             });
-            //send email here 
-            sql = 'SELECT email,name,id FROM users WHERE id = ?';
-            db.get(sql, [userID], (err, row) => {
-              emailservice.sendListingSoldEmail(row.email, row.name, listing.id);
-            });
-          }
 
+            // send email to seller
+              const sqlSeller = 'SELECT email, name FROM users WHERE id = ?';
+              db.get(sqlSeller, [listing.user_id], (err, row) => {
+                if (!err && row) {
+                  emailservice.sendListingSoldEmail(row.email, row.name, listing.id);
+                }
+              });
+
+              // send email to buyer
+              const sqlBuyer = 'SELECT email, name FROM users WHERE id = ?';
+              db.get(sqlBuyer, [userID], (err, row) => {
+                if (!err && row) {
+                  emailservice.sendListingBoughtEmail(row.email, row.name, listing.id);
+                }
+              });
+          }
           checkDone();
         });
       });
-
-      function checkDone() {
-        processedCount++;
-        if (processedCount === listings.length) {
-
-          res.json({ message: `Payment of $${totalPrice} completed`, results });
-        }
-      }
     });
 
-  });
-});
+    function checkDone() {
+      processedCount++;
+      if (processedCount === listings.length) {
+        res.json({ message: `Payment of $${totalPrice} completed`, results });
+      }
+    }
+
+  }); 
+}); 
+
 
 //get all transactions
 app.get("/api/transactions", auth, (req, res) => {
@@ -1095,7 +1103,6 @@ app.post('/api/users', async (req, res) => {
           return res.status(500).json({ error: err2.message });
         }
 
-        console.log("sending")
         await emailservice.sendWelcomeEmail(email, name, AddToken(userId, TokenType.EMAIL_VERIFICATION));
 
         res.json({ success: true, userId });
@@ -1212,9 +1219,122 @@ VALUES(?, ?, ?, ?, ?, ?,?,?,?,?)
 });
 
 
-app.get("/api", (req, res) => {
-  res.send("Welcome to Hangszercsere API!");
+// get cart-items of user as listing
+app.get("/api/cart-items", auth, (req, res) => {
+  const userId = req.userId;
+  if (!userId) return res.status(400).json({ error: "User ID is required" });
+
+  db.all("SELECT listing_id FROM cart_items WHERE cart_id = ?", [userId], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const cartIds = rows.map(row => row.listing_id);
+    if (cartIds.length === 0) return res.json([]);
+
+    const listings = [];
+    let completed = 0;
+
+    let sql = `SELECT 
+      l.user_id,
+      l.title,
+      l.price,
+      l.description,
+      l.status,
+      l.created_at,
+      l.condition,
+      l.brand,
+      l.model,
+      l.ai_rating,
+      m.url AS image_url
+   FROM listings l
+   LEFT JOIN (
+       SELECT listing_id, url
+       FROM media
+       WHERE type = 'image'
+       ORDER BY id ASC
+   ) m ON m.listing_id = l.id
+   WHERE l.id = ?
+   LIMIT 1`;
+
+    cartIds.forEach(id => {
+      db.get(sql, [id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: `Listing ${id} not found` });
+
+        listings.push(row);
+        completed++;
+
+        if (completed === cartIds.length) {
+          res.json(listings);
+        }
+      });
+    });
+  });
 });
+
+
+//add to cart
+app.post("/api/cart-items", auth, (req, res) => {
+  const { id } = req.body;
+  if (!id) return res.status(400).json({ error: "Listing ID is required" });
+
+  const userId = req.userId;
+  if (!userId) return res.status(400).json({ error: "User ID is required" });
+
+  const sql = `
+    INSERT OR IGNORE INTO cart_items (cart_id, listing_id)
+    VALUES (?, ?)
+  `;
+
+  db.run(sql, [userId, id], function (err) {
+    if (err) return res.status(500).json({ error: "Could not add to database: " + err.message });
+
+    if (this.changes === 0) {
+      return res.status(409).json({ message: "Item already in cart" });
+    }
+
+    return res.status(200).json({ message: "Added to cart" });
+  });
+});
+
+//remove from cart
+app.delete("/api/cart-items", auth, (req, res) => {
+  const userId = req.userId;
+  if (!userId) return res.status(400).json({ error: "User ID is required" });
+
+  let ids = [];
+
+  function doDelete(idsToDelete) {
+    let completed = 0;
+
+    if (idsToDelete.length === 0) {
+      return res.status(404).json({ error: "Cart is empty" });
+    }
+
+    idsToDelete.forEach(id => {
+      db.run("DELETE FROM cart_items WHERE cart_id = ? AND listing_id = ?", [userId, id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+
+        completed++;
+        if (completed === idsToDelete.length) {
+          res.status(200).json({ message: "Removed from cart" });
+        }
+      });
+    });
+  }
+
+  if (req.body && req.body.length > 0) {
+    ids = req.body;
+    doDelete(ids);
+  } else {
+    const sql = `SELECT listing_id FROM cart_items WHERE cart_id = ?`;
+    db.all(sql, [userId], (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      ids = rows.map(row => row.listing_id);
+      doDelete(ids);
+    });
+  }
+});
+
 
 
 app.get('/*splat', (req, res) => {

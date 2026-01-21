@@ -6,16 +6,14 @@
     <div *ngFor="let listing of listings" class="bg-light-card-bg dark:bg-card-bg rounded-lg shadow p-4 mb-4 flex flex-col md:flex-row gap-4">
 
       <!-- Thumbnail -->
-      <img *ngIf="listing.images?.length" [src]="'https://hangszercsere.hu/uploads/' + listing.images[0]"
+      <img *ngIf="listing.image_url" [src]="'https://hangszercsere.hu/uploads/' + listing.image_url"
            class="w-full md:w-40 h-32 object-cover rounded" alt="Listing Image">
 
       <!-- Info -->
       <div class="flex-1 flex flex-col justify-between">
         <div>
           <h3 class="text-lg font-bold text-light-text-primary dark:text-text-primary">{{ listing.title }}</h3>
-          <p class="text-light-text-secondary dark:text-text-secondary">{{ listing.description }}</p>
           <p class="text-sm text-light-text-secondary dark:text-text-secondary">Seller: {{ listing.seller }}</p>
-          <p class="text-sm text-light-text-secondary dark:text-text-secondary">Category: {{ listing.category }}</p>
         </div>
 
         <div class="flex items-center justify-between mt-2">
@@ -33,6 +31,11 @@
     <div class="text-right text-xl font-bold text-light-text-primary dark:text-text-primary">
       Total: {{ totalPrice }} Ft
     </div>
+
+   <p class="text-sm text-gray-500 mt-2">
+      Ez a tranzakció szimulált. Valós fizetés nem történik. Részletek: 
+      <a href="/aszf" class="underline">ÁSZF</a>.
+    </p>
 
     <!-- purchase button -->
       <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition" (click)="Purchase()">
