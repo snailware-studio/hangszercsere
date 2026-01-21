@@ -27,7 +27,44 @@ function rateListing(listing) {
         //rate and return rating and feedback
         const listing_id = listing.listing_id;
         const rating_id = listing.id;
-        const sql = `SELECT * FROM listings WHERE id = ?`;
+        const sql = `
+                    SELECT
+                l.title,
+                l.description,
+                l.price,
+                l.status,
+                l.created_at,
+                l.condition,
+                l.brand,
+                l.model,
+                l.ai_rating,
+                l.ai_reviewed,
+                l.ai_feedback,
+                c.name AS category,
+
+                COUNT(DISTINCT mi.id) AS image_count,
+                COUNT(DISTINCT mv.id) AS video_count
+
+            FROM listings l
+            JOIN categories c 
+                ON c.id = l.category_id
+
+            LEFT JOIN media mi 
+                ON mi.listing_id = l.id 
+                AND mi.type = 'image'
+
+            LEFT JOIN media mv 
+                ON mv.listing_id = l.id 
+                AND mv.type = 'video'
+
+            WHERE l.id = ?
+
+            GROUP BY
+                l.id,
+                c.name;
+
+        
+        `;
 
         db.get(sql, [listing_id], async (err, row) => {
             if (err) return reject("Error getting listing");
@@ -85,6 +122,8 @@ function rateListing(listing) {
                         - Ne értékeld a képek vagy videók minőségét, csak a meglétüket és számukat.
                         - A rövid, semmitmondó leírás csökkenti az értékelést.
                         - A visszajelzés legyen konkrét, segítőkész és javításra ösztönző.
+                        - A pénznem mindig magyar Forint.
+                        - Vedd figyelembe az előző értékelés számát is.
 
                         ### Kimeneti formátum (CSAK JSON)
                         Pontosan az alábbi struktúrát add vissza:
@@ -123,14 +162,14 @@ function rateListing(listing) {
             db.run(sqlUpdate, [rating, feedback, listing_id], function (err) {
                 if (err) return reject("Failed to update AI rating");
 
-                console.log("AI rating updated");
+                //console.log("AI rating updated");
 
                 //delete from ai_queue
                 const sqlDelete = `DELETE FROM ai_queue WHERE id = ?`;
                 db.run(sqlDelete, [rating_id], function (err) {
                     if (err) return reject("Failed to delete from AI queue");
 
-                    console.log("AI queue item deleted");
+                    //console.log("AI queue item deleted");
                     resolve(true);
                 });
             });
@@ -146,8 +185,10 @@ async function runAI() {
 
         console.log(`Rating ${listings.length} listings...`);
 
-        for (const listing of listings) {
+        let count = 0;
 
+        for (const listing of listings) {
+            count++;
             let tries = 3;
             let success = false;
 
@@ -161,11 +202,11 @@ async function runAI() {
                     await sleep(10 * 1000);
                 }
             }
-
+            console.log(`${count}/${listings.length}`);
             await sleep(5 * 1000);
         }
 
-        console.log(`Rating completed.`);
+        console.log(`Rating completed. ✅`);
 
     } catch (err) {
         console.error("AI runner error:", err);

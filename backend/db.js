@@ -141,6 +141,43 @@ CREATE TABLE IF NOT EXISTS ai_queue (
     FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE
 );
 
+-- --------------------
+-- Triggers
+-- --------------------
+DROP TRIGGER IF EXISTS listings_after_insert;
+CREATE TRIGGER listings_after_insert
+AFTER INSERT ON listings
+WHEN NEW.user_id IS NOT NULL
+BEGIN
+  UPDATE user_stats
+  SET total_listings = total_listings + 1
+  WHERE user_id = NEW.user_id;
+END;
+
+
+DROP TRIGGER IF EXISTS listings_after_status_update;
+CREATE TRIGGER listings_after_status_update
+AFTER UPDATE OF status ON listings
+WHEN OLD.user_id IS NOT NULL AND OLD.status != NEW.status
+BEGIN
+  UPDATE user_stats
+  SET active_listings = active_listings - (OLD.status='active') + (NEW.status='active'),
+      total_sold = total_sold + (NEW.status='sold') - (OLD.status='sold')
+  WHERE user_id = OLD.user_id;
+END;
+
+DROP TRIGGER IF EXISTS listings_after_delete;
+CREATE TRIGGER listings_after_delete
+AFTER DELETE ON listings
+WHEN OLD.user_id IS NOT NULL
+BEGIN
+  UPDATE user_stats
+  SET active_listings = active_listings - (OLD.status='active'),
+      total_sold = total_sold + (OLD.status='sold')
+  WHERE user_id = OLD.user_id;
+END;
+
+
 
 `);
 

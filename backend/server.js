@@ -460,8 +460,7 @@ app.post("/api/messages/send", auth, (req, res) => {
       return res.status(500).json({ error: err.message });
     }
 
-    // update last login/active
-    db.run("UPDATE user_stats SET last_login = CURRENT_TIMESTAMP WHERE user_id = ?", [sent_from]);
+
 
     res.json({ message_id: this.lastID });
   });
@@ -525,9 +524,6 @@ app.get("/api/messages/:listingId/:userId", auth, (req, res) => {
 
   db.all(sql, [listingId, userId, userId], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-
-    // update last login/active
-    db.run("UPDATE user_stats SET last_login = CURRENT_TIMESTAMP WHERE user_id = ?", [userId]);
 
     res.json(rows);
   });
@@ -619,9 +615,6 @@ app.get("/api/users/:userID", (req, res) => {
   db.get(sql, [userID], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!row) return res.status(404).json({ error: "User not found" });
-
-    // update last login/active
-    db.run("UPDATE user_stats SET last_login = CURRENT_TIMESTAMP WHERE user_id = ?", [userID]);
 
     res.json(row);
   });
@@ -1000,9 +993,6 @@ app.delete("/api/instruments/:id", auth, (req, res) => {
         db.run(deleteListingSql, [listingId], function (err) {
           if (err) return res.status(500).json({ error: "Failed to delete listing: " + err.message });
 
-          // update stats: decrease active listings
-          db.run("UPDATE user_stats SET active_listings = active_listings - 1 WHERE user_id = ?", [userId]);
-
           res.json({ success: true, message: "Listing and media deleted successfully" });
         });
       });
@@ -1218,8 +1208,6 @@ VALUES(?, ?, ?, ?, ?, ?,?,?,?,?)
       res.json({ success: true, id: this.lastID });
     });
 
-    // update user stats
-    //db.run("UPDATE user_stats SET total_listings = total_listings + 1, active_listings = active_listings + 1 WHERE user_id = ?", [user_id]);
   });
 });
 

@@ -14,8 +14,7 @@ export class PopupComponent {
   }
 
     text: string = 'test';
-    buttons: string[] = [];
-    functions: any[] = [];
+    button_dict: any = {};
     show: boolean = false;
 
 }

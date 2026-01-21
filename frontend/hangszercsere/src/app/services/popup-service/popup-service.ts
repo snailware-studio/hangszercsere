@@ -13,11 +13,10 @@ export class PopupService {
   }
   
 
-  Show(text: string, buttons: string[], functions: any[]): void
+  Show(text: string, button_dict: any): void
   {
     this.popup.text = text;
-    this.popup.buttons = buttons;
-    this.popup.functions = functions;
+    this.popup.button_dict = button_dict;
     this.popup.show = true;
   }
 

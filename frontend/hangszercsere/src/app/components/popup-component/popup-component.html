@@ -1,6 +1,11 @@
 <ng-container *ngIf="show">
-    <p>{{ text }}</p>
-    <button *ngFor="let button of buttons" (click)="functions[button]()">
-        {{ button }}
-    </button>
+  <p>{{ text }}</p>
+
+  <button
+    *ngFor="let button of button_dict | keyvalue"
+    [attr.data-button]="button.key"
+    (click)="button.value()"
+  >
+    {{ button.key }}
+  </button>
 </ng-container>

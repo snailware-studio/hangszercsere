@@ -16,7 +16,7 @@ export class NotifComponent {
     this.notifService.register(this);
   }
 
-  show(type: 'success' | 'error' | 'message' | 'warning', message: string, button1: string = '', button2: string = '',buttin1_function: Function | null = null, buttin2_function: Function | null = null, duration: number = 3000) {
+  show(type: 'success' | 'error' | 'message' | 'warning', message: string, duration: number = 3000) {
     this.visible = false;
     this.type = type;
     this.message = message;

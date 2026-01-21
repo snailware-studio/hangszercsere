@@ -11,9 +11,9 @@ export class NotifService {
     this.notifComponent = component;
   }
 
-  show(type: 'success' | 'error' | 'message' | 'warning', message: string,button1: string = '', button2: string = '', duration: number = 3000) { 
+  show(type: 'success' | 'error' | 'message' | 'warning', message: string, duration: number = 3000) { 
     if (this.notifComponent) {
-      this.notifComponent.show(type, message, button1, button2);
+      this.notifComponent.show(type, message, duration);
     } else {
       console.warn('NotifComponent not registered!');
     }

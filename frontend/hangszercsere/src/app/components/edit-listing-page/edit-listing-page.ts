@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { HttpEventType } from '@angular/common/http';
 import { GlobalService } from '../../services/GlobalService/global-service';
+import { NotifService } from '../../services/notif-service/notif-service';
 
 @Component({
   selector: 'app-edit-listing-page',
@@ -19,7 +20,8 @@ export class EditListingPage {
     private route: ActivatedRoute,
     private userService: UserService,
     private router: Router,
-    private global: GlobalService
+    private global: GlobalService,
+    private notif: NotifService,
   ){
     this.rootUrl = this.global.rootUrl;
   }
@@ -102,14 +104,14 @@ export class EditListingPage {
           this.selectedVideos = [];
           this.uploadProgress = 0;
 
-          alert('Listing Edited! 🎉');
+          this.notif.show('success','Listing Edited!');
           this.router.navigate(['/listing', this.listing.id]);
           break;
       }
     },
     error: (err) => {
       console.error('Upload failed', err);
-      alert('Upload failed: ' + (err.error?.error || 'Unknown error'));
+      this.notif.show('error','Upload failed: ' + (err.error?.error || 'Unknown error'));
     }
   });
 }
@@ -126,7 +128,7 @@ export class EditListingPage {
       
     if(this.listing.user_id != this.userService.currentUserId)
     {
-      alert('You are not the seller of this listing!');
+      this.notif.show('error','You are not the seller of this listing!');
       this.listing = null;
       this.router.navigate(['/listing', id]);
     }
@@ -143,7 +145,7 @@ export class EditListingPage {
       },
       error: (err) => {
         console.error('Listing update failed', err);
-        alert('Listing update failed: ' + (err.error?.error || 'Unknown error'));
+        this.notif.show('error','Listing update failed: ' + (err.error?.error || 'Unknown error'));
       }
     });
   }

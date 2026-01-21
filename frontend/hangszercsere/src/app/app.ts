@@ -21,8 +21,7 @@ export class App {
   }
 
   ngOnInit(): void {
- // this.popup.Show('test', ['close','google'], [() => this.popup.close(), () => window.open('https://google.com')]);
-    this.popup.Show('test', ['close'], [() => this.popup.close()]);
+    this.popup.Show('test', {close: () => this.popup.close()});
 
     this.ws.message.subscribe(data => {
       const message = JSON.parse(data);
