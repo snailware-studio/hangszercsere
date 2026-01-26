@@ -1228,8 +1228,8 @@ app.post("/api/users/login", (req, res) => {
   }
 
   db.get(
-    "SELECT id, name, pass_hash, email_verified FROM users WHERE name = ?",
-    [name],
+    "SELECT id, name, pass_hash, email_verified FROM users WHERE name = ? OR email = ?",
+    [name,name],
     (err, user) => {
       if (err) return res.status(500).json({ error: err.message });
       if (!user) return res.status(401).json({ error: "Hibás felhasználónév vagy jelszó" });
