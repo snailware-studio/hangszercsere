@@ -34,7 +34,7 @@ export class CartService {
   AddToCart(listing_id: number): void {
 
     if (!this.user.isLoggedIn()) {
-      this.notif.show("error", "You must be logged in!");
+      this.notif.show("error", "Be kell jelentkezned!");
       this.router.navigate(['/login'])
       return;
     }
@@ -43,14 +43,14 @@ export class CartService {
       withCredentials: true
     }).subscribe({
       next: (res) => {
-        this.notif.show("success", "Added to cart!");
+        this.notif.show("success", "Hozzáadva a kosarához!");
       },
       error: (err) => {
         if (err.status === 409) {
-          this.notif.show("error", "Item already in cart!");
+          this.notif.show("warning", "Ez a hangszer már a kosárban van!");
           return;
         }
-        this.notif.show("error", "Failed to add to cart!");
+        this.notif.show("error", "Nem sikerült hozzáadni a kosarához!");
         console.error('failed to add to cart', err);
       }
     });
@@ -58,7 +58,7 @@ export class CartService {
 
 RemoveFromCart(listing_id: number): Observable<any> {
   if (!this.user.isLoggedIn()) {
-    this.notif.show("error", "You must be logged in!");
+    this.notif.show("error", "Be kell jelentkezned!");
     this.router.navigate(['/login']);
     return;
   }
@@ -67,9 +67,9 @@ RemoveFromCart(listing_id: number): Observable<any> {
     withCredentials: true
   }).pipe(
     tap({
-      next: () => this.notif.show("success", "Removed from cart!"),
+      next: () => console.log("Removed from cart!"),
       error: (err) => {
-        this.notif.show("error", "Failed to remove from cart!");
+        this.notif.show("error", "Hiba");
         console.error("failed to remove from cart", err);
       }
     })
@@ -80,7 +80,7 @@ RemoveFromCart(listing_id: number): Observable<any> {
 
   Purchase(): Observable<any> {
     if (!this.user.isLoggedIn()) {
-      this.notif.show("error", "You must be logged in!");
+      this.notif.show("error", "Be kell jelentkezned!");
       this.router.navigate(['/login']);
       return;
     }
@@ -94,13 +94,13 @@ RemoveFromCart(listing_id: number): Observable<any> {
         if (response.results && response.results.length > 0) {
           response.results.forEach(result => {
             if (result.status === 204) {
-              this.notif.show("warning", `Your cart is empty!`);
+              this.notif.show("warning", `A kosarad üres!`);
               return;
             }
             if (result.status === "error") {
               this.notif.show("error", `Listing ${result.listingID}: ${result.message}`);
             } else {
-              this.notif.show("success", `Payment completed!`);
+              this.notif.show("success", `Sikeres fizetés!`);
               this.RemoveFromCart(result.listingID);
             }
           });
@@ -123,10 +123,10 @@ RemoveFromCart(listing_id: number): Observable<any> {
       withCredentials: true
     }).subscribe({
       next: (res) => {
-        this.notif.show("success", "Cart cleared!");
+        console.log("Cart cleared!");
       },
       error: (err) => {
-        this.notif.show("error", "Failed to clear cart!");
+        this.notif.show("error", "Nem sikerült törölni a kosarát!");
         console.error('failed to clear cart', err);
       }
     });
