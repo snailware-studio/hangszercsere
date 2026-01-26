@@ -1,4 +1,4 @@
-<nav class="sticky top-0 z-50 flex flex-wrap justify-between items-center px-4 border-b-2
+<nav class="sticky top-0 z-50 flex justify-between items-center px-4 border-b-2
             border-gray-300 dark:border-gray-700
             bg-light-navbar-bg text-light-text-primary dark:bg-navbar-bg dark:text-text-primary">
 
@@ -8,7 +8,7 @@
   </a>
 
   <!-- Menu items -->
-  <div class="flex flex-wrap gap-2 items-center mt-2 sm:mt-0">
+<div class="flex gap-2 items-center mt-2 sm:mt-0 min-w-0">
 
     <!-- Dark mode toggle -->
     <button (click)="toggleDarkMode()"
@@ -24,8 +24,8 @@
     <!-- NOT logged in -->
     <ng-container *ngIf="!isLoggedIn()">
 
-    <button (click)="openMenu('login')" class="nav-item">Login</button>
-    <button (click)="openMenu('register')" class="nav-item">Register</button>
+    <button (click)="openMenu('login')" class="nav-item flex-shrink-0">Bejelentkezés</button>
+    <button (click)="openMenu('register')" class="nav-item flex-shrink-0">Regisztráció</button>
     </ng-container>
 
     <!-- Logged in -->
@@ -53,18 +53,18 @@
              [class.hidden]="!dropdown">
 
 
-          <a (click)="GotoProfile(userService.getUserId());dropdown = !dropdown" class="dropdown-item"><i class="nf nf-fa-user"></i> Profile</a>
+          <a (click)="GotoProfile(userService.getUserId());dropdown = !dropdown" class="dropdown-item"><i class="nf nf-fa-user"></i> Profil</a>
 
-          <a routerLink="/chat" class="dropdown-item" (click)="dropdown = !dropdown"><i class="nf nf-md-chat"></i> Chats</a>
+          <a routerLink="/chat" class="dropdown-item" (click)="dropdown = !dropdown"><i class="nf nf-md-chat"></i> Üzenetek</a>
 
-          <a (click)="LogOut();dropdown = !dropdown" class="dropdown-item"><i class="nf nf-md-exit_to_app"></i> Logout</a>
+          <a (click)="LogOut();dropdown = !dropdown" class="dropdown-item"><i class="nf nf-md-exit_to_app"></i> Kijelentkezés</a>
 
 
         </div>
       </div>
 
-      <a routerLink="/upload" class="nav-item"><i class="nf nf-oct-upload"></i> Upload</a>
-      <a routerLink="/cart" class="nav-item"><i class="nf nf-fa-shopping_cart"></i> Cart</a>
+      <a routerLink="/upload" class="nav-item flex-shrink-0"><i class="nf nf-oct-upload"></i> Feltöltés</a>
+      <a routerLink="/cart" class="nav-item flex-shrink-0"><i class="nf nf-fa-shopping_cart"></i> Kosár</a>
     </ng-container>
 
   </div>

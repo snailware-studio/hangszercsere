@@ -84,7 +84,6 @@ export class UserService {
       next: () => {
         this.currentUserId = null;
         this.currentUser = null;
-        this.cart.ClearCart();
       },
       error: err => console.error("Logout failed", err)
     });

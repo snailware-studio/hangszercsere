@@ -38,7 +38,7 @@ export class EditProfilePage {
   }
 
   uploadAvatar() {
-    if (!this.selectedAvatar) return this.notif.show("error", "No file selected!");
+    if (!this.selectedAvatar) return this.notif.show("error", "Nincs fájl kiválasztva!");
 
     const formData = new FormData();
     formData.append('avatar', this.selectedAvatar);
@@ -50,7 +50,7 @@ export class EditProfilePage {
         this.user.profile_url = res.filename;
       },
       error: (err) => {
-        console.error('Upload failed', err);
+        console.error('Feltöltés sikertelen!', err);
         this.notif.show("error", err.error.error);
       }
     });
@@ -63,7 +63,7 @@ export class EditProfilePage {
 
     if(!this.userService.isLoggedIn())
     {
-          this.notif.show("error", "You can't edit someone else's profile!");
+          this.notif.show("error", "Nem módosíthatod ezt a profilt!");
           this.router.navigate(['/']);
       return;
     }
@@ -71,21 +71,22 @@ export class EditProfilePage {
     this.userService.GetUser(userId).subscribe({
       next: (data) => {
         if (data.id !== this.userService.getUserId()) {
-          this.notif.show("error", "You can't edit someone else's profile!");
+          this.notif.show("error", "Nem módosíthatod ezt a profilt!");
           this.router.navigate(['/']);
           return;
         }
         this.user = data;
       },
       error: (err) => {
-        console.error('Failed to load user', err);
+        console.error('Nem sikerült betölteni a felhasználó adatait!', err);
+        this.notif.show("error", "Nem sikerült betölteni a felhasználó adatait!");
       }
     });
   }
 
   ChangePassword() {
     if ((this.newPassword != this.confirmPassword) && this.confirmPassword != '') {
-      this.notif.show("error", "New passwords don't match!");
+      this.notif.show("error", "Az új jelszó nem egyezik!");
       return;
     }
   }
@@ -93,10 +94,10 @@ export class EditProfilePage {
   DeleteAccount() {
     this.userService.DeleteAccount(this.userService.getUserId()).subscribe({ 
       next: (res) => {
-        this.notif.show("success", "Confirmation email sent!");
+        this.notif.show("success", "Megerősítő email elküldve!");
       },
       error: (err) => {
-        console.error('Account delete failed', err);
+        console.error('Törlés sikertelen!', err);
         this.notif.show("error", err.error.error);
       }
     });
@@ -109,10 +110,9 @@ export class EditProfilePage {
       this.userService.LoginUser(this.user.name, this.currentPassword).subscribe({
 
         next: (res: any) => {
-
         },
         error: (err) => {
-          let msg = "Unkown error";
+          let msg = "Ismeretlen hiba";
           if (err && err.error && err.error.error) {
             msg = err.error.error;
           }
@@ -122,15 +122,16 @@ export class EditProfilePage {
       });
     }
 
+    this.uploadAvatar();
 
     this.userService.UpdateUser(this.user.id, this.user.name, this.user.email, this.user.bio, this.user.location, this.newPassword).subscribe({
       next: (res) => {
         console.log('Profile updated', res);
-        this.notif.show("success", "Profile updated! 🎉");
+        this.notif.show("success", "Profil frissítve! 🎉");
         this.router.navigate(['/profile', this.user.id]);
       },
       error: (err) => {
-        console.error('Profile update failed', err);
+        console.error('Módosítás sikertelen!', err);
         this.notif.show("error", err.error.error);
       }
     });

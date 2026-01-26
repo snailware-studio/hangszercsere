@@ -3,28 +3,27 @@
   <div class="flex flex-wrap items-center gap-2" >
     <button (click)="showExtra = !showExtra"
       class="px-4 py-2 bg-accent text-white rounded hover:bg-accent-dark transition">
-      Filters
+      szűrők
     </button>
 
     <select [(ngModel)]="filters.category"
       class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg hover:bg-accent hover:text-white transition">
-      <option value="">Category</option>
-      <option value="guitar">Guitar</option>
-      <option value="bass">Bass</option>
-      <option value="keyboard">Keyboard</option>
-      <option value="drums">Drums</option>
+      <option value=null>Kategória</option>
+       <ng-container *ngFor="let category of categories">
+          <option [value]="category.name">{{category.name}}</option>
+        </ng-container>
     </select>
 
     <div class="flex gap-2 items-center">
       <select [(ngModel)]="filters.priceType"
         class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg hover:bg-accent hover:text-white transition">
-        <option value="">Price</option>
-        <option value="less">Less than</option>
-        <option value="more">More than</option>
-        <option value="custom">Custom range</option>
+        <option value=null>Ár</option>
+        <option value="less">Kevesebb mint</option>
+        <option value="more">Több mint</option>
+        <option value="custom">Egyéni</option>
       </select>
 
-      <input *ngIf="filters.priceType === 'less' || filters.priceType === 'more'" type="number" placeholder="Price"
+      <input *ngIf="filters.priceType === 'less' || filters.priceType === 'more'" type="number" placeholder="Ár"
         [(ngModel)]="filters.priceValue" class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
 
       <div *ngIf="filters.priceType === 'custom'" class="flex gap-1">
@@ -36,48 +35,48 @@
     </div>
 
     <select [(ngModel)]="filters.condition" [ngClass]="{
-                            'text-green-500 border-green-500 focus:border-green-500': filters.condition === 'New',
-                            'text-emerald-400 border-emerald-400 focus:border-emerald-400': filters.condition === 'Very Good',
-                            'text-yellow-500 border-yellow-500 focus:border-yellow-500': filters.condition === 'Good',
-                            'text-orange-500 border-orange-500 focus:border-orange-500': filters.condition === 'Satisfactory'
+                            'text-green-500 border-green-500 focus:border-green-500': filters.condition === 'Új',
+                            'text-emerald-400 border-emerald-400 focus:border-emerald-400': filters.condition === 'Nagyon jó',
+                            'text-yellow-500 border-yellow-500 focus:border-yellow-500': filters.condition === 'Jó',
+                            'text-orange-500 border-orange-500 focus:border-orange-500': filters.condition === 'Elfogadható'
                         }"
       class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg hover:bg-accent hover:text-white transition">
 
-      <option value="" disabled class="text-gray-400 dark:bg-gray-800">Select condition</option>
-      <option value="New" class="text-green-500 font-semibold dark:bg-gray-800">New</option>
-      <option value="Very Good" class="text-emerald-400 font-semibold dark:bg-gray-800">Very Good
+      <option value=null disabled class="text-gray-400 dark:bg-gray-800">Állapot</option>
+      <option value="Új" class="text-green-500 font-semibold dark:bg-gray-800">Új</option>
+      <option value="Nagyon jó" class="text-emerald-400 font-semibold dark:bg-gray-800">Nagyon jó
       </option>
-      <option value="Good" class="text-yellow-500 font-semibold dark:bg-gray-800">Good</option>
-      <option value="Satisfactory" class="text-orange-500 font-semibold dark:bg-gray-800">
-        Satisfactory</option>
+      <option value="Jó" class="text-yellow-500 font-semibold dark:bg-gray-800">Jó</option>
+      <option value="Elfogadható" class="text-orange-500 font-semibold dark:bg-gray-800">
+        Elfogadható</option>
     </select>
   </div>
 
   <div *ngIf="showExtra" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 
-    <input [(ngModel)]="filters.brand" placeholder="Brand"
+    <input [(ngModel)]="filters.brand" placeholder="Márka"
       class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
 
-    <input [(ngModel)]="filters.model" placeholder="Model"
+    <input [(ngModel)]="filters.model" placeholder="Modell"
       class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
 
-    <input [(ngModel)]="filters.location" placeholder="Location"
+    <input [(ngModel)]="filters.location" placeholder="Hely"
       class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />
 
     <select [(ngModel)]="filters.aiRating" class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition">
-      <option value="">AI Rating</option>
-      <option value="1">1 ⭐</option>
-      <option value="2">2 ⭐</option>
-      <option value="3">3 ⭐</option>
-      <option value="4">4 ⭐</option>
-      <option value="5">5 ⭐</option>
+      <option value=null>AI Értékelés</option>
+      <option value=1>1 ⭐</option>
+      <option value=2>2 ⭐</option>
+      <option value=3>3 ⭐</option>
+      <option value=4>4 ⭐</option>
+      <option value=5>5 ⭐</option>
     </select>
 
     <div class="flex gap-2 items-center">
       <select [(ngModel)]="filters.dateType" class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition">
-        <option value="">Date Added</option>
-        <option value="before">Before</option>
-        <option value="after">After</option>
+        <option value=null>Dátum</option>
+        <option value="before">Előtt</option>
+        <option value="after">Után</option>
       </select>
       <input type="date" [(ngModel)]="filters.dateValue"
         class="px-4 py-2 rounded bg-light-card-bg dark:bg-card-bg transition" />

@@ -11,14 +11,14 @@
       ✕
     </button>
 
-    <h2 class="text-xl font-bold mb-4 text-light-text-primary dark:text-text-primary">Register</h2>
+    <h2 class="text-xl font-bold mb-4 text-light-text-primary dark:text-text-primary">Regisztráció</h2>
 
     <form (ngSubmit)="RegisterUser()" class="flex flex-col gap-3">
 
-      <label class="text-light-text-secondary dark:text-text-secondary">Name</label>
+      <label class="text-light-text-secondary dark:text-text-secondary">Név</label>
       <input type="text" [(ngModel)]="name" required class="input-field" name="name" />
 
-      <label class="text-light-text-secondary dark:text-text-secondary">Password</label>
+      <label class="text-light-text-secondary dark:text-text-secondary">Jelszó</label>
       <input type="password" [(ngModel)]="password" required class="input-field" name="password" #passwcontrol="ngModel"
         pattern="^.{4,}$" [ngClass]="{
         'border-red-500 focus:border-red-500 dark:border-red-400 dark:focus:border-red-400':
@@ -28,10 +28,10 @@
       }" />
 
       <div *ngIf="passwcontrol.invalid && passwcontrol.touched" class="text-red-500 text-sm mt-1">
-        Password must be at least 4 characters long
+        A jelszó minimum 4 karakter hosszú kell hogy legyen!
       </div>
 
-      <label class="text-light-text-secondary dark:text-text-secondary">Location</label>
+      <label class="text-light-text-secondary dark:text-text-secondary">Hely</label>
       <input type="text" [(ngModel)]="location" required class="input-field" name="location" />
 
       <label class="text-light-text-secondary dark:text-text-secondary">Email</label>
@@ -45,7 +45,7 @@
        }" />
 
       <div *ngIf="emailCtrl.invalid && emailCtrl.touched" class="text-red-500 text-sm">
-        Please enter a valid email address.
+        Valós email címet adj meg!
       </div>
 
       <p class="text-sm text-gray-500 mt-2">
@@ -56,7 +56,7 @@
 
       <button type="submit" [disabled]="emailCtrl.invalid"
         class="mt-2 bg-accent text-white font-semibold py-2 rounded hover:bg-accent-hover transition">
-        Register
+        Fiók létrehozása
       </button>
 
     </form>

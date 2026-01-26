@@ -25,6 +25,8 @@ export class Upload {
       this.NotifService.show('error',"You must be logged in!");
       this.router.navigate(['/login']);
     }
+
+    this.GetCategories();
   }
 
   title: string = '';
@@ -44,7 +46,21 @@ export class Upload {
   PreviewImages: string[] = [];
   PreviewVideos: string[] = [];
 
+  categories: string[] = [];
+
   uploadProgress: number = 0;
+
+  GetCategories(): void {
+    this.ListingService.GetCategories().subscribe({
+      next: (res) => {
+        this.categories = res;
+      },
+      error: (err) => {
+        console.error('Failed to get categories', err);
+        this.NotifService.show('error','Failed to get categories: ' + (err.error?.error || 'Unknown error'));
+      }
+    });
+  }
 
   onSelectImages(event: Event) {
     const files = (event.target as HTMLInputElement).files;

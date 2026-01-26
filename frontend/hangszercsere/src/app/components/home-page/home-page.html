@@ -5,7 +5,7 @@
 <div class="product-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-4">
 
 <ng-container *ngIf="!listings">
-  <p class="text-light-text-secondary dark:text-text-secondary">No listings found... :(</p>
+  <p class="text-light-text-secondary dark:text-text-secondary">Nincs található hírdetés... :(</p>
 </ng-container>
 
 <ng-container *ngIf="listings?.length === 0">
@@ -23,10 +23,10 @@
         class="w-full h-48 object-cover rounded-t-md">
       <span class="price-badge">{{ listing.price }} Ft</span>
       <span class="condition-badge left-2 top-2" [ngClass]="{
-        'text-green-500 border-green-500': listing?.condition === 'New',
-        'text-emerald-400 border-emerald-400': listing?.condition === 'Very Good',
-        'text-yellow-500 border-yellow-500': listing?.condition === 'Good',
-        'text-orange-500 border-orange-500': listing?.condition === 'Satisfactory'
+        'text-green-500 border-green-500': listing?.condition === 'Új',
+        'text-emerald-400 border-emerald-400': listing?.condition === 'Nagyon jó',
+        'text-yellow-500 border-yellow-500': listing?.condition === 'Jó',
+        'text-orange-500 border-orange-500': listing?.condition === 'Elfogadható'
       }">{{ listing?.condition }}</span>
     </div>
 
@@ -46,8 +46,8 @@
 
     <!-- Meta info -->
     <div class="product-meta">
-      <span>Seller: <b>{{ listing.seller }}</b></span>
-      <span>Category: <b>{{ listing.category }}</b></span>
+      <span>Eladó: <b>{{ listing.seller }}</b></span>
+      <span>Kategória: <b>{{ listing.category }}</b></span>
     </div>
 
     <!-- Time since posted -->

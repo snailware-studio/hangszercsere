@@ -147,7 +147,7 @@ app.get("/api/users/me", auth, (req, res) => {
   db.get("SELECT id, name, email, profile_url  FROM users WHERE id = ?", [req.userId], (err, user) => {
     if (err) {
       console.log(err);
-      return res.status(500).json({ error: "DB error" });
+      return res.status(500).json({ error: "Adatbázis hiba" });
     }
     res.json(user);
   });
@@ -344,6 +344,8 @@ app.post('/api/users/avatar', auth, upload.single('avatar'), async (req, res) =>
     res.status(500).json({ error: 'Image processing failed' });
   }
 });
+
+
 
 
 // update media
@@ -716,6 +718,23 @@ app.post("/api/buy", auth, (req, res) => {
                   emailservice.sendListingBoughtEmail(row.email, row.name, listing.id);
                 }
               });
+              //doesnt work
+              const cartsql = 'SELECT user_id FROM cart_items WHERE listing_id = ?';
+              db.all(cartsql, [listing.id], (err, rows) => {
+                if (!err && rows) {
+                  rows.forEach(row => {
+                    if (row.user_id === userID) return;
+
+                    const sqlUser = 'SELECT email, name FROM users WHERE id = ?';
+                    db.get(sqlUser, [row.user_id], (err, userRow) => {
+                      if (!err && userRow) {
+                        emailservice.sendListingBoughtEmail(userRow.email, userRow.name, listing.id);
+                      }
+                    });
+                  });
+                }
+              });
+
           }
           checkDone();
         });
@@ -868,62 +887,130 @@ app.put("/api/instrument/update/:id", auth, (req, res) => {
 });
 
 
-// Get all instruments
+// Get listings/insturments
 app.get("/api/instruments", async (req, res) => {
   try {
-    const rows = await new Promise((resolve, reject) => {
-      db.all(
-        `
+    const filters = req.query;
+
+    const params = [];
+    let sql = `
       SELECT
-    l.id,
-      l.title,
-      l.price,
-      l.description,
-      l.status,
-      l.created_at,
-      l.user_id,
-      l.condition,
-      l.brand,
-      l.model,
-      l.ai_rating,
-      u.name AS seller,
+        l.id,
+        l.title,
+        l.price,
+        l.description,
+        l.status,
+        l.created_at,
+        l.user_id,
+        l.condition,
+        l.brand,
+        l.model,
+        l.ai_rating,
+        u.name AS seller,
         l.category_id,
         c.name AS category,
-          (
-            SELECT GROUP_CONCAT(m.url)
-              FROM media m
-              WHERE m.listing_id = l.id AND m.type = 'image'
-          ) AS images,
-    (
-      SELECT GROUP_CONCAT(m.url)
-              FROM media m
-              WHERE m.listing_id = l.id AND m.type = 'video'
-          ) AS videos
+        (
+          SELECT GROUP_CONCAT(m.url)
+          FROM media m
+          WHERE m.listing_id = l.id AND m.type = 'image'
+        ) AS images,
+        (
+          SELECT GROUP_CONCAT(m.url)
+          FROM media m
+          WHERE m.listing_id = l.id AND m.type = 'video'
+        ) AS videos
       FROM listings l
       JOIN users u ON u.id = l.user_id
       LEFT JOIN categories c ON c.id = l.category_id
-      WHERE l.status = 'active';
-`
-        ,
-        [],
-        (err, rows) => {
-          if (err) reject(err);
-          else resolve(rows);
-        }
-      );
+      WHERE l.status = 'active'
+    `;
+
+    // === Dynamic filters ===
+    if (filters.aiRating && Number(filters.aiRating) > 0) {
+      sql += ` AND l.ai_rating >= ?`;
+      params.push(Number(filters.aiRating));
+    }
+
+    if (filters.brand) {
+      sql += ` AND l.brand = ?`;
+      params.push(filters.brand);
+    }
+
+    if (filters.category) {
+      sql += ` AND c.name = ?`;
+      params.push(filters.category);
+    }
+
+    if (filters.condition) {
+      sql += ` AND l.condition = ?`;
+      params.push(filters.condition);
+    }
+
+    if (filters.model) {
+      sql += ` AND l.model = ?`;
+      params.push(filters.model);
+    }
+
+    if (filters.location) {
+      sql += ` AND l.location = ?`;
+      params.push(filters.location);
+    }
+
+    if (filters.dateType && filters.dateValue) {
+      if (filters.dateType === "before") {
+        sql += ` AND l.created_at <= ?`;
+      } else if (filters.dateType === "after") {
+        sql += ` AND l.created_at >= ?`;
+      }
+      params.push(filters.dateValue);
+    }
+
+    // Price filter
+    if (filters.priceType === "custom") {
+      if (filters.priceMin != null) {
+        sql += ` AND l.price >= ?`;
+        params.push(Number(filters.priceMin));
+      }
+      if (filters.priceMax != null) {
+        sql += ` AND l.price <= ?`;
+        params.push(Number(filters.priceMax));
+      }
+    } else if (filters.priceType === "less" && filters.priceValue != null) {
+      sql += ` AND l.price <= ?`;
+      params.push(Number(filters.priceValue));
+    } else if (filters.priceType === "more" && filters.priceValue != null) {
+      sql += ` AND l.price >= ?`;
+      params.push(Number(filters.priceValue));
+    }
+
+    // Pagination (optional, default 20)
+    const page = Number(filters.page) || 1;
+    const limit = Number(filters.limit) || 20;
+    const offset = (page - 1) * limit;
+    sql += ` LIMIT ? OFFSET ?`;
+    params.push(limit, offset);
+
+    // === Execute query ===
+    const rows = await new Promise((resolve, reject) => {
+      db.all(sql, params, (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
     });
 
     const listings = rows.map(row => ({
       ...row,
-      images: row.images ? row.images.split(',') : [],
-      videos: row.videos ? row.videos.split(',') : []
+      images: row.images ? row.images.split(",") : [],
+      videos: row.videos ? row.videos.split(",") : []
     }));
 
     res.json(listings);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // get specific instrument by id
 app.get("/api/instrument/:id", (req, res) => {
@@ -1008,7 +1095,7 @@ app.delete("/api/instruments/:id", auth, (req, res) => {
   });
 });
 
-//confirms token
+//confirm token
 app.get('/api/confirm/:token', async (req, res) => {
   const token = req.params.token;
 
@@ -1089,7 +1176,7 @@ app.post('/api/users', async (req, res) => {
     db.run(sql, [name, email, location, pass_hash], function (err) {
       if (err) {
         if (err.message.includes('UNIQUE')) {
-          return res.status(400).json({ error: 'User with that name or email already exists' });
+          return res.status(400).json({ error: 'Felhasználónév vagy email már regisztrálva van!' });
         }
         return res.status(500).json({ error: err.message });
       }
@@ -1114,6 +1201,7 @@ app.post('/api/users', async (req, res) => {
 
 });
 
+
 //delete user
 app.post('/api/users/delete', auth, (req, res) => {
   const userId = req.body.userId;
@@ -1136,20 +1224,22 @@ app.post("/api/users/login", (req, res) => {
   const { name, password } = req.body;
 
   if (!name || !password) {
-    return res.status(400).json({ error: "name and password required" });
+    return res.status(400).json({ error: "Felhasználónév és jelszó kötelezőek" });
   }
 
   db.get(
-    "SELECT id, name, pass_hash FROM users WHERE name = ?",
+    "SELECT id, name, pass_hash, email_verified FROM users WHERE name = ?",
     [name],
     (err, user) => {
       if (err) return res.status(500).json({ error: err.message });
-      if (!user) return res.status(401).json({ error: "Invalid name or password" });
+      if (!user) return res.status(401).json({ error: "Hibás felhasználónév vagy jelszó" });
 
       // bcrypt ellenőrzés
       bcrypt.compare(password, user.pass_hash, (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
-        if (!result) return res.status(401).json({ error: "Invalid name or password" });
+        if (!result) return res.status(401).json({ error: "Hibás felhasználónév vagy jelszó" });
+
+        if (user.email_verified == false) return res.status(401).json({ error: "Email nincs megerősítve!" });
 
         // session id generálás
         const sessionId = crypto.randomUUID();
@@ -1234,7 +1324,9 @@ app.get("/api/cart-items", auth, (req, res) => {
     let completed = 0;
 
     let sql = `SELECT 
+     l.id,
       l.user_id,
+      u.name AS seller,
       l.title,
       l.price,
       l.description,
@@ -1252,8 +1344,11 @@ app.get("/api/cart-items", auth, (req, res) => {
        WHERE type = 'image'
        ORDER BY id ASC
    ) m ON m.listing_id = l.id
+  JOIN users u ON u.id = l.user_id
    WHERE l.id = ?
    LIMIT 1`;
+
+  if (cartIds.length === 0) return res.status(204).res.json([{error: "Cart is empty"}]);
 
     cartIds.forEach(id => {
       db.get(sql, [id], (err, row) => {
@@ -1297,42 +1392,26 @@ app.post("/api/cart-items", auth, (req, res) => {
 });
 
 //remove from cart
-app.delete("/api/cart-items", auth, (req, res) => {
+app.delete("/api/cart-items/:listing_id", auth, (req, res) => {
   const userId = req.userId;
   if (!userId) return res.status(400).json({ error: "User ID is required" });
 
-  let ids = [];
-
-  function doDelete(idsToDelete) {
-    let completed = 0;
-
-    if (idsToDelete.length === 0) {
-      return res.status(404).json({ error: "Cart is empty" });
-    }
-
-    idsToDelete.forEach(id => {
-      db.run("DELETE FROM cart_items WHERE cart_id = ? AND listing_id = ?", [userId, id], function(err) {
-        if (err) return res.status(500).json({ error: err.message });
-
-        completed++;
-        if (completed === idsToDelete.length) {
-          res.status(200).json({ message: "Removed from cart" });
-        }
-      });
-    });
-  }
-
-  if (req.body && req.body.length > 0) {
-    ids = req.body;
-    doDelete(ids);
-  } else {
-    const sql = `SELECT listing_id FROM cart_items WHERE cart_id = ?`;
-    db.all(sql, [userId], (err, rows) => {
+  const id = req.params.listing_id;
+  //clear cart
+  if (!id)
+  {
+    db.run("DELETE FROM cart_items WHERE cart_id = ?", [userId], function (err) {
       if (err) return res.status(500).json({ error: err.message });
-      ids = rows.map(row => row.listing_id);
-      doDelete(ids);
+      res.json({ message: "Cart cleared" });
     });
+    return;
   }
+  //delete listing with id
+  db.run("DELETE FROM cart_items WHERE cart_id = ? AND listing_id = ?", [userId, id], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: "Removed from cart" });
+  });
+
 });
 
 

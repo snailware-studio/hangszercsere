@@ -3,7 +3,7 @@
     class="max-w-4xl mx-auto bg-light-card-bg dark:bg-card-bg rounded-xl shadow-lg p-8 flex flex-col items-center gap-6">
 
     <!-- Avatar + Name -->
-    <img [src]="rootUrl+'/uploads/' + user?.profile_url" alt="{{ user?.name }}'s avatar"
+    <img [src]="rootUrl+'/uploads/' + user?.profile_url" alt="{{ user?.name }} profilképe"
       class="w-32 h-32 rounded-full object-cover shadow-md">
 
     <h1 class="text-3xl font-bold text-light-text-primary dark:text-text-primary">
@@ -12,60 +12,45 @@
 
     <!-- Bio -->
     <p class="text-center text-light-text-secondary dark:text-text-secondary">
-      {{ user?.bio ? user?.bio : 'No bio provided.' }}
+      {{ user?.bio ? user?.bio : '-' }}
     </p>
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 w-full text-center mt-4">
       <div>
-        <span class="block text-xl font-bold text-light-text-primary dark:text-text-primary">{{ user?.total_listings
-          }}</span>
-        <span class="text-light-text-secondary dark:text-text-secondary">Total Listings</span>
-      </div>
-      <div>
         <span class="block text-xl font-bold text-light-text-primary dark:text-text-primary">{{ user?.active_listings
           }}</span>
-        <span class="text-light-text-secondary dark:text-text-secondary">Active Listings</span>
+        <span class="text-light-text-secondary dark:text-text-secondary">Aktív hírdetések</span>
       </div>
       <div>
         <span class="block text-xl font-bold text-light-text-primary dark:text-text-primary">{{ user?.total_sold
           }}</span>
-        <span class="text-light-text-secondary dark:text-text-secondary">Total Sold</span>
+        <span class="text-light-text-secondary dark:text-text-secondary">Összes eladás</span>
       </div>
       <div>
         <span class="block text-xl font-bold text-light-text-primary dark:text-text-primary">{{ user?.rating ?
           user?.rating : '-' }}</span>
-        <span class="text-light-text-secondary dark:text-text-secondary">Rating</span>
-      </div>
-      <div>
-        <span class="block text-xl font-bold text-light-text-primary dark:text-text-primary">{{ user?.total_reviews
-          }}</span>
-        <span class="text-light-text-secondary dark:text-text-secondary">Reviews</span>
-      </div>
-      <div>
-        <span class="block text-xl font-bold text-light-text-primary dark:text-text-primary">{{ user?.rating_count
-          }}</span>
-        <span class="text-light-text-secondary dark:text-text-secondary">Rating Count</span>
+        <span class="text-light-text-secondary dark:text-text-secondary">Értékelés</span>
       </div>
     </div>
 
     <!-- Additional Info -->
     <div class="flex flex-col sm:flex-row gap-4 mt-4 text-light-text-secondary dark:text-text-secondary text-sm">
-      <span>Location: {{ user?.location }}</span>
-      <span>Joined: {{ user?.join_date | date:'mediumDate' }}</span>
+      <span>Hely: {{ user?.location }}</span>
+      <span>Regisztrált: {{ user?.join_date | date:'mediumDate' }}</span>
     </div>
 
     <ng-container *ngIf="this.user.id == CurrentUserId()">
       <button
         class="bg-accent text-white py-3 rounded font-semibold hover:bg-accent-hover transition w-fit px-6 mx-auto mt-4"
         (click)="EditProfile()">
-        Edit Profile
+        Módosítás
       </button>
     </ng-container>
 
     <br>
     <div>
-      <span>Last active: {{ user?.last_login | date:'mediumDate' }}</span>
+      <span>Utoljára aktív: {{ user?.last_login | date:'mediumDate' }}</span>
     </div>
 
   </div>

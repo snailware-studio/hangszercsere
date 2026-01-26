@@ -46,40 +46,38 @@
         </p>
         <div class="text-light-text-primary font-semibold dark:text-text-primary flex flex-col gap-1">
 
-          <p><span class="font-semibold">Category:</span> {{ listing?.category }}</p>
+          <p><span class="font-semibold">Kategória:</span> {{ listing?.category }}</p>
           <p class="flex items-center gap-2">
-            <span class="font-semibold">Condition:</span>
+            <span class="font-semibold">Állapot:</span>
 
             <span [ngClass]="{
-      'text-green-500 border-green-500': listing?.condition === 'New',
-      'text-emerald-400 border-emerald-400': listing?.condition === 'Very Good',
-      'text-yellow-500 border-yellow-500': listing?.condition === 'Good',
-      'text-orange-500 border-orange-500': listing?.condition === 'Satisfactory'
+      'text-green-500 border-green-500': listing?.condition === 'Új',
+      'text-emerald-400 border-emerald-400': listing?.condition === 'Nagyon jó',
+      'text-yellow-500 border-yellow-500': listing?.condition === 'Jó',
+      'text-orange-500 border-orange-500': listing?.condition === 'Elfogadható'
     }" class="px-2 py-1 rounded border bg-transparent dark:bg-gray-800 text-sm">
               {{ listing?.condition }}
             </span>
           </p>
 
-          <p><span class="font-semibold">Brand:</span> {{ listing?.brand }}</p>
-          <p><span class="font-semibold">Model:</span> {{ listing?.model }}</p>
+          <p><span class="font-semibold">Márka:</span> {{ listing?.brand }}</p>
+          <p><span class="font-semibold">Modell:</span> {{ listing?.model }}</p>
 
-          <p><span class="font-semibold">Rating:</span>
+          <p><span class="font-semibold">Értékelés:</span>
             <ng-container *ngIf="listing?.ai_rating !== null && listing?.ai_rating !== undefined">
               {{ listing?.ai_rating }}/5 ⭐
             </ng-container>
             <ng-container *ngIf="listing?.ai_rating === null || listing?.ai_rating === undefined">
-              No rating
+              Nincs értékelés
             </ng-container>
           </p>
 
         </div>
 
-
         <div class="text-light-text-secondary dark:text-text-secondary flex flex-col gap-1">
-          <p (click)="GotoProfile(listing?.user_id)"><span class="font-semibold">Seller:</span> <span class="button">{{
+          <p (click)="GotoProfile(listing?.user_id)"><span class="font-semibold">Eladó:</span> <span class="button">{{
               listing?.seller }}</span></p>
-          <p><span class="font-semibold">Status:</span> {{ listing?.status }}</p>
-          <p><span class="font-semibold">Posted:</span> {{ listing?.created_at | date:'mediumDate' }}</p>
+          <p><span class="font-semibold">Közzétéve:</span> {{ listing?.created_at | date:'mediumDate' }}</p>
         </div>
 
 
@@ -87,28 +85,28 @@
         <ng-container *ngIf="GetUserId() != listing?.user_id">
 
           <!-- ADD TO CART BUTTON -->
-          <button class="bg-accent text-white font-semibold py-3 rounded hover:bg-accent-hover
+          <button class="bg-accent text-white font-semibold py-3 rounded hover:bg-accent-hover bg-green-500
                     transition w-full md:w-1/2" (click)="AddToCart(listing.id)">
-            Add to Cart
+            Kosárba
           </button>
 
           <!-- Message seller -->
           <button class="bg-accent text-white font-semibold py-3 rounded hover:bg-accent-hover
                     transition w-full md:w-1/2" (click)="StartChat(listing)">
-            Message seller
+            Üzenet
           </button>
 
         </ng-container>
         <ng-container *ngIf="GetUserId() == listing?.user_id">
           <!-- Edit listing -->
           <button class="bg-accent text-white font-semibold py-3 rounded hover:bg-accent-hover
-                    transition w-full md:w-1/2" (click)="EditListing(listing?.id)">
-            Edit Listing
+                    transition w-full md:w-1/2 text-white bg-blue-500" (click)="EditListing(listing?.id)">
+            Módosítás
           </button>
 
           <button (click)="RemoveListing(listing.id)" class="bg-red-600 text-white font-semibold py-2 rounded w-full md:w-1/2
                    hover:bg-red-700 transition">
-            Delete Listing
+            Törlés
           </button>
         </ng-container>
 

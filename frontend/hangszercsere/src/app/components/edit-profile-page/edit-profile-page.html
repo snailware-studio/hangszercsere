@@ -1,8 +1,6 @@
 <div class="w-full min-h-screen bg-light-site-bg dark:bg-site-bg py-12">
   <div class="max-w-2xl mx-auto flex flex-col gap-6">
 
-    <h2 class="text-3xl font-bold text-light-text-primary dark:text-text-primary">Edit Profile</h2>
-
     <!-- Avatar -->
 <div class="flex flex-col gap-2 items-center">
   <img [src]="rootUrl+'/uploads/' + user?.profile_url"
@@ -10,41 +8,38 @@
        class="w-32 h-32 rounded-full object-cover shadow-md">
 
   <input type="file" (change)="onSelectAvatar($event)" accept="image/*" class="mt-2" />
-  <button (click)="uploadAvatar()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
-    Upload
-  </button>
 </div>
 
     <ng-container *ngIf="this.user">
     <!-- Name -->
     <div class="flex flex-col gap-1">
-      <label class="text-light-text-secondary dark:text-text-secondary">Name</label>
+      <label class="text-light-text-secondary dark:text-text-secondary">Név</label>
       <input type="text" [(ngModel)]="this.user.name" class="input-field" placeholder="John Doe"/>
     </div>
 
     <!-- Bio -->
     <div class="flex flex-col gap-1">
-      <label class="text-light-text-secondary dark:text-text-secondary">Bio</label>
-      <input type="text" [(ngModel)]="this.user.bio" class="input-field" placeholder="{{'Your bio...'}}" />
+      <label class="text-light-text-secondary dark:text-text-secondary">Leírás</label>
+      <input type="text" [(ngModel)]="this.user.bio" class="input-field" placeholder="{{'leírásod...'}}" />
     </div>
 
     <!-- Location -->
     <div class="flex flex-col gap-1">
-      <label class="text-light-text-secondary dark:text-text-secondary">Location</label>
-      <input type="text" [(ngModel)]="this.user.location" class="input-field" placeholder="{{'Location'}}" />
+      <label class="text-light-text-secondary dark:text-text-secondary">Hely</label>
+      <input type="text" [(ngModel)]="this.user.location" class="input-field" placeholder="{{'Hely'}}" />
     </div>
 
     <!-- password-->
     <div class="flex flex-col gap-1">
-      <label class="text-light-text-secondary dark:text-text-secondary">Change Password</label>
-      <input type="password" [(ngModel)]="this.currentPassword" class="input-field" placeholder="{{'Current password'}}" />
-      <input type="password" [(ngModel)]="this.newPassword" class="input-field" placeholder="{{'New password'}}" (change)="ChangePassword()" />
-      <input type="password" [(ngModel)]="this.confirmPassword" class="input-field" placeholder="{{'Confirm new password'}}" (change)="ChangePassword()"/>
+      <label class="text-light-text-secondary dark:text-text-secondary">Jelszó módosítása</label>
+      <input type="password" [(ngModel)]="this.currentPassword" class="input-field" placeholder="{{'Jelszó'}}" />
+      <input type="password" [(ngModel)]="this.newPassword" class="input-field" placeholder="{{'Új jelszó'}}" (change)="ChangePassword()" />
+      <input type="password" [(ngModel)]="this.confirmPassword" class="input-field" placeholder="{{'Új jelszó megerősítése'}}" (change)="ChangePassword()" />
     </div>
 </ng-container>
 
-    <button class="bg-accent text-white py-3 rounded font-semibold hover:bg-accent-hover transition w-fit px-6 mx-auto mt-4" (click)="UpdateProfile()">
-      Save Changes
+    <button class="bg-green-500 text-white py-3 rounded font-semibold hover:bg-accent-hover transition w-fit px-6 mx-auto mt-4" (click)="UpdateProfile()">
+      Mentés
     </button>
-    <button class="bg-red-500 text-white py-3 rounded font-semibold hover:bg-red-600 transition w-fit px-6 mx-auto mt-4" (click)="DeleteAccount()">Delete Account</button>
+    <button class="bg-red-500 text-white py-3 rounded font-semibold hover:bg-red-600 transition w-fit px-6 mx-auto mt-4" (click)="DeleteAccount()">Fiók törlése</button>
 </div>

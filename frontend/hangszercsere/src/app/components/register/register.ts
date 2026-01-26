@@ -49,7 +49,7 @@ export class Register {
       this.userservice.RegisterUser(newUser).subscribe({
         next: (res) => {
           console.log('Registration successful', res);
-          this.NotifService.show('success',"Registration successful! 🎉");
+          this.NotifService.show('success',"Megerősítő email elküldve!");
           this.name = '';
           this.email = '';
           this.password = '';
@@ -65,7 +65,12 @@ export class Register {
         error: (err) => {
           console.error('Registration failed', err);
           //alert('Registration failed: ' + (err.error?.error || 'Unknown error'));
-          this.NotifService.show('error',"Registration failed!");
+          if(err.err.error == 'Email nincs megerősítve!')
+          {
+            this.NotifService.show('warning',"Erősítsd meg az email címed!");
+            return;
+          }
+          this.NotifService.show('error',"Sikertelen regisztráció!");
         }});
   }
 

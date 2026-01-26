@@ -30,7 +30,7 @@ export class Login {
   {
     if (this.userService.isLoggedIn())
     {
-      this.NotifService.show('error',"You are already logged in!");
+      this.NotifService.show('error',"Már be vagy jelentkezve!");
       this.router.navigate(['/'])
     }
   }
@@ -40,14 +40,19 @@ export class Login {
     this.userService.LoginUser(this.name,this.password).subscribe({
 
       next: (res: any) => {
-            this.NotifService.show('success',"Login successful!");
+            this.NotifService.show('success',"Sikeres bejelentkezés!");
             this.router.navigate(['/']);
             if (this.isMenu) this.closeMenu();
           },
           error: (err) => {
-            let msg = "Unkown error"; // translation: it's cooked
+            let msg = "Ismeretlen hiba"; // translation: it's cooked
             if (err && err.error && err.error.error) {
               msg = err.error.error;
+            }
+            if(msg == 'Email nincs megerősítve!')
+            {
+              this.NotifService.show('warning',"Erősítsd meg az email címed!");
+              return;
             }
             this.alertmsg = msg;
           }

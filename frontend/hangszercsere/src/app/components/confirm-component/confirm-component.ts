@@ -17,16 +17,16 @@ export class ConfirmComponent {
 
   private typeMessages: { [key: string]: { success: string; fail: string } } = {
     email: {
-      success: 'Your email has been successfully verified!',
-      fail: 'Email verification failed. The link may be expired or invalid.'
+      success: 'Email sikeresen megerősítve!',
+      fail: 'Sikertelen megerősítes. A link lehet lejárt/már használt.'
     },
     delete: {
-      success: 'Your account has been deleted successfully!',
-      fail: 'Could not delete your account. Please try again later.'
+      success: 'A fiók sikeresen törölve.',
+      fail: 'Nem sikerült törölni a fiókod. Kérjük, próbáld meg később!'
     },
     unknown: {
-      success: 'Operation completed successfully.',
-      fail: 'Something went wrong. Please try again later.'
+      success: 'Sikeres!',
+      fail: 'Valami elromlott. Kérjük, próbáld meg később!'
     }
   };
 
@@ -48,10 +48,10 @@ export class ConfirmComponent {
     const typeConfig = this.typeMessages[this.type] ?? this.typeMessages['unknown'];
 
     if (this.status === 'success') {
-      this.title = 'Success!';
+      this.title = 'Siker!';
       this.message = typeConfig.success;
     } else {
-      this.title = 'Failed';
+      this.title = 'Hiba!';
       this.message = typeConfig.fail;
     }
   }

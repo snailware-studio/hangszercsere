@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, Timestamp, of, tap } from 'rxjs';
 import { Filters } from '../../components/filter/filter';
 import { GlobalService } from '../GlobalService/global-service';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -38,11 +39,22 @@ export class ListingService {
     }
   };
 
-  GetListings(): Observable<any> {
-    return this.http.get(this.apiUrl, {
-      withCredentials: true 
-    });
-  }
+GetListings(): Observable<any> {
+  let params = new HttpParams();
+
+  Object.entries(this.global.filters).forEach(([key, value]) => {
+    if (value !== null && value !== undefined && value !== '') {
+      params = params.set(key, value.toString()); // convert numbers to strings
+    }
+  });
+
+  console.log("Filters object being sent:", this.global.filters); // <-- check your original filters
+  console.log("HttpParams being sent:", params.toString()); // 
+  return this.http.get(this.apiUrl, {
+    params,           // <-- Angular converts HttpParams to ?key=value&key2=value2
+    withCredentials: true
+  });
+}
 
   AddListing(listing: Listing): Observable<any> {
     return this.http.post(this.apiUrl, listing, {
@@ -78,6 +90,10 @@ export class ListingService {
     });
   }
 
+  GetCategories(): Observable<any> {
+    return this.http.get(`${this.apiUrl.substring(0,this.apiUrl.length-12)}/categories`);
+  }
+
   AddMedia(images: File[] | null, videos: File[] | null, listingId: number): Observable<any> {
     const formData = new FormData();
 
@@ -109,76 +125,6 @@ export class ListingService {
       withCredentials: true 
     });
   }
-
-  UploadFilters(filters: Filters): void {
-    this.filters = filters;
-  }
-
-  FilterListings(listings: Listing[]) {
-    var newlistings: any[] = [];
-    listings.forEach(listing => {
-      console.log(this.filters.brand + "vs" + listing.brand);
-      if (
-        this.filters.category &&
-        listing.category.toLowerCase() !== this.filters.category.toLowerCase()
-      ) return;
-
-      if (
-        this.filters.priceType.toLowerCase() === 'less' &&
-        listing.price > this.filters.priceValue
-      ) return;
-
-      if (
-        this.filters.priceType.toLowerCase() === 'more' &&
-        listing.price < this.filters.priceValue
-      ) return;
-
-      if (
-        this.filters.priceType.toLowerCase() === 'custom' &&
-        (listing.price < this.filters.priceMin || listing.price > this.filters.priceMax)
-      ) return;
-
-      if (
-        this.filters.condition &&
-        listing.condition.toLowerCase().replaceAll(' ', '').trim() !==
-        this.filters.condition.toLowerCase().replaceAll(' ', '').trim()
-      ) return;
-
-      if (this.filters.brand &&
-        listing.brand.toLowerCase().replaceAll(' ', '').trim()
-          .includes(this.filters.brand.toLowerCase().replaceAll(' ', '').trim()) == false
-      )
-        return;
-
-      if (this.filters.model &&
-        listing.model.toLowerCase().replaceAll(' ', '').trim()
-          .includes(this.filters.model.toLowerCase().replaceAll(' ', '').trim()) == false
-      )
-        return;
-
-      newlistings.push(listing);
-      console.log(listing);
-    });
-    if (newlistings.length === 0) {
-      return null;
-    }
-    return newlistings;
-  }
-
-  /*
-      category: '',
-    priceType: '',     // 'less', 'more', 'custom'
-    priceValue: null,  // For less/more
-    priceMin: null,    // Custom range min
-    priceMax: null,    // Custom range max
-    condition: '',
-    brand: '',
-    model: '',
-    location: '',
-    aiRating: '',
-    dateType: '',      // 'before' or 'after'
-    dateValue: ''  
-  */
 }
 
 export interface Listing {

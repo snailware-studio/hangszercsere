@@ -24,18 +24,12 @@ export class CartService {
 
     this.apiUrl = this.global.apiUrl;
 
-    this.LoadListings().subscribe(data => {
-      this.cart = data;
-    });
-
     setTimeout(() => {
       this.user = this.injector.get(UserService);
     });
   };
 
   private apiUrl = "https://hangszercsere.hu/api/cart-items";
-
-  cart: number[] = [];
 
   AddToCart(listing_id: number): void {
 
@@ -45,38 +39,44 @@ export class CartService {
       return;
     }
 
-    if (!this.cart.includes(listing_id)) {
-      this.http.post(`${this.apiUrl}cart-items`, { id: listing_id }, {
-        withCredentials: true
-      }).subscribe({
-        next: (res) => {
-          this.notif.show("success", "Added to cart!");
-          this.cart.push(listing_id);
-        },
-        error: (err) => {
-          this.notif.show("error", "Failed to add to cart!");
-          console.error('failed to add to cart', err);
-        }
-      });
-    }
-    else {
-      alert("item already in cart!")
-    }
-  }
-
-  RemoveFromCart(listing_id: number): void {
-    this.http.delete(`${this.apiUrl}cart-items`, { withCredentials: true }).subscribe({
+    this.http.post(`${this.apiUrl}cart-items`, { id: listing_id }, {
+      withCredentials: true
+    }).subscribe({
       next: (res) => {
-        this.notif.show("success", "Removed from cart!");
-        this.cart = this.cart.filter(item => item !== listing_id);
+        this.notif.show("success", "Added to cart!");
       },
       error: (err) => {
-        this.notif.show("error", "Failed to remove from cart!");
-        console.error('failed to remove from cart', err);
+        if (err.status === 409) {
+          this.notif.show("error", "Item already in cart!");
+          return;
+        }
+        this.notif.show("error", "Failed to add to cart!");
+        console.error('failed to add to cart', err);
       }
     });
-
   }
+
+RemoveFromCart(listing_id: number): Observable<any> {
+  if (!this.user.isLoggedIn()) {
+    this.notif.show("error", "You must be logged in!");
+    this.router.navigate(['/login']);
+    return;
+  }
+
+  return this.http.delete(`${this.apiUrl}cart-items/${listing_id}`, {
+    withCredentials: true
+  }).pipe(
+    tap({
+      next: () => this.notif.show("success", "Removed from cart!"),
+      error: (err) => {
+        this.notif.show("error", "Failed to remove from cart!");
+        console.error("failed to remove from cart", err);
+      }
+    })
+  );
+}
+
+
 
   Purchase(): Observable<any> {
     if (!this.user.isLoggedIn()) {
@@ -85,27 +85,22 @@ export class CartService {
       return;
     }
 
-    if (this.cart.length === 0) {
-      this.notif.show("error", "Cart is empty!");
-      return;
-    }
-
-    return this.http.post<any>(`${this.apiUrl}buy`,{}, {
+    return this.http.post<any>(`${this.apiUrl}buy`, {}, {
       withCredentials: true
     }).pipe(
 
       tap(response => {
 
-        this.notif.show("success", `Payment completed!`);
-
-        // update cart
-        this.cart = [];
-
         if (response.results && response.results.length > 0) {
           response.results.forEach(result => {
+            if (result.status === 204) {
+              this.notif.show("warning", `Your cart is empty!`);
+              return;
+            }
             if (result.status === "error") {
               this.notif.show("error", `Listing ${result.listingID}: ${result.message}`);
             } else {
+              this.notif.show("success", `Payment completed!`);
               this.RemoveFromCart(result.listingID);
             }
           });
@@ -116,11 +111,11 @@ export class CartService {
   }
 
 
-LoadListings(): Observable<any> {
-  return this.http.get(`${this.apiUrl}cart-items`, {
-    withCredentials: true 
-  });
-}
+  LoadListings(): Observable<any> {
+    return this.http.get(`${this.apiUrl}cart-items`, {
+      withCredentials: true
+    });
+  }
 
 
   ClearCart(): void {
@@ -129,7 +124,6 @@ LoadListings(): Observable<any> {
     }).subscribe({
       next: (res) => {
         this.notif.show("success", "Cart cleared!");
-        this.cart = [];
       },
       error: (err) => {
         this.notif.show("error", "Failed to clear cart!");

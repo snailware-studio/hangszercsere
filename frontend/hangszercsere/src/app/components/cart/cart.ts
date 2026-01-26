@@ -37,15 +37,16 @@ export class Cart {
     this.cart.LoadListings().subscribe(listings => {
       this.listings = listings;
       this.calculateTotal();
-    });
-
-
+    });    
   }
   
   removeFromCart(listing_id: number): void
   {
-    this.cart.RemoveFromCart(listing_id);
-    this.LoadListings();
+    this.cart.RemoveFromCart(listing_id).subscribe({
+      next: () => {
+        this.LoadListings();
+      }
+    });
   }
 
   calculateTotal() {

@@ -4,13 +4,13 @@
     <!-- Title -->
     <div>
       <h1 class="text-4xl font-bold text-light-text-primary dark:text-text-primary mb-2">
-        <input type="text" [(ngModel)]="title" name="title" class="input-field" placeholder="Title" required />
+        <input type="text" [(ngModel)]="title" name="title" class="input-field" placeholder="Cím" required />
       </h1>
 
       <p class="text-2xl font-semibold text-accent mb-4">
         <input type="number" [(ngModel)]="price" name="price"
           class="text-2xl font-semibold text-accent bg-transparent border border-gray-400 rounded px-1 py-0.5 focus:outline-none focus:border-accent"
-          placeholder="Price" required /> Ft
+          placeholder="Ár" required /> Ft
       </p>
       <hr class="border-gray-300 dark:border-gray-700">
     </div>
@@ -53,13 +53,13 @@
 
         <!-- Upload Inputs -->
         <div class="flex flex-col gap-1">
-          <label class="text-light-text-secondary dark:text-text-secondary font-semibold">Images</label>
+          <label class="text-light-text-secondary dark:text-text-secondary font-semibold">Képek</label>
           <input type="file" multiple (change)="onSelectImages($event)" accept="image/*"
             class="text-light-text-secondary dark:text-text-secondary" />
         </div>
 
         <div class="flex flex-col gap-1">
-          <label class="text-light-text-secondary dark:text-text-secondary font-semibold">Videos</label>
+          <label class="text-light-text-secondary dark:text-text-secondary font-semibold">Videók</label>
           <input type="file" multiple (change)="onSelectVideos($event)" accept="video/*"
             class="text-light-text-secondary dark:text-text-secondary" />
         </div>
@@ -72,57 +72,52 @@
 
         <textarea [(ngModel)]="description" name="description"
           class="w-full text-lg bg-transparent border border-gray-400 rounded px-2 py-1 focus:outline-none focus:border-accent resize-none h-32 text-light-text-primary dark:text-text-primary"
-          placeholder="Description..." required></textarea>
+          placeholder="Leírás..." required></textarea>
 
 
         <div class="flex flex-col gap-2 text-light-text-secondary dark:text-text-secondary">
 
           <!-- Category -->
           <div class="flex items-center gap-2">
-            <label class="font-semibold w-20">Category</label>
+            <label class="font-semibold w-20">Kategória</label>
             <select [(ngModel)]="category_id" name="category" class="input-field" required>
-              <option [value]="0">Other</option>
-              <option [value]="1">Guitar</option>
-              <option [value]="2">Bass</option>
-              <option [value]="3">Keyboard</option>
-              <option [value]="4">Drums</option>
-              <option [value]="5">Amplifier</option>
-              <option [value]="6">Pedal</option>
-              <option [value]="7">Recording</option>
+              <ng-container *ngFor="let category of categories">
+                <option [value]="category.id">{{category.name}}</option>
+              </ng-container>
             </select>
           </div>
 
           <!-- Condition -->
           <div class="flex items-center gap-2">
-            <label class="font-semibold w-20">Condition</label>
+            <label class="font-semibold w-20">Állapot</label>
             <select [(ngModel)]="condition" [ngClass]="{
-                            'text-green-500 border-green-500 focus:border-green-500': condition === 'New',
-                            'text-emerald-400 border-emerald-400 focus:border-emerald-400': condition === 'Very Good',
-                            'text-yellow-500 border-yellow-500 focus:border-yellow-500': condition === 'Good',
-                            'text-orange-500 border-orange-500 focus:border-orange-500': condition === 'Satisfactory'
+                            'text-green-500 border-green-500 focus:border-green-500': condition === 'Új',
+                            'text-emerald-400 border-emerald-400 focus:border-emerald-400': condition === 'Nagyon jó',
+                            'text-yellow-500 border-yellow-500 focus:border-yellow-500': condition === 'Jó',
+                            'text-orange-500 border-orange-500 focus:border-orange-500': condition === 'Elfogadható'
                         }"
               class="w-40 bg-transparent dark:bg-gray-800 border border-gray-400 rounded px-2 py-1 focus:outline-none">
 
-              <option value="" disabled class="text-gray-400 dark:bg-gray-800">Select condition</option>
-              <option value="New" class="text-green-500 font-semibold dark:bg-gray-800">New</option>
-              <option value="Very Good" class="text-emerald-400 font-semibold dark:bg-gray-800">Very Good
+              <option value="" disabled class="text-gray-400 dark:bg-gray-800">Választás</option>
+              <option value="Új" class="text-green-500 font-semibold dark:bg-gray-800">Új</option>
+              <option value="Nagyon jó" class="text-emerald-400 font-semibold dark:bg-gray-800">Nagyon jó
               </option>
-              <option value="Good" class="text-yellow-500 font-semibold dark:bg-gray-800">Good</option>
-              <option value="Satisfactory" class="text-orange-500 font-semibold dark:bg-gray-800">
-                Satisfactory</option>
+              <option value="Jó" class="text-yellow-500 font-semibold dark:bg-gray-800">Jó</option>
+              <option value="Elfogadható" class="text-orange-500 font-semibold dark:bg-gray-800">
+                Elfogadható</option>
             </select>
           </div>
 
           <!-- Brand -->
           <div class="flex items-center gap-2">
-            <label class="font-semibold w-20">Brand</label>
+            <label class="font-semibold w-20">Márka</label>
             <input type="text" [(ngModel)]="brand"
               class="w-40 bg-transparent border border-gray-400 rounded px-2 py-1 focus:outline-none focus:border-accent" />
           </div>
 
           <!-- Model -->
           <div class="flex items-center gap-2">
-            <label class="font-semibold w-20">Model</label>
+            <label class="font-semibold w-20">Modell</label>
             <input type="text" [(ngModel)]="model"
               class="w-40 bg-transparent border border-gray-400 rounded px-2 py-1 focus:outline-none focus:border-accent" />
           </div>
@@ -132,7 +127,7 @@
 
         <!-- Upload Progress -->
         <div *ngIf="uploadProgress > 0 && uploadProgress < 100">
-          <p class="text-light-text-secondary dark:text-text-secondary">Uploading: {{ uploadProgress }}%</p>
+          <p class="text-light-text-secondary dark:text-text-secondary">Feltöltés: {{ uploadProgress }}%</p>
           <div class="w-full bg-gray-300 dark:bg-gray-600 h-3 rounded overflow-hidden">
             <div class="h-full bg-accent transition-all" [style.width.%]="uploadProgress"></div>
           </div>
@@ -141,7 +136,7 @@
         <!-- Upload Button -->
         <button class="bg-accent text-white font-semibold py-3 rounded hover:bg-accent-hover transition w-full md:w-1/2"
           (click)="UploadListing()">
-          Create Listing
+          Feltöltés
         </button>
 
       </div>

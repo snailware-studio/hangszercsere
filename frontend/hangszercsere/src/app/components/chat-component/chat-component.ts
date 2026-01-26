@@ -64,7 +64,6 @@ export class ChatComponent {
 
   SendMessage(): void {
 
-
     if (this.msg_content == '') return;
 
     this.ChatService.SendMessage(
@@ -75,6 +74,8 @@ export class ChatComponent {
     )
 
     this.msg_content = "";
+
+    this.GetMessages(this.listing_id);
   }
 
   SetInfo(thread: any): void {

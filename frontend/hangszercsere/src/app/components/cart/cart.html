@@ -1,6 +1,6 @@
 <div class="w-full max-w-4xl mx-auto p-4">
 
-  <h2 class="text-2xl font-bold mb-4 text-light-text-primary dark:text-text-primary">Your Cart</h2>
+  <h2 class="text-2xl font-bold mb-4 text-light-text-primary dark:text-text-primary">Kosár</h2>
 
   <ng-container *ngIf="listings.length; else emptyCart">
     <div *ngFor="let listing of listings" class="bg-light-card-bg dark:bg-card-bg rounded-lg shadow p-4 mb-4 flex flex-col md:flex-row gap-4">
@@ -13,14 +13,14 @@
       <div class="flex-1 flex flex-col justify-between">
         <div>
           <h3 class="text-lg font-bold text-light-text-primary dark:text-text-primary">{{ listing.title }}</h3>
-          <p class="text-sm text-light-text-secondary dark:text-text-secondary">Seller: {{ listing.seller }}</p>
+          <p class="text-sm text-light-text-secondary dark:text-text-secondary">Eladó: {{ listing.seller }}</p>
         </div>
 
         <div class="flex items-center justify-between mt-2">
           <p class="text-lg font-semibold text-light-text-primary dark:text-text-primary">{{ listing.price }} Ft</p>
           <button (click)="removeFromCart(listing.id)"
                   class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
-            Remove
+            Eltávolítás
           </button>
         </div>
       </div>
@@ -29,7 +29,7 @@
 
     <!-- Total -->
     <div class="text-right text-xl font-bold text-light-text-primary dark:text-text-primary">
-      Total: {{ totalPrice }} Ft
+      Összeg: {{ totalPrice }} Ft
     </div>
 
    <p class="text-sm text-gray-500 mt-2">
@@ -39,13 +39,13 @@
 
     <!-- purchase button -->
       <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition" (click)="Purchase()">
-        Purchase
+        Vásárlás
       </button>
 
   </ng-container>
 
   <ng-template #emptyCart>
-    <p class="text-light-text-secondary dark:text-text-secondary text-center mt-10">Your cart is empty!</p>
+    <p class="text-light-text-secondary dark:text-text-secondary text-center mt-10">A kosarad üres!</p>
   </ng-template>
 
 </div>
