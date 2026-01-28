@@ -18,10 +18,10 @@ const transporter = nodemailer.createTransport({
 export async function sendWelcomeEmail(toEmail, name,token) {
   try {
     const info = await transporter.sendMail({
-      from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
+      from: '"Hangszercsere.hu Support" <support@hangszercsere.hu>',
       to: toEmail,
-      subject: 'Welcome to Hangszercsere!',
-      html: `<h2>Hello ${name}!</h2><p>Thank you for registering at Hangszercsere!.</p><p>Please click the link below to confirm your email address:</p><a href="${process.env.ORIGIN}/api/confirm/${token}">Confirm email</a>`
+      subject: 'Üdv a Hangszercserénél!',
+      html: `<h2>Szia ${name}!</h2><p>Köszönjük, hogy regisztrált az oldalunkon.</p><p>Az email megerősítéséhez kattintson a következő linkre: </p><a href="${process.env.ORIGIN}/api/confirm/${token}">Email megerősítése</a>`
     });
     console.log('Email sent:', info.messageId);
   } catch (err) {
@@ -36,8 +36,8 @@ export async function sendProfileDeleteEmail(toEmail, name,token)
       const info = await transporter.sendMail({
         from: '"Hangszercsere Support" <support@hangszercsere.hu>',
         to: toEmail,
-        subject: 'Confirm account deletion',
-        html: `<h2>Hello ${name}!</h2><p>Please click the link below to confirm your account deletion:</p><a href="${process.env.ORIGIN}/api/confirm/${token}">Delete account</a>`
+        subject: 'Fiók törlés megerősítése',
+        html: `<h2>Szia ${name}!</h2><p>Sajnáljuk, hogy így döntött. Ha valóban így gondolja, hogy törli a fiókját, akkor kattintson a következő linkre: </p><a href="${process.env.ORIGIN}/api/confirm/${token}">Fiók törlése</a>`
       });
       console.log('Email sent:', info.messageId);
     } catch (err) {
@@ -50,10 +50,10 @@ export async function sendListingSoldEmail(toEmail, name,listing_id)
 {
     try {
       const info = await transporter.sendMail({
-        from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
+        from: '"Hangszercsere.hu Support" <support@hangszercsere.hu>',
         to: toEmail,
-        subject: 'Your listing was sold!',
-        html: `<h2>Hello ${name}!</h2><p>Your listing was sold! You can view it here: <a href="${process.env.ORIGIN}/listing/${listing_id}">View listing</a></p>`
+        subject: 'A hírdetésed elkelt!',
+        html: `<h2>Szia ${name}!</h2><p>A hírdetésedet elkelt! Megtekintheted itt: <a href="${process.env.ORIGIN}/listing/${listing_id}">Hírdetés megtekintése</a></p>`
       });
       console.log('Email sent:', info.messageId);
     } catch (err) {
@@ -66,10 +66,10 @@ export async function sendWantedListingSoldEmail(toEmail, name,listing_id)
 {
     try {
       const info = await transporter.sendMail({
-        from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
+        from: '"Hangszercsere.hu Support" <support@hangszercsere.hu>',
         to: toEmail,
-        subject: 'A Listing you wanted has been sold to someone else!',
-        html: `<h2>Hello ${name}!</h2><p>A listing you wanted has been sold to someone else! You can view it here: <a href="${process.env.ORIGIN}/listing/${listing_id}">View listing</a></p>`
+        subject: 'Kosárban lévő hírdetés elkelt!',
+        html: `<h2>Szia ${name}!</h2><p>A hírdetés, amit kosárba tettél elkelt! Megtekintheted itt: <a href="${process.env.ORIGIN}/listing/${listing_id}">Hírdetés megtekintése</a></p>`
       });
       console.log('Email sent:', info.messageId);
     } catch (err) {
@@ -82,10 +82,10 @@ export async function sendListingBoughtEmail(toEmail, name,listing_id)
 {
     try {
       const info = await transporter.sendMail({
-        from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
+        from: '"Hangszercsere.hu Support" <support@hangszercsere.hu>',
         to: toEmail,
-        subject: 'Listing bought!',
-        html: `<h2>Hello ${name}!</h2><p>Thank you for your purchase! You can view it here: <a href="${process.env.ORIGIN}/listing/${listing_id}">View listing</a></p>`
+        subject: 'Sikeres vásárlás!',
+        html: `<h2>Szia ${name}!</h2><p>Köszönjük, hogy nálunk vásárolt! Megtekintheted itt: <a href="${process.env.ORIGIN}/listing/${listing_id}">Hírdetés megtekintése</a></p>`
       });
       console.log('Email sent:', info.messageId);
     } catch (err) {
