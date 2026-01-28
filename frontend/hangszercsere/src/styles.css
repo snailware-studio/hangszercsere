@@ -72,7 +72,7 @@
   }
 
   .hover-button {
-    @apply block w-full text-center font-semibold py-4 dark:hover:bg-accent-hover hover:bg-accent-hover hover:dark:text-black transition-all;
+    @apply block w-full text-center font-semibold py-4 dark:bg-card-bg dark:hover:bg-accent-hover hover:bg-accent-hover hover:dark:text-black transition-all;
   }
   .cart-button {
     @apply flex text-center font-semibold p-4 px-8 rounded-lg border-2 border-accent-hover dark:border-accent hover:border-transparent border-solid duration-200 dark:hover:bg-accent-hover hover:bg-accent-hover hover:dark:text-black transition-all;
