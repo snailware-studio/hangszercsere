@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -16,11 +16,17 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "marked": "^17.0.1",
     "multer": "^2.0.2",
+    "ngx-markdown": "^21.0.1",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.11",
     "sharp": "^0.34.5",
     "sqlite3": "^5.1.7",
     "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "jest": "^30.2.0"
   }
 }

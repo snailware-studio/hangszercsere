@@ -39,6 +39,12 @@ export class ListingService {
     }
   };
 
+  MyListings(): Observable<any> {
+    return this.http.get(`${this.global.rootUrl}/api/mylistings`, {
+      withCredentials: true
+    });
+  }
+
 GetListings(): Observable<any> {
   let params = new HttpParams();
 

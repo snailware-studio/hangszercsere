@@ -51,13 +51,17 @@ export class HomePage {
     this.cart.AddToCart(listing_id);
   }
 
-  GetListings(): void
-  {
-    this.ListingService.GetListings().subscribe(
-      (Data) => (this.listings = Data,
-         this.storedListings = Data)
-    );
-  }
+ GetListings(): void {
+  this.ListingService.GetListings().subscribe((Data) => {
+    this.listings = Data;
+    this.storedListings = Data;
+
+    if (this.listings.length === 0) {
+      this.listings = null;
+    }
+  });
+}
+
 
   ngOnInit(): void {
     this.GetListings();

@@ -6,7 +6,7 @@
     <div *ngFor="let listing of listings" class="bg-light-card-bg dark:bg-card-bg rounded-lg shadow p-4 mb-4 flex flex-col md:flex-row gap-4">
 
       <!-- Thumbnail -->
-      <img *ngIf="listing.image_url" [src]="'https://hangszercsere.hu/uploads/' + listing.image_url"
+      <img *ngIf="listing.image_url" [src]="rootUrl + '/uploads/' + listing.image_url"
            class="w-full md:w-40 h-32 object-cover rounded" alt="Listing Image">
 
       <!-- Info -->

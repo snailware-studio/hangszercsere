@@ -30,6 +30,12 @@ GetAllMessages(): Observable<any> {
   });
 }
 
+DeleteMessage(messageId: number): Observable<any> {
+  return this.http.delete(`${this.apiurl}/${messageId}`, {
+    withCredentials: true
+  });
+}
+
 GetMessages(listingId: number, userId: number): Observable<any> {
   return this.http.get(`${this.apiurl}/${listingId}/${userId}`, {
     withCredentials: true

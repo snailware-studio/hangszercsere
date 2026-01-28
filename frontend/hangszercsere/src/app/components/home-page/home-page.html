@@ -4,15 +4,15 @@
 
 <div class="product-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-4">
 
-<ng-container *ngIf="!listings">
-  <p class="text-light-text-secondary dark:text-text-secondary">Nincs található hírdetés... :(</p>
-</ng-container>
+  <ng-container *ngIf="!listings">
+    <p class="text-light-text-secondary dark:text-text-secondary">Nincs található hírdetés... :(</p>
+  </ng-container>
 
-<ng-container *ngIf="listings?.length === 0">
-  <div class="flex justify-center items-center h-40">
-    <div class="w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
-  </div>
-</ng-container>
+  <ng-container *ngIf="listings?.length === 0">
+    <div class="flex justify-center items-center h-40">
+      <div class="w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+    </div>
+  </ng-container>
 
   <div *ngFor="let listing of listings" class="product-card" routerLink="/listing"
     (click)="viewListing(listing.id); SetListing(listing);">
@@ -37,7 +37,7 @@
 
     <div class="product-description">
       <ng-container *ngIf="listing.description.length > 30">
-        {{ listing.description.substring(0, 30) }}...
+        {{ listing.description.substring(0, 50) }}...
       </ng-container>
       <ng-container *ngIf="listing.description.length <= 30">
         {{ listing.description }}
@@ -48,6 +48,18 @@
     <div class="product-meta">
       <span>Eladó: <b>{{ listing.seller }}</b></span>
       <span>Kategória: <b>{{ listing.category }}</b></span>
+
+    </div>
+
+
+    <div class="relative inline-block text-xl leading-none">
+      <div class="text-gray-300">
+        ★★★★★
+      </div>
+      <div class="absolute top-0 left-0 overflow-hidden text-yellow-400 whitespace-nowrap"
+        [style.width]="'calc(' + (+listing.ai_rating * 1.6) + 'ch)'">
+        ★★★★★
+      </div>
     </div>
 
     <!-- Time since posted -->

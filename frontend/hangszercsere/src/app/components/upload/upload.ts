@@ -108,13 +108,13 @@ AddMedia(listingId: number): void {
 
       if (event.type === HttpEventType.Response) {
         console.log('Media upload successful', event.body);
-        this.NotifService.show('success',"Upload successful 🎉");
-        this.router.navigate(['/listing', listingId]);
+        this.NotifService.show('success',"Sikeresen feltöltve!! 🎉");
+        this.router.navigate(['/my-listings']);
       }
     },
     error: (err) => {
       console.error('Media upload failed', err);
-      this.NotifService.show('error','Upload failed: ' + (err.error?.error || 'Unknown error'));
+      this.NotifService.show('error','Hiba: ' + (err.error?.error || 'Unknown error'));
 
     }
   });
@@ -122,8 +122,14 @@ AddMedia(listingId: number): void {
 
   UploadListing(): void {
   if (!this.userService.isLoggedIn())  {
-    alert("You must be logged in!");
+    this.NotifService.show("warning","Be kell jelentkezned!");
     this.router.navigate(['/login']);
+    return;
+  }
+
+  if(this.selectedImages.length == 0 && this.selectedVideos.length == 0)
+  {
+    this.NotifService.show('warning','Nincs kép vagy videó feltöltve!');
     return;
   }
 

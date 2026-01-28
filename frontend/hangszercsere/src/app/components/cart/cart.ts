@@ -1,6 +1,7 @@
 import { Component,OnInit } from '@angular/core';
 import { CartService } from '../../services/cart-service/cart-service';
 import { Listing } from '../../services/listing-service/listing-service';
+import { GlobalService } from '../../services/GlobalService/global-service';
 
 @Component({
   selector: 'app-cart',
@@ -12,16 +13,17 @@ export class Cart {
 
   constructor(
     private cart: CartService,
-
+    private global: GlobalService
   ){};
   
   totalPrice: number = 0;
   listings: Listing[] = [];
+  rootUrl: string = 'https://hangszercsere.hu';
 
   ngOnInit(): void
   {
     this.LoadListings();
-
+    if (this.global.rootUrl) this.rootUrl = this.global.rootUrl;
   }
 
   Purchase(): void

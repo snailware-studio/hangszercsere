@@ -1,0 +1,12 @@
+.message-container .delete-icon {
+  display: none;
+}
+
+.message-container:hover .delete-icon {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.delete-icon:hover {
+  color: red;
+}

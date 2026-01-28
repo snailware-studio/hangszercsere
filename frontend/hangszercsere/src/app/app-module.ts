@@ -28,6 +28,8 @@ import { PopupComponent } from './components/popup-component/popup-component';
 import { AdatvedelemComponent } from './components/adatvedelem-component/adatvedelem-component';
 import { AszfComponent } from './components/aszf-component/aszf-component';
 import { ImpresszumComponent } from './components/impresszum-component/impresszum-component';
+import { MarkdownModule } from 'ngx-markdown';
+import { MylistingsComponent } from './components/mylistings-component/mylistings-component';
 
 @NgModule({
   declarations: [
@@ -55,12 +57,14 @@ import { ImpresszumComponent } from './components/impresszum-component/impresszu
     AdatvedelemComponent,
     AszfComponent,
     ImpresszumComponent,
+    MylistingsComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+    MarkdownModule.forRoot()
   ],
   providers: [
   ],

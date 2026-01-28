@@ -15,6 +15,7 @@ import { ConfirmComponent } from './components/confirm-component/confirm-compone
 import { AdatvedelemComponent } from './components/adatvedelem-component/adatvedelem-component';
 import { AszfComponent } from './components/aszf-component/aszf-component';
 import { ImpresszumComponent } from './components/impresszum-component/impresszum-component';
+import { MylistingsComponent } from './components/mylistings-component/mylistings-component';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
@@ -31,7 +32,9 @@ export const routes: Routes = [
   { path: 'confirm/:status/:type', component: ConfirmComponent },
   { path: 'adatvedelem', component: AdatvedelemComponent },
   { path: 'aszf', component: AszfComponent },
-  { path: 'impresszum', component: ImpresszumComponent }
+  { path: 'impresszum', component: ImpresszumComponent },
+  { path: 'my-listings', component: MylistingsComponent }
+
 ];
 
 @NgModule({

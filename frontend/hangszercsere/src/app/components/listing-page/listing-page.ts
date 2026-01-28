@@ -43,7 +43,7 @@ export class ListingPage {
 
   AddToCart(listing_id: number): void {
     if (!this.user.isLoggedIn()) {
-      this.NotifService.show('error',"You must be logged in!");
+      this.NotifService.show('error',"Be kell jelentkezned!");
       this.router.navigate(['/login']);
       return;
     }
@@ -65,11 +65,11 @@ export class ListingPage {
   RemoveListing(id: number): void {
     this.listingService.RemoveListing(id).subscribe({
       next: (res) => {
-        this.NotifService.show('success',"Removed listing.");
+        this.NotifService.show('success',"Hírdetés törölve.");
         this.router.navigate(['/']);
       },
       error: (err) => {
-        this.NotifService.show('error',"Failed to remove listing.");
+        this.NotifService.show('error',"Hiba");
         console.error('failed to remove', err);
       }
     });
@@ -82,7 +82,7 @@ export class ListingPage {
 
   StartChat(listing: Listing) {
     if (!this.user.isLoggedIn()) {
-      this.NotifService.show('error',"You must be logged in!");
+      this.NotifService.show('error',"Be kell jelentkezned!");
       this.router.navigate(['/login']);
       return
     }

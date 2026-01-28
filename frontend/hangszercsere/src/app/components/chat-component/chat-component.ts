@@ -4,6 +4,7 @@ import { UserService } from '../../services/user-service/user-service';
 import { ListingService, Listing } from '../../services/listing-service/listing-service';
 import { WSservice } from '../../services/WSservice/wsservice';
 import { th } from 'date-fns/locale';
+import { NotifService } from '../../services/notif-service/notif-service';
 
 @Component({
   selector: 'app-chat-component',
@@ -17,7 +18,8 @@ export class ChatComponent {
     private ChatService: ChatService,
     private user: UserService,
     private ListingService: ListingService,
-    private ws: WSservice
+    private ws: WSservice,
+    private notif: NotifService
   ) { }
 
   chatter_id: number = 0;
@@ -51,6 +53,7 @@ export class ChatComponent {
         );
       },
       error: err => {
+        this.notif.show("error", "Nem található ez a felhasználó!");
         console.error('Failed to load user info', err);
       }
     });
@@ -84,6 +87,17 @@ export class ChatComponent {
     this.thread = thread;
   }
 
+  DeleteMessage(message_id: number): void {
+    this.ChatService.DeleteMessage(message_id).subscribe({
+      next: (res) => {
+        this.GetMessages(this.listing_id);
+      },
+      error: (err) => {
+        this.notif.show("error", "Hiba");
+        console.error('failed to delete message', err);
+      }
+    });
+  }
 
   GetMessages(listing_id: number): void {
 

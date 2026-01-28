@@ -62,7 +62,7 @@
                                 class="absolute top-1 right-1 z-10 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
                                 (click)="listing.videos.splice(i, 1)" type="button">×</button>
                             <video controls class="rounded-lg shadow-md w-full">
-                                <source [src]="'https://hangszercsere.hu/uploads/' + video" type="video/mp4">
+                                <source [src]="rootUrl + '/uploads/' + video" type="video/mp4">
                             </video>
                         </div>
                     </ng-container>
@@ -83,13 +83,13 @@
                 </div>
 
                 <div class="flex flex-col gap-1">
-                    <label class="text-light-text-secondary dark:text-text-secondary font-semibold">Images</label>
+                    <label class="text-light-text-secondary dark:text-text-secondary font-semibold">Képek</label>
                     <input type="file" multiple (change)="onSelectImages($event)" accept="image/*"
                         class="text-light-text-secondary dark:text-text-secondary" />
                 </div>
 
                 <div class="flex flex-col gap-1">
-                    <label class="text-light-text-secondary dark:text-text-secondary font-semibold">Videos</label>
+                    <label class="text-light-text-secondary dark:text-text-secondary font-semibold">Videók</label>
                     <input type="file" multiple (change)="onSelectVideos($event)" accept="video/*"
                         class="text-light-text-secondary dark:text-text-secondary" />
                 </div>
@@ -110,50 +110,45 @@
                 <div class="flex flex-col gap-2 text-light-text-secondary dark:text-text-secondary">
 
                     <div class="flex items-center gap-2">
-                        <label class="font-semibold w-20">Category</label>
+                        <label class="font-semibold w-20">Kategória</label>
                         <select id="category" [(ngModel)]="listing.category_id" name="category" required
                             class="input-field">
-                            <option [value]="0">Other</option>
-                            <option [value]="1">Guitar</option>
-                            <option [value]="2">Bass</option>
-                            <option [value]="3">Keyboard</option>
-                            <option [value]="4">Drums</option>
-                            <option [value]="5">Amplifier</option>
-                            <option [value]="6">Pedal</option>
-                            <option [value]="7">Recording</option>
+                            <ng-container *ngFor="let category of categories">
+                                <option [value]="category.id">{{category.name}}</option>
+                            </ng-container>
                         </select>
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <label class="font-semibold w-20">Condition</label>
+                        <label class="font-semibold w-20">Állapot</label>
 
                         <select [(ngModel)]="listing.condition" [ngClass]="{
-                            'text-green-500 border-green-500 focus:border-green-500': listing.condition === 'New',
-                            'text-emerald-400 border-emerald-400 focus:border-emerald-400': listing.condition === 'Very Good',
-                            'text-yellow-500 border-yellow-500 focus:border-yellow-500': listing.condition === 'Good',
-                            'text-orange-500 border-orange-500 focus:border-orange-500': listing.condition === 'Satisfactory'
+                            'text-green-500 border-green-500 focus:border-green-500': listing.condition === 'Új',
+                            'text-emerald-400 border-emerald-400 focus:border-emerald-400': listing.condition === 'Nagyon jó',
+                            'text-yellow-500 border-yellow-500 focus:border-yellow-500': listing.condition === 'Jó',
+                            'text-orange-500 border-orange-500 focus:border-orange-500': listing.condition === 'Elfogadható'
                         }"
                             class="w-40 bg-transparent dark:bg-gray-800 border border-gray-400 rounded px-2 py-1 focus:outline-none">
 
-                            <option value="" disabled class="text-gray-400 dark:bg-gray-800">Select condition</option>
-                            <option value="New" class="text-green-500 font-semibold dark:bg-gray-800">New</option>
-                            <option value="Very Good" class="text-emerald-400 font-semibold dark:bg-gray-800">Very Good
+                            <option value="" disabled class="text-gray-400 dark:bg-gray-800">Állapot</option>
+                            <option value="Új" class="text-green-500 font-semibold dark:bg-gray-800">Új</option>
+                            <option value="Nagyon jó" class="text-emerald-400 font-semibold dark:bg-gray-800">nagyon jó
                             </option>
-                            <option value="Good" class="text-yellow-500 font-semibold dark:bg-gray-800">Good</option>
-                            <option value="Satisfactory" class="text-orange-500 font-semibold dark:bg-gray-800">
-                                Satisfactory</option>
+                            <option value="Jó" class="text-yellow-500 font-semibold dark:bg-gray-800">Jó</option>
+                            <option value="Elfogadható" class="text-orange-500 font-semibold dark:bg-gray-800">
+                                Elfogadható</option>
                         </select>
 
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <label class="font-semibold w-20">Brand</label>
+                        <label class="font-semibold w-20">Márka</label>
                         <input type="text" [(ngModel)]="listing.brand"
                             class="w-40 bg-transparent border border-gray-400 rounded px-2 py-1 focus:outline-none focus:border-accent" />
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <label class="font-semibold w-20">Model</label>
+                        <label class="font-semibold w-20">Modell</label>
                         <input type="text" [(ngModel)]="listing.model"
                             class="w-40 bg-transparent border border-gray-400 rounded px-2 py-1 focus:outline-none focus:border-accent" />
                     </div>
@@ -164,25 +159,37 @@
 
 
                 <div class="text-light-text-secondary dark:text-text-secondary flex flex-col gap-1">
-                    <p><span class="font-semibold">Seller:</span>seller:
+                    <p><span class="font-semibold">Eladó:</span>
                         {{listing?.seller }}</p>
-                    <p><span class="font-semibold">Status:</span> {{ listing?.status }}</p>
-                    <p><span class="font-semibold">Posted:</span> {{ listing?.created_at | date:'mediumDate' }}</p>
+                    <p><span class="font-semibold">Feltöltve:</span> {{ listing?.created_at | date:'mediumDate' }}</p>
                 </div>
 
                 <div *ngIf="uploadProgress > 0 && uploadProgress < 100" class="mt-4">
-                    <p class="text-light-text-secondary dark:text-text-secondary mb-1">Uploading: {{ uploadProgress }}%
+                    <p class="text-light-text-secondary dark:text-text-secondary mb-1">Feltöltés: {{ uploadProgress }}%
                     </p>
                     <div class="w-full bg-gray-300 dark:bg-gray-600 h-3 rounded overflow-hidden">
                         <div class="h-full bg-accent transition-all" [style.width.%]="uploadProgress"></div>
                     </div>
                 </div>
 
-                <!-- ADD TO CART BUTTON -->
                 <button class="bg-accent text-white font-semibold py-3 rounded hover:bg-accent-hover
                     transition w-full md:w-1/2" (click)="SaveChanges()">
-                    Save changes
+                    Módosítás
                 </button>
+
+                <div>
+                    <h1>AI Javaslat a hírdetés minőségének javítására:</h1>
+                    <br>
+                    <markdown class="
+                            prose
+                            dark:prose-invert
+                            max-w-none
+                            text-light-text-secondary
+                            dark:text-text-secondary
+                        " [data]="listing?.ai_feedback">
+                    </markdown>
+
+                </div>
 
 
             </div>

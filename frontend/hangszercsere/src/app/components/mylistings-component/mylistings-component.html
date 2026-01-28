@@ -1,0 +1,99 @@
+<div class="w-full max-w-5xl mx-auto p-6">
+
+    <div class="flex justify-center mb-8">
+        <a routerLink="/upload"
+            class="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold shadow-lg hover:from-purple-600 hover:to-indigo-700 hover:scale-105 transition transform">
+            <i class="nf nf-oct-upload text-lg"></i>
+            Feltöltés
+        </a>
+    </div>
+
+    <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-light-text-primary dark:text-text-primary">
+        {{ this.user.getUserName() }} hírdetései
+    </h2>
+
+    <ng-container *ngIf="listings.length; else empty">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div *ngFor="let listing of listings"
+                class="bg-light-card-bg dark:bg-card-bg rounded-xl shadow-md hover:shadow-xl transition overflow-hidden flex flex-col relative group">
+
+                <!-- Kép -->
+                <div class="relative w-full h-48 md:h-40">
+                    <img *ngIf="listing.image_url" [src]="rootUrl + '/uploads/' + listing.image_url" alt="Listing Image"
+                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+
+                    <!-- Státusz badge -->
+                    <span [ngClass]="{
+                            'text-green-500 border-green-500': listing.status === 'active',
+                            'text-red-500 border-red-500': listing.status === 'inactive',
+                            'text-orange-500 border-orange-500': listing.status === 'waiting for review',
+                            'text-yellow-500 border-yellow-500': listing.status === 'sold'
+                        }" class="absolute top-2 right-2 px-3 py-1 rounded-md border text-sm font-semibold bg-white dark:bg-opacity-10 bg-opacity-80 backdrop-blur-sm shadow-md">
+                        {{ listing.status === 'waiting for review' ? 'Értékelésre vár' :
+                        listing.status === 'sold' ? 'Eladva' :
+                        listing.status === 'inactive' ? 'Inaktív' : 'Aktív' }}
+                    </span>
+
+                    <!-- Hover overlay -->
+                    <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity"
+                        (click)="goTo(listing.id)">
+
+                        <ng-container *ngIf="listing.status != 'sold'">
+                            <button
+                                class="px-4 py-2 bg-purple-600 text-white rounded-full shadow hover:bg-purple-700 transition"
+                                (click)="editListing(listing.id)">
+                                Szerkesztés
+                            </button>
+                            <button
+                                class="px-4 py-2 bg-red-600 text-white rounded-full shadow hover:bg-red-700 transition">
+                                Törlés
+                            </button>
+                        </ng-container>
+
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div class="p-4 flex-1 flex flex-col justify-between">
+                    <h3 class="text-lg md:text-xl font-semibold text-light-text-primary dark:text-text-primary mb-2">
+                        {{ listing.title }}
+                    </h3>
+                    <p class="text-sm md:text-base text-light-text-secondary dark:text-text-secondary mb-4">
+                        {{ listing.description.length > 80 ? (listing.description | slice:0:80) + '...' :
+                        listing.description }}
+                    </p>
+
+                    <div class="relative inline-block text-xl leading-none">
+                        <!-- Háttér csillagok -->
+                        <div class="text-gray-300">
+                            ★★★★★
+                        </div>
+                        <!-- Előtöltött csillagok  1.6 a varázs szám ne érj hozzá mert 30 percig kerestem -->
+                        <div class="absolute top-0 left-0 overflow-hidden text-yellow-400 whitespace-nowrap"
+                            [style.width]="'calc(' + (+listing.ai_rating * 1.6) + 'ch)'">
+                            ★★★★★
+                        </div>
+                    </div>
+
+
+
+                    <p class="text-lg md:text-xl font-bold text-light-text-primary dark:text-text-primary">
+                        {{ listing.price }} Ft
+                    </p>
+                    <p class="text-sm md:text-base text-light-text-secondary dark:text-text-secondary mb-4">
+                        Feltöltve: {{ listing.created_at | date:'mediumDate' }}
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-template #empty>
+        <p class="text-light-text-secondary dark:text-text-secondary text-center mt-16 text-lg">
+            Még nincsenek hírdetéseid!
+        </p>
+    </ng-template>
+
+</div>

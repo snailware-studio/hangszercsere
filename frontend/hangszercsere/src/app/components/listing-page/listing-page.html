@@ -21,8 +21,8 @@
         <div *ngIf="listing?.images?.length" class="flex flex-col gap-3">
           <div class="grid grid-cols-2 gap-3">
             <ng-container *ngFor="let img of listing?.images; let i = index">
-              <img [src]="rootUrl + '/uploads/' + img"
-                class="cursor-pointer w-64 h-64 object-cover rounded" (click)="lightbox.show(i)">
+              <img [src]="rootUrl + '/uploads/' + img" class="cursor-pointer w-64 h-64 object-cover rounded"
+                (click)="lightbox.show(i)">
             </ng-container>
           </div>
         </div>
@@ -41,9 +41,17 @@
       <!-- RIGHT SIDE: Details -->
       <div class="flex flex-col gap-5">
 
-        <p class="text-light-text-primary dark:text-text-primary leading-relaxed">
-          {{ listing?.description }}
-        </p>
+
+        <markdown class="
+    prose
+    dark:prose-invert
+    max-w-none
+    text-light-text-primary
+    dark:text-text-primary
+  " [data]="listing?.description">
+        </markdown>
+
+
         <div class="text-light-text-primary font-semibold dark:text-text-primary flex flex-col gap-1">
 
           <p><span class="font-semibold">Kategória:</span> {{ listing?.category }}</p>
@@ -77,7 +85,7 @@
         <div class="text-light-text-secondary dark:text-text-secondary flex flex-col gap-1">
           <p (click)="GotoProfile(listing?.user_id)"><span class="font-semibold">Eladó:</span> <span class="button">{{
               listing?.seller }}</span></p>
-          <p><span class="font-semibold">Közzétéve:</span> {{ listing?.created_at | date:'mediumDate' }}</p>
+          <p><span class="font-semibold">Feltöltve:</span> {{ listing?.created_at | date:'mediumDate' }}</p>
         </div>
 
 

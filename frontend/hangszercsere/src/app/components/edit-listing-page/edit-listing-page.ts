@@ -36,6 +36,15 @@ export class EditListingPage {
   PreviewImages: string[] = [];
   PreviewVideos: string[] = [];
 
+  categories: any[] = [];
+
+  LoadCategories(): void {
+    this.listingService.GetCategories().subscribe(data => {
+      this.categories = data;
+      console.log('Categories loaded:', this.categories);
+    });
+  }
+
   onSelectImages(event: Event) {
     const files = (event.target as HTMLInputElement).files;
     if (!files) return;
@@ -104,7 +113,7 @@ export class EditListingPage {
           this.selectedVideos = [];
           this.uploadProgress = 0;
 
-          this.notif.show('success','Listing Edited!');
+          this.notif.show('success','Módosítva!');
           this.router.navigate(['/listing', this.listing.id]);
           break;
       }
@@ -133,6 +142,8 @@ export class EditListingPage {
       this.router.navigate(['/listing', id]);
     }
     });
+
+    this.LoadCategories();
 
   }  
 

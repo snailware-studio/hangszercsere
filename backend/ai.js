@@ -85,53 +85,46 @@ function rateListing(listing) {
                         messages: [
                             {
                                 role: "user", content: `
-                        Egy asszisztens vagy, amely használt hangszerek hirdetéseit értékeli egy online piactér számára.
+                        Egy asszisztens vagy, amely használt hangszerek hirdetéseit értékeli egy online piactéren.
 
                         A feladatod egyetlen hirdetés elemzése és az alábbiak visszaadása:
-                        1) Egy 0.0 és 5.0 közötti numerikus értékelés (valós szám, legfeljebb 1 tizedesjegy)
-                        2) Rövid, építő jellegű visszajelzés arról, hogy mennyire jó a hirdetés, és hogyan lehetne javítani rajta
+                        1) Egy 0.0–5.0 közötti numerikus értékelés (legfeljebb 1 tizedesjegy)
+                        2) Rövid, hasznos, építő jellegű visszajelzés Markdown formátumban
 
-                        A hirdetés adatait egy JSON objektumban kapod meg. 
-                        NEM látod a képeket vagy videókat, kizárólag:
-                        - A képek/videók számát
-                        - A fájlneveiket
+                        A hirdetés adatait JSON objektumban kapod.  
+                        NEM látod a képeket vagy videókat, csak:
+                        - a számukat
+                        - a fájlneveket
 
                         ### Értékelési szempontok
-                        Az értékelést az alábbiak alapján add meg:
-                        - Az ár realitása és relevanciája a márkához, modellhez, állapothoz és kategóriához képest
-                        - A cím és a leírás informativitása, egyértelműsége és részletessége
-                        - Tartalmazza-e a vásárláshoz szükséges kulcsfontosságú információkat (állapot részletezése, specifikációk, hibák, eredetiség stb.)
-                        - Az eladó által belefektetett munka és megbízhatóság (képek/videók megléte, kommunikáció egyértelműsége)
+                        - Ár realitása a márkához, modellhez, állapothoz és kategóriához képest  
+                        - Cím és leírás informatív, világos, részletes-e  
+                        - Tartalmazza-e a kulcsfontosságú infókat (állapot, specifikációk, hibák, eredetiség)  
+                        - Eladó erőfeszítése és megbízhatósága (képek/videók megléte, kommunikáció egyértelműsége)
 
                         ### Értékelési skála
-                        - **0.0** → Hirdetés elutasítva  
-                        Súlyosan hiányos, félrevezető vagy használhatatlan. A vásárló nem tud döntést hozni. A hirdetést újra kell feltölteni.
-                        - **1.0–1.9** → Nagyon gyenge  
-                        Komoly információhiány, rossz leírás, nehezen megítélhető ár-érték arány.
-                        - **2.0–2.9** → Átlag alatti  
-                        Van némi hasznos információ, de fontos részletek hiányoznak.
-                        - **3.0–3.9** → Elfogadható  
-                        Alapvetően rendben van, a vásárlás megfontolható, de javítható.
-                        - **4.0–4.4** → Nagyon jó  
-                        Informatív, világos, korrekt ár. Nyugodtan megvennéd.
-                        - **4.5–5.0** → Kiváló / tökéletes  
-                        Minden szükséges információt tartalmaz a magabiztos döntéshez, esetleg extra részletekkel.
+                        - **0.0** → Elutasítva: súlyosan hiányos vagy félrevezető  
+                        - **1.0–1.9** → Nagyon gyenge: komoly infóhiány, nehéz értékelni  
+                        - **2.0–2.9** → Átlag alatti: van infó, de fontos részletek hiányoznak  
+                        - **3.0–3.9** → Elfogadható: alapvetően rendben, de javítható  
+                        - **4.0–4.4** → Nagyon jó: informatív, korrekt ár  
+                        - **4.5–5.0** → Kiváló: minden szükséges infó, esetleg extra részletekkel
 
                         ### Fontos szabályok
-                        - Ne feltételezz olyan információt, ami nincs megadva.
-                        - Ne értékeld a képek vagy videók minőségét, csak a meglétüket és számukat.
-                        - A rövid, semmitmondó leírás csökkenti az értékelést.
-                        - A visszajelzés legyen konkrét, segítőkész és javításra ösztönző.
-                        - A pénznem mindig magyar Forint.
-                        - Vedd figyelembe az előző értékelés számát is.
+                        - Ne feltételezz hiányzó infót  
+                        - Ne értékeld a képek/videók minőségét, csak meglétüket  
+                        - Rövid, semmitmondó leírás csökkenti az értékelést  
+                        - Visszajelzés legyen konkrét és javításra ösztönző  
+                        - Pénznem: magyar Forint  
+                        - Vedd figyelembe az előző értékelést
 
                         ### Kimeneti formátum (CSAK JSON)
-                        Pontosan az alábbi struktúrát add vissza:
-
+                        json
                         {
                         "rating": number,
-                        "feedback": "rövid, hasznos visszajelzés"
+                        "feedback": "Markdownban, rövid, hasznos visszajelzés"
                         }
+
 
                         A hírdetés: 
                         ${JSON.stringify(row)}
@@ -151,7 +144,7 @@ function rateListing(listing) {
             const rating = ai_rating.rating;
             const feedback = ai_rating.feedback;
 
-            if (!rating || !feedback) {
+            if (rating == null) {
                 console.log("No response from ai");
                 console.log("message: " + JSON.stringify(data.choices[0].message.content))
                 return;

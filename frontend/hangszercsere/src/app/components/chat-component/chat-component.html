@@ -1,13 +1,15 @@
-<div class="min-h-screen bg-light-site-bg dark:bg-site-bg text-light-text-primary dark:text-text-primary flex flex-col sm:flex-row">
+<div
+  class="min-h-screen bg-light-site-bg dark:bg-site-bg text-light-text-primary dark:text-text-primary flex flex-col sm:flex-row">
 
-  <div class="w-full sm:w-1/4 md:w-1/5 bg-light-card-bg dark:bg-card-bg p-4 overflow-y-auto border-b sm:border-b-0 sm:border-r border-gray-300 dark:border-gray-700">
+  <div
+    class="w-full sm:w-1/4 md:w-1/5 bg-light-card-bg dark:bg-card-bg p-4 overflow-y-auto border-b sm:border-b-0 sm:border-r border-gray-300 dark:border-gray-700">
     <ng-container *ngIf="threads.length == 0">
-        <span class="font-semibold">Még nincsenek beszélgetéseid!</span>
+      <span class="font-semibold">Még nincsenek beszélgetéseid!</span>
     </ng-container>
 
     <ng-container *ngFor="let t of threads">
       <button (click)="GetMessages(t.listing_id); SetInfo(t)"
-              class="w-full text-left px-3 py-2 mb-2 rounded-lg hover:bg-accent hover:text-text-primary dark:hover:bg-accent dark:hover:text-text-primary transition-all">
+        class="w-full text-left px-3 py-2 mb-2 rounded-lg hover:bg-accent hover:text-text-primary dark:hover:bg-accent dark:hover:text-text-primary transition-all">
         <span class="font-semibold">{{ t.listing_title }}</span>
         <span class="block text-sm text-light-text-secondary dark:text-text-secondary">
           {{ t.other_user_name }}
@@ -17,36 +19,44 @@
   </div>
 
   <ng-container *ngIf="listing">
-  <!-- Chat Panel -->
-  <div class="flex-1 flex flex-col p-4 gap-4 h-screen sm:h-auto" >
-    <h3 class="text-xl font-semibold">
-      <span class="text-accent"><a [routerLink]="['/listing', listing.id]" class="hover:underline">{{ listing?.title }}</a></span> - <span class="font-medium"><a [routerLink]="['/profile', this.thread.other_user_id || this.listing.user_id]" class="hover:underline">{{ this.thread?.other_user_name || this.listing.seller }}</a></span>
-    </h3>
+    <!-- Chat Panel -->
+    <div class="flex-1 flex flex-col p-4 gap-4 h-screen sm:h-auto">
+      <h3 class="text-xl font-semibold">
+        <span class="text-accent"><a [routerLink]="['/listing', listing.id]" class="hover:underline">{{ listing?.title
+            }}</a></span> - <span class="font-medium"><a
+            [routerLink]="['/profile', this.thread.other_user_id || this.listing.user_id]" class="hover:underline">{{
+            this.thread?.other_user_name || this.listing.seller }}</a></span>
+      </h3>
 
-    <!-- Messages container <i class="nf nf-weather-time_4"></i> {{message.created_at | timeAgo }}-->
-    <div #messagescontainer class="flex-1 overflow-y-auto p-3 bg-light-card-bg dark:bg-card-bg rounded-lg shadow-md flex flex-col gap-3 max-h-[70vh]">
-      <ng-container *ngIf="messages.length; else noMessages">
-        <div *ngFor="let message of messages" class="p-2 rounded hover:bg-light-site-bg/10 dark:hover:bg-site-bg/10 transition">
-          <p><strong>{{ message.sender_name }}</strong>: {{ message.content }}</p>
-          <p class="text-xs text-light-text-secondary dark:text-text-secondary">{{ message.timestamp | date:'medium' }}</p>
-        </div>
-      </ng-container>
-      <ng-template #noMessages>
-        <p class="text-light-text-secondary dark:text-text-secondary">Nincsenek üzenetek!</p>
-      </ng-template>
+      <!-- Messages container <i class="nf nf-weather-time_4"></i> {{message.created_at | timeAgo }}-->
+      <div #messagescontainer
+        class="flex-1 overflow-y-auto p-3 bg-light-card-bg dark:bg-card-bg rounded-lg shadow-md flex flex-col gap-3 max-h-[70vh]">
+        <ng-container *ngIf="messages.length; else noMessages">
+          <div *ngFor="let message of messages"
+            class="p-2 rounded hover:bg-light-site-bg/10 dark:hover:bg-site-bg/10 transition message-container">
+            <p>
+              <strong>{{ message.sender_name }}</strong>: {{ message.content }}
+              <i class="nf nf-md-delete_forever delete-icon" (click)="DeleteMessage(message.id)"></i>
+            </p>
+            <p class="text-xs text-light-text-secondary dark:text-text-secondary">
+              {{ message.timestamp | date:'medium' }}
+            </p>
+          </div>
+
+        </ng-container>
+        <ng-template #noMessages>
+          <p class="text-light-text-secondary dark:text-text-secondary">Nincsenek üzenetek!</p>
+        </ng-template>
+      </div>
+
+      <div class="flex gap-2 mt-2">
+        <input type="text" [(ngModel)]="msg_content" placeholder="Aa" class="input-field flex-1" />
+        <button (click)="SendMessage()"
+          class="bg-accent text-white font-semibold px-4 py-2 rounded hover:bg-accent-hover transition">
+          Küldés
+        </button>
+      </div>
+
     </div>
-
-    <div class="flex gap-2 mt-2">
-      <input type="text"
-             [(ngModel)]="msg_content"
-             placeholder="Aa"
-             class="input-field flex-1" />
-      <button (click)="SendMessage()"
-              class="bg-accent text-white font-semibold px-4 py-2 rounded hover:bg-accent-hover transition">
-        Küldés
-      </button>
-    </div>
-
-  </div>
   </ng-container>
 </div>

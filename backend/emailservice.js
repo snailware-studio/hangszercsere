@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import env from 'dotenv';
 import dotenv from 'dotenv';
 
 dotenv.config();
