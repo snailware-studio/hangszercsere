@@ -62,6 +62,10 @@ export class HomePage {
   });
 }
 
+ ngAfterViewInit() {
+  this.GetListings();
+ }
+
 
   ngOnInit(): void {
     this.GetListings();

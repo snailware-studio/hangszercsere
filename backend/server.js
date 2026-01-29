@@ -957,8 +957,8 @@ app.get("/api/instruments", async (req, res) => {
     }
 
     if (filters.brand) {
-      sql += ` AND l.brand = ?`;
-      params.push(filters.brand);
+      sql += ` AND lower(l.brand) LIKE lower(?)`;
+      params.push(`%${filters.brand}%`);
     }
 
     if (filters.category) {
@@ -972,8 +972,8 @@ app.get("/api/instruments", async (req, res) => {
     }
 
     if (filters.model) {
-      sql += ` AND l.model = ?`;
-      params.push(filters.model);
+      sql += ` AND lower(l.model) LIKE lower(?)`;
+      params.push(`%${filters.model}%`);
     }
 
     if (filters.location) {
