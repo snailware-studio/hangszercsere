@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --verbose"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +19,7 @@
     "marked": "^17.0.1",
     "multer": "^2.0.2",
     "ngx-markdown": "^21.0.1",
-    "node-fetch": "^3.3.2",
+    "node-fetch": "^2.7.0",
     "nodemailer": "^7.0.11",
     "sharp": "^0.34.5",
     "sqlite3": "^5.1.7",
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
-    "jest": "^30.2.0"
+    "jest": "^30.2.0",
+    "supertest": "^7.2.2"
   }
 }

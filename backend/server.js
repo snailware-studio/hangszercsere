@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt");
 const multer = require('multer');
 const fs = require('fs');
 const WebSocket = require('ws');
-const emailservice = require("./emailservice");
+const emailservice = require("./emailservice.js");
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const db = require("./db");
@@ -16,7 +16,7 @@ const dotenv = require('dotenv');
 const sharp = require('sharp');
 require("./ai");
 
-dotenv.config();
+dotenv.config({quiet:true});
 
 app.use(cors({
   origin: process.env.ORIGIN, //localhost:4200
@@ -1492,8 +1492,10 @@ app.get('/*splat', (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
 
+if (process.env.NODE_ENV !== 'test'){
+  server.listen(port, ip, () => {
+    console.log(`Server running at http://${ip}:${port}`);
+  });
+}
 
-server.listen(port, ip, () => {
-  console.log(`Server running at http://${ip}:${port}`);
-});
-
+module.exports = {app};

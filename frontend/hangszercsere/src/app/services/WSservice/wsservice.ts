@@ -22,8 +22,6 @@ export class WSservice {
       this.socket = new WebSocket('wss://hangszercsere.hu');
     }
 
-
-
     this.socket.onopen = () => {
 
       if (!this.user.isLoggedIn()) {
