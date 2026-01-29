@@ -1,8 +1,8 @@
 //kód az ai ratingekhez.
-import db from "./db.js";
-import fetch from "node-fetch";
-import dotenv from "dotenv";
-dotenv.config();
+const db = require("./db.js");
+const fetch = require("node-fetch");
+const dotenv = require("dotenv");
+dotenv.config({quiet:true});
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -206,7 +206,8 @@ async function runAI() {
     }
 }
 
-//run every 10 mins
-setInterval(runAI, timer_minutes * 60 * 1000);
-
-runAI();
+//run every 10 mins IF NOT TEST
+if (process.env.NODE_ENV !== 'test') {
+  aiInterval = setInterval(runAI, timer_minutes * 60 * 1000);
+  runAI();
+}

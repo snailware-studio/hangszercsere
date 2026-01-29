@@ -30,7 +30,7 @@
                             <div class="relative w-64 h-64">
                                 <button
                                     class="absolute top-1 right-1 z-10 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-                                    (click)="listing.images.splice(i, 1)" type="button">×</button>
+                                    (click)="listing.images.splice(i, 1)" type="button"><i class="nf nf-fa-xmark"></i></button>
 
                                 <img [src]="rootUrl + '/uploads/' + img"
                                     class="cursor-pointer w-full h-full object-cover rounded">
@@ -83,9 +83,11 @@
                 </div>
 
                 <div class="flex flex-col gap-1">
-                    <label class="text-light-text-secondary dark:text-text-secondary font-semibold">Képek</label>
+
+                    <label class="block mb-2.5 text-sm font-medium text-heading">Képek</label>
                     <input type="file" multiple (change)="onSelectImages($event)" accept="image/*"
-                        class="text-light-text-secondary dark:text-text-secondary" />
+                        class="cursor-pointer bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full shadow-xs placeholder:text-body" />
+
                 </div>
 
                 <div class="flex flex-col gap-1">
@@ -177,8 +179,8 @@
                     Módosítás
                 </button>
 
-                <div>
-                    <h1>AI Javaslat a hírdetés minőségének javítására:</h1>
+                <div class="ai-feedback">
+                    <h1 class="text-text-primary text-lg font-bold">AI Javaslat a hírdetés minőségének javítására:</h1>
                     <br>
                     <markdown class="
                             prose

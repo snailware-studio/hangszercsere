@@ -6,5 +6,8 @@ backend/uploads/
 frontend/node_modules/
 frontend/dist/
 
+# Database
+backend/database.db
+
 .vscode/
 *.env

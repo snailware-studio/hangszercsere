@@ -33,16 +33,11 @@
     <!-- Title -->
     <div class="product-title">
       {{ listing.title }}
+      <div class="product-description">
+        {{ listing.model }}
+      </div>
     </div>
 
-    <div class="product-description">
-      <ng-container *ngIf="listing.description.length > 30">
-        {{ listing.description.substring(0, 50) }}...
-      </ng-container>
-      <ng-container *ngIf="listing.description.length <= 30">
-        {{ listing.description }}
-      </ng-container>
-    </div>
 
     <!-- Meta info -->
     <div class="product-meta">
@@ -52,7 +47,7 @@
     </div>
 
 
-    <div class="relative inline-block text-xl leading-none">
+    <div class="relative inline-block text-xl leading-none m-4">
       <div class="text-gray-300">
         ★★★★★
       </div>

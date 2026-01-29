@@ -1,7 +1,7 @@
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
 
-dotenv.config();
+dotenv.config({quiet:true});
 
 //Configure transporter
 const transporter = nodemailer.createTransport({
@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // welcome email
-export async function sendWelcomeEmail(toEmail, name,token) {
+async function sendWelcomeEmail(toEmail, name,token) {
   try {
     const info = await transporter.sendMail({
       from: '"Hangszercsere.hu Support" <support@hangszercsere.hu>',
@@ -30,7 +30,7 @@ export async function sendWelcomeEmail(toEmail, name,token) {
 }
 
 //profile delete verify
-export async function sendProfileDeleteEmail(toEmail, name,token)
+async function sendProfileDeleteEmail(toEmail, name,token)
 {
     try {
       const info = await transporter.sendMail({
@@ -46,7 +46,7 @@ export async function sendProfileDeleteEmail(toEmail, name,token)
 }
 
 //listing sold
-export async function sendListingSoldEmail(toEmail, name,listing_id)
+async function sendListingSoldEmail(toEmail, name,listing_id)
 {
     try {
       const info = await transporter.sendMail({
@@ -62,7 +62,7 @@ export async function sendListingSoldEmail(toEmail, name,listing_id)
 }
 
 //wanted listing sold
-export async function sendWantedListingSoldEmail(toEmail, name,listing_id)
+async function sendWantedListingSoldEmail(toEmail, name,listing_id)
 {
     try {
       const info = await transporter.sendMail({
@@ -78,7 +78,7 @@ export async function sendWantedListingSoldEmail(toEmail, name,listing_id)
 }
 
 //listing bought
-export async function sendListingBoughtEmail(toEmail, name,listing_id)
+async function sendListingBoughtEmail(toEmail, name,listing_id)
 {
     try {
       const info = await transporter.sendMail({
@@ -92,3 +92,11 @@ export async function sendListingBoughtEmail(toEmail, name,listing_id)
       console.error('Error sending email:', err);
     }
 }
+
+module.exports = {
+  sendWelcomeEmail,
+  sendProfileDeleteEmail,
+  sendListingSoldEmail,
+  sendWantedListingSoldEmail,
+  sendListingBoughtEmail
+};

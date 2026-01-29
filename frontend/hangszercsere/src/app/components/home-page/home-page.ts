@@ -7,6 +7,7 @@ import { Filter } from '../filter/filter';
 import { NotifService } from '../../services/notif-service/notif-service';
 import { th } from 'date-fns/locale';
 import { GlobalService } from '../../services/GlobalService/global-service';
+import { errorKatexNotLoaded } from 'ngx-markdown';
 
 @Component({
   selector: 'app-home-page',
@@ -37,7 +38,7 @@ export class HomePage {
 
   SetListing(data:Listing): void
   {
-  this.ListingService.SetListing(data);
+    this.ListingService.SetListing(data);
   }
 
   AddToCart(listing_id: number): void
@@ -53,6 +54,10 @@ export class HomePage {
 
  GetListings(): void {
   this.ListingService.GetListings().subscribe((Data) => {
+    for (let i = 0; i < Data.length; i++) {
+      Data[i].model = Data[i].model ? Data[i].model : "⎯";
+    }
+
     this.listings = Data;
     this.storedListings = Data;
 

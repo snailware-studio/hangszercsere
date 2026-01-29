@@ -49,16 +49,16 @@
   }
 
   .product-title {
-    @apply h-full px-4 py-3 text-center text-lg font-bold mt-2 line-clamp-1
-           text-light-text-primary dark:text-text-primary pb-4 border-b-2 border-b-accent-hover dark:border-b-accent mb-4;
+    @apply h-full mb-4 pt-3 pb-10 text-center text-lg font-bold line-clamp-1
+           text-light-text-primary dark:text-text-primary border-b-2 border-b-accent-hover dark:border-b-accent;
   }
 
   .product-description {
-    @apply h-full text-center mt-1 text-sm text-light-text-secondary dark:text-text-secondary line-clamp-2 px-4 mb-3 min-h-[20px] pb-4;
+    @apply h-full mt-1 text-center text-sm text-light-text-secondary dark:text-text-secondary line-clamp-2 min-h-[20px];
   }
 
   .product-meta {
-    @apply h-full mt-2 px-4 text-sm text-light-text-secondary dark:text-text-secondary mb-4 flex justify-between pb-4;
+    @apply h-full mt-2 px-4 text-sm text-light-text-secondary dark:text-text-secondary flex justify-between;
   }
 
   .product-date {
@@ -100,6 +100,10 @@
 
   .cookie-banner button {
     @apply px-3 py-1 rounded bg-accent text-white hover:bg-accent-hover transition-all;
+  }
+
+  .ai-feedback {
+    @apply p-4 rounded border-2 dark:border-accent-hover border-accent bg-light-card-bg dark:bg-card-bg text-light-text-secondary dark:text-text-secondary;
   }
 
   body {
