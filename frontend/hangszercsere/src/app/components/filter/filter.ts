@@ -18,26 +18,36 @@ export class Filter {
 
   ngOnInit(): void {
     this.GetCategories();
+    this.ClearFilters();
+  }
+
+  ngAfterViewInit(): void {
+    this.ClearFilters();
+    this.FilterListings();
   }
 
   showExtra = false;
 
   categories: any[] = [];
 
-  filters: Filters = {
-    category: null,
-    priceType: null,     // 'less', 'more', 'custom'
-    priceValue: null,  // For less/more
-    priceMin: null,    // Custom range min
-    priceMax: null,    // Custom range max
-    condition: null,
-    brand: null,
-    model: null,
-    location: null,
-    aiRating: null,
-    dateType: null,      // 'before' or 'after'
-    dateValue: null      // Actual date
-  };
+  filters: Filters;
+
+  ClearFilters() {
+    this.filters = {
+      category: null,
+      priceType: null,     // 'less', 'more', 'custom'
+      priceValue: null,  // For less/more
+      priceMin: null,    // Custom range min
+      priceMax: null,    // Custom range max
+      condition: null,
+      brand: null,
+      model: null,
+      location: null,
+      aiRating: null,
+      dateType: null,      // 'before' or 'after'
+      dateValue: null      // Actual date
+    };
+  }
 
   GetCategories() {
     this.ListingService.GetCategories().subscribe({

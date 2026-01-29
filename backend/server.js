@@ -79,7 +79,7 @@ wss.on('connection', (ws) => {
 
     if (action === 'register') {
       users.set(userID, ws);
-      console.log(`User ${userID} connected`);
+      //console.log(`User ${userID} connected`);
     }
 
     if (action === 'message') {
@@ -203,8 +203,8 @@ app.post(
     { name: 'videos', maxCount: 5 }
   ]),
   async (req, res) => {
-    console.log('req.body:', req.body);
-    console.log('req.files:', req.files);
+    //console.log('req.body:', req.body);
+    //console.log('req.files:', req.files);
 
     const hasImages = Array.isArray(req.files['images']) && req.files['images'].length > 0;
     const hasVideos = Array.isArray(req.files['videos']) && req.files['videos'].length > 0;
@@ -663,117 +663,111 @@ app.get("/api/messages", auth, (req, res) => {
   });
 });
 
-//transactions
 app.post("/api/buy", auth, (req, res) => {
   const userID = req.userId;
 
-  const sql = `
+  const fetchCartSQL = `
     SELECT l.id, l.user_id, l.price, l.status
-    FROM cart_items 
+    FROM cart_items
     JOIN listings l ON l.id = cart_items.listing_id
     WHERE cart_items.cart_id = ?
   `;
 
-  db.all(sql, [userID], (err, rows) => {
+  db.all(fetchCartSQL, [userID], (err, listings) => {
     if (err) return res.status(500).json({ error: "Database error" });
-    if (rows.length === 0) return res.status(404).json({ error: "Cart is empty" });
+    if (!listings.length) return res.status(404).json({ error: "Cart is empty" });
 
-    const listings = rows;
+    for (const l of listings) {
+      if (l.user_id === userID)
+        return res.status(403).json({ error: "Cannot buy your own listing", listingID: l.id });
 
-    // validate listings
-    for (let listing of listings) {
-      if (listing.user_id === userID) {
-        return res.status(403).json({ error: "Cannot buy your own listing", listingID: listing.id });
-      }
-      if (listing.status === "sold") {
-        return res.status(400).json({ error: "Listing already sold", listingID: listing.id });
-      }
+      if (l.status === "sold")
+        return res.status(400).json({ error: "Listing already sold", listingID: l.id });
     }
 
     const totalPrice = listings.reduce((sum, l) => sum + l.price, 0);
-    const paymentStatus = "completed";
-    console.log(`Charged user ${userID} a total of ${totalPrice}FT`);
+    console.log(`Charged user ${userID} ${totalPrice}FT`);
 
-    let processedCount = 0;
-    let results = [];
+    const results = [];
 
-    listings.forEach((listing) => {
-      const sqlInsert = `
-        INSERT INTO transactions (sent_from, sent_to, listing_id, status, price)
-        VALUES (?, ?, ?, ?, ?)
-      `;
-      db.run(sqlInsert, [userID, listing.user_id, listing.id, paymentStatus, listing.price], function (err) {
-        if (err) {
-          results.push({
-            listingID: listing.id,
-            status: "error",
-            message: "Failed to create transaction"
-          });
-          return checkDone();
-        }
+    db.serialize(() => {
+      db.run("BEGIN TRANSACTION");
 
-        const sqlUpdate = `UPDATE listings SET status = 'sold' WHERE id = ?`;
-        db.run(sqlUpdate, [listing.id], function (err) {
-          if (err) {
-            results.push({
-              listingID: listing.id,
-              status: "error",
-              message: "Failed to mark listing as sold"
-            });
-          } else {
-            results.push({
-              listingID: listing.id,
-              status: "success",
-              message: "Transaction created and listing sold"
-            });
+      listings.forEach((listing) => {
+        db.run(
+          `INSERT INTO transactions (sent_from, sent_to, listing_id, status, price)
+           VALUES (?, ?, ?, 'completed', ?)`,
+          [userID, listing.user_id, listing.id, listing.price],
+          (err) => {
+            if (err) {
+              results.push({ listingID: listing.id, status: "error", message: "Transaction failed" });
+              return db.run("ROLLBACK");
+            }
 
-            // send email to seller
-            const sqlSeller = 'SELECT email, name FROM users WHERE id = ?';
-            db.get(sqlSeller, [listing.user_id], (err, row) => {
-              if (!err && row) {
-                emailservice.sendListingSoldEmail(row.email, row.name, listing.id);
+            db.run(
+              `UPDATE listings SET status = 'sold' WHERE id = ?`,
+              [listing.id],
+              (err) => {
+                if (err) {
+                  results.push({ listingID: listing.id, status: "error", message: "Failed to mark sold" });
+                  return db.run("ROLLBACK");
+                }
+
+                notifyUsers(listing);
+                results.push({ listingID: listing.id, status: "success" });
               }
-            });
-
-            // send email to buyer
-            const sqlBuyer = 'SELECT email, name FROM users WHERE id = ?';
-            db.get(sqlBuyer, [userID], (err, row) => {
-              if (!err && row) {
-                emailservice.sendListingBoughtEmail(row.email, row.name, listing.id);
-              }
-            });
-            //doesnt work
-            const cartsql = 'SELECT user_id FROM cart_items WHERE listing_id = ?';
-            db.all(cartsql, [listing.id], (err, rows) => {
-              if (!err && rows) {
-                rows.forEach(row => {
-                  if (row.user_id === userID) return;
-
-                  const sqlUser = 'SELECT email, name FROM users WHERE id = ?';
-                  db.get(sqlUser, [row.user_id], (err, userRow) => {
-                    if (!err && userRow) {
-                      emailservice.sendListingBoughtEmail(userRow.email, userRow.name, listing.id);
-                    }
-                  });
-                });
-              }
-            });
-
+            );
           }
-          checkDone();
-        });
+        );
       });
+
+      db.run(
+        `DELETE FROM cart_items WHERE cart_id = ?`,
+        [userID],
+        (err) => {
+          if (err) {
+            db.run("ROLLBACK");
+            return res.status(500).json({ error: "Failed to clear cart" });
+          }
+
+          db.run("COMMIT", () => {
+            res.json({ message: "Payment completed", totalPrice, results });
+          });
+        }
+      );
+    });
+  });
+
+  function notifyUsers(listing) {
+    db.get(`SELECT email, name FROM users WHERE id = ?`, [listing.user_id], (err, seller) => {
+      if (!err && seller)
+        emailservice.sendListingSoldEmail(seller.email, seller.name, listing.id);
     });
 
-    function checkDone() {
-      processedCount++;
-      if (processedCount === listings.length) {
-        res.json({ message: `Payment of $${totalPrice} completed`, results });
-      }
-    }
+    db.get(`SELECT email, name FROM users WHERE id = ?`, [userID], (err, buyer) => {
+      if (!err && buyer)
+        emailservice.sendListingBoughtEmail(buyer.email, buyer.name, listing.id);
+    });
 
-  });
+    // notify other watchers BEFORE cart delete
+    db.all(
+      `SELECT DISTINCT cart_id FROM cart_items WHERE listing_id = ? AND cart_id != ?`,
+      [listing.id, userID],
+      (err, rows) => {
+        if (err) return;
+
+        rows.forEach(({ cart_id }) => {
+          db.get(`SELECT email, name FROM users WHERE id = ?`, [cart_id], (err, user) => {
+            if (!err && user)
+              emailservice.sendWantedListingSoldEmail(user.email, user.name, listing.id);
+            
+          });
+        });
+      }
+    );
+  }
 });
+
 
 
 //get all transactions
@@ -950,9 +944,11 @@ app.get("/api/instruments", async (req, res) => {
       WHERE l.status = 'active'
     `;
 
-    // === Dynamic filters ===
+    //console.log("ai rating: " + filters.aiRating);
+
     if (filters.aiRating && Number(filters.aiRating) > 0) {
-      sql += ` AND l.ai_rating >= ?`;
+      sql += ` AND l.ai_rating > ? AND l.ai_rating < ? + 1`;
+      params.push(Number(filters.aiRating));
       params.push(Number(filters.aiRating));
     }
 
@@ -1133,8 +1129,8 @@ app.get('/api/confirm/:token', async (req, res) => {
 
   tokens.delete(token);
 
-  console.log('Token type:', type);
-  console.log('TokenType.EMAIL_VERIFICATION:', TokenType.EMAIL_VERIFICATION);
+  //console.log('Token type:', type);
+  //console.log('TokenType.EMAIL_VERIFICATION:', TokenType.EMAIL_VERIFICATION);
 
   try {
     switch (type.trim()) {

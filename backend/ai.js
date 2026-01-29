@@ -32,7 +32,6 @@ function rateListing(listing) {
                 l.title,
                 l.description,
                 l.price,
-                l.status,
                 l.created_at,
                 l.condition,
                 l.brand,

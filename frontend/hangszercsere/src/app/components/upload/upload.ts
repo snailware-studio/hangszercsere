@@ -79,7 +79,6 @@ onSelectMedia(event: Event) {
     }
   });
 
-  // reset input so same file can be re-selected
   input.value = '';
 }
 

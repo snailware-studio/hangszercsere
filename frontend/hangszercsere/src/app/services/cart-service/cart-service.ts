@@ -93,6 +93,7 @@ RemoveFromCart(listing_id: number): Observable<any> {
 
         if (response.results && response.results.length > 0) {
           response.results.forEach(result => {
+            console.log(result);
             if (result.status === 204) {
               this.notif.show("warning", `A kosarad üres!`);
               return;
@@ -100,8 +101,7 @@ RemoveFromCart(listing_id: number): Observable<any> {
             if (result.status === "error") {
               this.notif.show("error", `Listing ${result.listingID}: ${result.message}`);
             } else {
-              this.notif.show("success", `Sikeres fizetés!`);
-              this.RemoveFromCart(result.listingID);
+              this.notif.show("success", `Sikeres vásárlás!`);
             }
           });
         }

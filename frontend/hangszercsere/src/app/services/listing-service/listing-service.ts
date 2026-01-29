@@ -50,14 +50,12 @@ GetListings(): Observable<any> {
 
   Object.entries(this.global.filters).forEach(([key, value]) => {
     if (value !== null && value !== undefined && value !== '') {
-      params = params.set(key, value.toString()); // convert numbers to strings
+      params = params.set(key, value.toString());
     }
   });
 
-  console.log("Filters object being sent:", this.global.filters); // <-- check your original filters
-  console.log("HttpParams being sent:", params.toString()); // 
   return this.http.get(this.apiUrl, {
-    params,           // <-- Angular converts HttpParams to ?key=value&key2=value2
+    params,           
     withCredentials: true
   });
 }

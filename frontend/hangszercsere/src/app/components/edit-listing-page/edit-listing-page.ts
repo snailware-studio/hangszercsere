@@ -45,36 +45,25 @@ export class EditListingPage {
     });
   }
 
-  onSelectImages(event: Event) {
-    const files = (event.target as HTMLInputElement).files;
-    if (!files) return;
+ onSelectMedia(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (!input.files) return;
 
-    const newFiles = Array.from(files);
+  const files = Array.from(input.files);
 
-    if (!this.selectedImages) {
-      this.selectedImages = newFiles;
-    } else {
-      this.selectedImages.push(...newFiles);
+  files.forEach(file => {
+    if (file.type.startsWith('image/')) {
+      this.selectedImages.push(file);
+      this.PreviewImages.push(URL.createObjectURL(file));
+    } 
+    else if (file.type.startsWith('video/')) {
+      this.selectedVideos.push(file);
+      this.PreviewVideos.push(URL.createObjectURL(file));
     }
+  });
 
-    this.PreviewImages = this.selectedImages.map(f => URL.createObjectURL(f));
-    (event.target as HTMLInputElement).value = '';
-  }
-
-  onSelectVideos(event: Event) {
-    const files = (event.target as HTMLInputElement).files;
-    if (!files) return;
-
-    const newFiles = Array.from(files);
-    this.selectedVideos.push(...newFiles);
-
-    console.log('Selected videos:', this.selectedVideos);
-
-    this.PreviewVideos = this.selectedVideos.map(f => URL.createObjectURL(f));
-
-    console.log('Preview videos:', this.PreviewVideos);
-    (event.target as HTMLInputElement).value = '';
-  }
+  input.value = '';
+}
 
   UploadMedia(): void {
     const formData = new FormData();
