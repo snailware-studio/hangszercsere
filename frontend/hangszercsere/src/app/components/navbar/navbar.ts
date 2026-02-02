@@ -2,6 +2,8 @@ import { Component,OnInit } from '@angular/core';
 import { UserService } from '../../services/user-service/user-service';
 import { Router } from '@angular/router';
 import { GlobalService } from '../../services/GlobalService/global-service';
+import { CartService } from '../../services/cart-service/cart-service';
+
 
 @Component({
   selector: 'app-navbar',
@@ -14,7 +16,8 @@ export class Navbar {
   constructor(
     private userService: UserService,
     private router: Router,
-    private global: GlobalService
+    private global: GlobalService,
+    private cart: CartService
   ){
     this.rootUrl = this.global.rootUrl;
   }

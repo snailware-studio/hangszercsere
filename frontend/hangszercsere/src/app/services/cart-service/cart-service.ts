@@ -27,7 +27,11 @@ export class CartService {
     setTimeout(() => {
       this.user = this.injector.get(UserService);
     });
+
+    this.LoadListings();
   };
+
+  public cart = [];
 
   private apiUrl = "https://hangszercsere.hu/api/cart-items";
 
@@ -44,6 +48,7 @@ export class CartService {
     }).subscribe({
       next: (res) => {
         this.notif.show("success", "Hozzáadva a kosarához!");
+        this.cart.push(listing_id);
       },
       error: (err) => {
         if (err.status === 409) {
@@ -56,25 +61,26 @@ export class CartService {
     });
   }
 
-RemoveFromCart(listing_id: number): Observable<any> {
-  if (!this.user.isLoggedIn()) {
-    this.notif.show("error", "Be kell jelentkezned!");
-    this.router.navigate(['/login']);
-    return;
-  }
+  RemoveFromCart(listing_id: number): Observable<any> {
+    if (!this.user.isLoggedIn()) {
+      this.notif.show("error", "Be kell jelentkezned!");
+      this.router.navigate(['/login']);
+      return;
+    }
 
-  return this.http.delete(`${this.apiUrl}cart-items/${listing_id}`, {
-    withCredentials: true
-  }).pipe(
-    tap({
-      next: () => console.log("Removed from cart!"),
-      error: (err) => {
-        this.notif.show("error", "Hiba");
-        console.error("failed to remove from cart", err);
-      }
-    })
-  );
-}
+    return this.http.delete(`${this.apiUrl}cart-items/${listing_id}`, {
+      withCredentials: true
+    }).pipe(
+      tap({
+        next: () => 
+          this.cart.splice(this.cart.indexOf(listing_id), 1),
+        error: (err) => {
+          this.notif.show("error", "Hiba");
+          console.error("failed to remove from cart", err);
+        }
+      })
+    );
+  }
 
 
 
@@ -114,16 +120,39 @@ RemoveFromCart(listing_id: number): Observable<any> {
   LoadListings(): Observable<any> {
     return this.http.get(`${this.apiUrl}cart-items`, {
       withCredentials: true
-    });
+    }).pipe(
+      tap({
+        next: (res) => {
+          res.forEach(listing =>
+            this.addToLocalCart(listing.id)
+          );
+        },
+        error: (err) => {
+          this.notif.show("error", "Nem sikerült betölteni a kosarát!");
+          console.error('failed to load cart', err);
+        }
+      })
+    );
   }
 
+  addToLocalCart(listing_id: number): void {
+    if (!this.cart.includes(listing_id)) {
+      this.cart.push(listing_id);
+    };
+  }
 
   ClearCart(): void {
+    if (!this.user.isLoggedIn()) {
+      this.cart = [];
+      return;
+    }
+
     this.http.delete(`${this.apiUrl}cart-items`, {
       withCredentials: true
     }).subscribe({
       next: (res) => {
         console.log("Cart cleared!");
+        this.cart = [];
       },
       error: (err) => {
         this.notif.show("error", "Nem sikerült törölni a kosarát!");

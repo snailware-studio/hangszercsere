@@ -32,7 +32,6 @@ export class ListingService {
       return of(this.cachedListing);
     }
     else {
-      
       return this.http.get<Listing>(`${this.apiUrl.substring(0, this.apiUrl.length - 1)}/${id}`, {
         withCredentials: true 
       }).pipe(tap(data => this.cachedListing = data));

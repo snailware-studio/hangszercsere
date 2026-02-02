@@ -127,7 +127,7 @@ wss.on('connection', (ws) => {
     users.forEach((socket, userID) => {
       if (socket === ws) {
         users.delete(userID);
-        console.log(`User ${userID} disconnected`);
+       // console.log(`User ${userID} disconnected`);
       }
     });
   });
@@ -1092,7 +1092,7 @@ app.delete("/api/instruments/:id", auth, (req, res) => {
 
       // delete files
       rows.forEach(row => {
-        const filePath = path.join(__dirname, 'public/uploads', row.url);
+        const filePath = path.join(__dirname, 'uploads', row.url);
         fs.unlink(filePath, (err) => {
           if (err) console.error("Failed to delete file:", filePath, err);
         });
@@ -1485,6 +1485,9 @@ app.delete("/api/cart-items/:listing_id", auth, (req, res) => {
 
 
 app.get('/*splat', (req, res) => {
+  if (process.env.ORIGIN === 'http://localhost:4200') {
+    return;
+  }
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
 

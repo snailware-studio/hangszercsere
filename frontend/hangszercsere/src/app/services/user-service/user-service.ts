@@ -35,6 +35,7 @@ export class UserService {
       next: user => {
         this.currentUser = user;
         this.currentUserId = user?.id ?? null;
+        this.cart.LoadListings().subscribe();
       },
       error: err => {
         console.error('Failed to load user info', err);
@@ -64,6 +65,7 @@ export class UserService {
           console.log("logged in", res);
           this.currentUser = { name: res.name };
           this.currentUserId = res?.id ?? null; 
+          this.cart.LoadListings().subscribe();
           this.GetCurrentUser().subscribe(data => this.currentUser = data);
         }
       })
@@ -84,6 +86,7 @@ export class UserService {
       next: () => {
         this.currentUserId = null;
         this.currentUser = null;
+        this.cart.ClearCart();
       },
       error: err => console.error("Logout failed", err)
     });

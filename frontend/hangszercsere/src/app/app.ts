@@ -3,6 +3,7 @@ import { WSservice } from './services/WSservice/wsservice';
 import { NotifService } from './services/notif-service/notif-service';
 import { UserService } from './services/user-service/user-service';
 import { PopupService } from './services/popup-service/popup-service';
+import { CartService } from './services/cart-service/cart-service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,8 @@ export class App {
   constructor(private ws: WSservice,
     private notif: NotifService,
     private user: UserService,
-    private popup: PopupService
+    private popup: PopupService,
+    private cart: CartService
   ) {
   }
 

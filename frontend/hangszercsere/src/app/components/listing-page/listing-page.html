@@ -93,10 +93,19 @@
         <ng-container *ngIf="GetUserId() != listing?.user_id">
 
           <!-- ADD TO CART BUTTON -->
-          <button class="bg-accent text-white font-semibold py-3 rounded hover:bg-lime-500 bg-lime-600
+           <ng-container *ngIf="this.cart.cart.includes(listing.id)">
+          <button class=" text-white/40 font-semibold py-3 rounded hover:bg-zinc-500/40 bg-zinc-600/40
+                    transition w-full md:w-1/2" (click)="AddToCart(listing.id)"> 
+            <i class="nf nf-fa-cart_shopping"></i> Kosárba
+          </button>
+           </ng-container>
+           <ng-container *ngIf="!this.cart.cart.includes(listing.id)">
+          <button class="text-white font-semibold py-3 rounded hover:bg-lime-500 bg-lime-600
                     transition w-full md:w-1/2" (click)="AddToCart(listing.id)">
             <i class="nf nf-fa-cart_shopping"></i> Kosárba
           </button>
+           </ng-container>
+
 
           <!-- Message seller -->
           <button class="bg-purple-700 text-white font-semibold py-3 rounded hover:bg-purple-600
