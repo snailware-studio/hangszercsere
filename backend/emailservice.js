@@ -21,7 +21,7 @@ async function sendWelcomeEmail(toEmail, name, token) {
       from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
       to: toEmail,
       subject: 'Üdv a Hangszercsere.hu-n!',
-      html: `<h2>Szia ${name}!</h2><p>Köszönjük, hogy regisztráltál a Hangszercsere.hu-n!</p><p>Kérjük, kattints az alábbi linkre az email címed megerősítéséhez:</p><a href="${process.env.ORIGIN}/api/confirm/${token}">Email megerősítése</a>`
+      html: `<h2>Szia ${name}!</h2><p>Köszönjük, hogy regisztráltál a Hangszercsere.hu-n!</p><p>Kérjük, kattints az alábbi linkre az email címed megerősítéséhez:</p><a href="${process.env.BACKEND}/api/confirm/${token}">Email megerősítése</a>`
     });
     console.log('Email sent:', info.messageId);
   } catch (err) {
@@ -36,7 +36,7 @@ async function sendProfileDeleteEmail(toEmail, name, token) {
       from: '"Hangszercsere Support" <support@hangszercsere.hu>',
       to: toEmail,
       subject: 'Fiók törlésének megerősítése',
-      html: `<h2>Szia ${name}!</h2><p>Kérjük, kattints az alábbi linkre a fiókod törlésének megerősítéséhez:</p><a href="${process.env.ORIGIN}/api/confirm/${token}">Fiók törlése</a>`
+      html: `<h2>Szia ${name}!</h2><p>Kérjük, kattints az alábbi linkre a fiókod törlésének megerősítéséhez:</p><a href="${process.env.BACKEND}/api/confirm/${token}">Fiók törlése</a>`
     });
     console.log('Email sent:', info.messageId);
   } catch (err) {
@@ -51,7 +51,7 @@ async function sendListingSoldEmail(toEmail, name, listing_id) {
       from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
       to: toEmail,
       subject: 'Elkelt a hirdetésed!',
-      html: `<h2>Szia ${name}!</h2><p>A hirdetésed elkelt! Megtekintheted itt: <a href="${process.env.ORIGIN}/listing/${listing_id}">Hirdetés megtekintése</a></p>`
+      html: `<h2>Szia ${name}!</h2><p>A hirdetésed elkelt! Megtekintheted itt: <a href="${process.env.BACKEND}/listing/${listing_id}">Hirdetés megtekintése</a></p>`
     });
     console.log('Email sent:', info.messageId);
   } catch (err) {
@@ -66,7 +66,7 @@ async function sendWantedListingSoldEmail(toEmail, name, listing_id) {
       from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
       to: toEmail,
       subject: 'A kosaradban lévő termék elkelt!',
-      html: `<h2>Szia ${name}!</h2><p>Egy kosaradban lévő termék sajnos elkelt! Megtekintheted itt: <a href="${process.env.ORIGIN}/listing/${listing_id}">Hirdetés megtekintése</a></p>`
+      html: `<h2>Szia ${name}!</h2><p>Egy kosaradban lévő termék sajnos elkelt! Megtekintheted itt: <a href="${process.env.BACKEND}/listing/${listing_id}">Hirdetés megtekintése</a></p>`
     });
     console.log('Email sent:', info.messageId);
   } catch (err) {
@@ -81,7 +81,7 @@ async function sendListingBoughtEmail(toEmail, name, listing_id) {
       from: '"Hangszercsere.hu" <support@hangszercsere.hu>',
       to: toEmail,
       subject: 'Sikeres vásárlás!',
-      html: `<h2>Szia ${name}!</h2><p>Köszönjük a vásárlást! Megtekintheted itt: <a href="${process.env.ORIGIN}/listing/${listing_id}">Hirdetés megtekintése</a></p>`
+      html: `<h2>Szia ${name}!</h2><p>Köszönjük a vásárlást! Megtekintheted itt: <a href="${process.env.BACKEND}/listing/${listing_id}">Hirdetés megtekintése</a></p>`
     });
     console.log('Email sent:', info.messageId);
   } catch (err) {

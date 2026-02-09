@@ -16,7 +16,7 @@ const dotenv = require('dotenv');
 const sharp = require('sharp');
 require("./ai");
 
-dotenv.config({quiet:true});
+dotenv.config({ quiet: true });
 
 app.use(cors({
   origin: process.env.ORIGIN, //localhost:4200
@@ -84,16 +84,19 @@ wss.on('connection', (ws) => {
 
     if (action === 'message') {
       // console.log(JSON.parse(message));
-      const { toUserID, message: msgContent, listing } = JSON.parse(message);
-      Sendmessage(userID, toUserID, msgContent, listing);
+      let { toUserID, message: msgContent, listing, reply_to } = JSON.parse(message);
+      if (reply_to) {
+        reply_to = reply_to.id;
+      }
+      Sendmessage(userID, toUserID, msgContent, listing, reply_to);
     }
 
   });
 
-  function Sendmessage(userID, toUserID, message, listing) {
+  function Sendmessage(userID, toUserID, message, listing, reply_to) {
     const touser = users.get(toUserID);
     if (touser && touser.readyState === WebSocket.OPEN) {
-      touser.send(JSON.stringify({ action: 'message', from: 'server', user: userID, toUser: toUserID, message: message, listing: listing }));
+      touser.send(JSON.stringify({ action: 'message', from: 'server', user: userID, toUser: toUserID, message: message, listing: listing, reply_to: reply_to }));
       //console.log(`Message sent to user ${toUserID}`);
     }
     else {
@@ -102,15 +105,15 @@ wss.on('connection', (ws) => {
 
     const user = users.get(userID);
     if (user && user.readyState === WebSocket.OPEN) {
-      user.send(JSON.stringify({ action: 'message', from: 'server', user: userID, toUser: toUserID, message: message, listing: listing }));
+      user.send(JSON.stringify({ action: 'message', from: 'server', user: userID, toUser: toUserID, message: message, listing: listing, reply_to: reply_to }));
     }
 
     const sql = `
-    INSERT INTO messages (sent_from, sent_to, content, listing_id)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO messages (sent_from, sent_to, content, listing_id,reply_to)
+    VALUES (?, ?, ?, ?,?)
   `;
 
-    db.run(sql, [userID, toUserID, message, listing], function (err) {
+    db.run(sql, [userID, toUserID, message, listing, reply_to], function (err) {
       if (err) {
         console.error("INSERT ERROR:", err.message);
       }
@@ -127,7 +130,7 @@ wss.on('connection', (ws) => {
     users.forEach((socket, userID) => {
       if (socket === ws) {
         users.delete(userID);
-       // console.log(`User ${userID} disconnected`);
+        // console.log(`User ${userID} disconnected`);
       }
     });
   });
@@ -143,7 +146,7 @@ app.post("/api/users/logout", auth, (req, res) => {
 
 
 app.get("/api/users/me", auth, (req, res) => {
-  db.get("SELECT id, name, email, profile_url  FROM users WHERE id = ?", [req.userId], (err, user) => {
+  db.get("SELECT id, name, email, profile_url,role  FROM users WHERE id = ?", [req.userId], (err, user) => {
     if (err) {
       console.log(err);
       return res.status(500).json({ error: "Adatbázis hiba" });
@@ -445,7 +448,7 @@ app.post('/api/instruments/media/update', auth, upload.fields([
 // send message
 app.post("/api/messages/send", auth, (req, res) => {
 
-  const { sent_from, sent_to, content, listing_id } = req.body;
+  const { sent_from, sent_to, content, listing_id, reply_to } = req.body;
 
   if (!sent_from || !sent_to || !content || !listing_id) {
     return res.status(400).json({
@@ -458,11 +461,11 @@ app.post("/api/messages/send", auth, (req, res) => {
   }
 
   const sql = `
-    INSERT INTO messages (sent_from, sent_to, content, listing_id)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO messages (sent_from, sent_to, content, listing_id,reply_to)
+    VALUES (?, ?, ?, ?,?)
   `;
 
-  db.run(sql, [sent_from, sent_to, content, listing_id], function (err) {
+  db.run(sql, [sent_from, sent_to, content, listing_id, reply_to], function (err) {
     if (err) {
       console.error("INSERT ERROR:", err.message);
       return res.status(500).json({ error: err.message });
@@ -536,16 +539,21 @@ app.get("/api/messages/:listingId/:userId", auth, (req, res) => {
   if (!(userId == req.userId)) {
     return res.status(403).json({ error: "Not authorized" });
   }
-
+  //to-do
   const sql = `
-    SELECT 
-      m.*,
-      u.name AS sender_name
-    FROM messages m
-    JOIN users u ON m.sent_from = u.id
-    WHERE m.listing_id = ?
-      AND (m.sent_from = ? OR m.sent_to = ?)
-    ORDER BY m.created_at ASC;
+  SELECT
+    m.*,
+    u.name AS sender_name,
+    rm.id AS reply_id,
+    ru.name AS reply_name,
+    rm.content AS reply_content
+  FROM messages m
+  JOIN users u ON m.sent_from = u.id
+  LEFT JOIN messages rm ON m.reply_to = rm.id
+  LEFT JOIN users ru ON rm.sent_from = ru.id
+  WHERE m.listing_id = ?
+    AND (m.sent_from = ? OR m.sent_to = ?)
+  ORDER BY m.created_at ASC;
   `;
 
   db.all(sql, [listingId, userId, userId], (err, rows) => {
@@ -557,18 +565,53 @@ app.get("/api/messages/:listingId/:userId", auth, (req, res) => {
 
 // * of listings
 app.get("/api/listings", auth, (req, res) => {
-  const sql = `SELECT * FROM listings`;
+  const sql =`
+      SELECT
+  l.id,
+  l.title,
+  l.price,
+  l.description,
+  l.status,
+  l.created_at,
+  l.user_id,
+  l.condition,
+  l.brand,
+  l.model,
+  l.ai_rating,
+  l.ai_feedback,
+  u.name AS seller,
+  l.category_id,
+  c.name AS category,
+  (
+    SELECT m.url
+    FROM media m
+    WHERE m.listing_id = l.id AND m.type = 'image'
+    ORDER BY m.id ASC
+    LIMIT 1
+  ) AS image
+FROM listings l
+JOIN users u ON u.id = l.user_id
+LEFT JOIN categories c ON c.id = l.category_id;
 
-  if (!(req.userId == 1)) {
-    return res.status(403).json({ error: "Not authorized" });
-  }
+ 
+    `;
 
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(rows);
+  let admin = false;
+
+  db.get("SELECT role FROM users WHERE id = ?", [req.userId], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!row) return res.status(404).json({ error: "User not found" });
+    admin = row.role === 'admin';
+
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(rows);
+    });
   });
+
+
 });
 
 // * of media
@@ -616,6 +659,7 @@ app.get("/api/users", auth, (req, res) => {
 
 //GET user by id
 app.get("/api/users/:userID", (req, res) => {
+
   const sql = `
     SELECT 
       u.id,
@@ -760,7 +804,7 @@ app.post("/api/buy", auth, (req, res) => {
           db.get(`SELECT email, name FROM users WHERE id = ?`, [cart_id], (err, user) => {
             if (!err && user)
               emailservice.sendWantedListingSoldEmail(user.email, user.name, listing.id);
-            
+
           });
         });
       }
@@ -782,16 +826,39 @@ app.get("/api/transactions", auth, (req, res) => {
 });
 
 //get transaction by id
-app.get("/api/transactions/id/:id", auth, (req, res) => {
-  const id = req.params.id;
+app.get("/api/transactions/id", auth, (req, res) => {
+  const id = req.userId;
+  const sql = `
+SELECT
+    t.id,
+    t.sent_from,
+    u.name AS seller,
+    t.price,
+    t.status,
+    t.created_at,
+    t.completed_at,
+    t.listing_id,
+    l.title AS listing_title,
+    (
+        SELECT m.url
+        FROM media m
+        WHERE m.listing_id = t.listing_id
+          AND m.type = 'image'
+        ORDER BY m.id ASC
+        LIMIT 1
+    ) AS thumbnail
+FROM transactions t
+JOIN users u ON t.sent_to = u.id
+JOIN listings l ON t.listing_id = l.id
+WHERE t.sent_from = ?;
 
-  db.get("SELECT * FROM transactions WHERE id = ?", [id], (err, row) => {
+
+  `
+
+  db.all(sql, [id], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    if (!row) return res.status(404).json({ error: "Transaction not found" });
-    if (!(row.sent_from == req.userId)) {
-      return res.status(403).json({ error: "Not authorized" });
-    }
-    res.json(row);
+    if (!rows || rows.length === 0) return res.status(404).json({ error: "Transactions not found" });
+    res.json(rows);
   });
 });
 
@@ -1328,12 +1395,61 @@ VALUES(?, ?, ?, ?, ?, ?,?,?,?,?)
   });
 });
 
+//listings by userid
+app.get("/api/listings/user/:userID", (req, res) => {
+  const userId = req.params.userID;
+  if (!userId) return res.status(400).json({ error: "User ID is required" });
+
+  const sql = `
+    SELECT 
+      l.id,
+      l.user_id,
+      l.title,
+      l.price,
+      l.description,
+      l.condition,
+      l.ai_rating,
+      l.brand,
+      l.model,
+      l.created_at,
+      c.name AS category,
+      u.name AS seller,
+      m.url AS image_url,
+      CASE 
+        WHEN aq.id IS NOT NULL THEN 'waiting for review'
+        ELSE l.status
+      END AS status
+    FROM listings l
+    LEFT JOIN categories c ON c.id = l.category_id
+    JOIN users u ON u.id = l.user_id
+    LEFT JOIN (
+      SELECT listing_id, url
+      FROM media 
+      WHERE type = 'image' 
+        AND id IN (
+          SELECT MIN(id)
+          FROM media
+          WHERE type = 'image'
+          GROUP BY listing_id
+        )
+    ) m ON m.listing_id = l.id
+    LEFT JOIN ai_queue aq ON aq.listing_id = l.id
+    WHERE l.user_id = ?
+    ORDER BY l.created_at DESC
+  `;
+
+  db.all(sql, [userId], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
 //my listings
 app.get("/api/mylistings", auth, (req, res) => {
   const userId = req.userId;
   if (!userId) return res.status(400).json({ error: "User ID is required" });
 
-const sql = `
+  const sql = `
     SELECT 
       l.id,
       l.user_id,
@@ -1491,10 +1607,10 @@ app.get('/*splat', (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
 
-if (process.env.NODE_ENV !== 'test'){
+if (process.env.NODE_ENV !== 'test') {
   server.listen(port, ip, () => {
     console.log(`Server running at http://${ip}:${port}`);
   });
 }
 
-module.exports = {app};
+module.exports = { app };

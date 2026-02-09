@@ -30,6 +30,7 @@ import { AszfComponent } from './components/aszf-component/aszf-component';
 import { ImpresszumComponent } from './components/impresszum-component/impresszum-component';
 import { MarkdownModule } from 'ngx-markdown';
 import { MylistingsComponent } from './components/mylistings-component/mylistings-component';
+import { HistoryComponent } from './components/history-component/history-component';
 
 @NgModule({
   declarations: [
@@ -58,6 +59,7 @@ import { MylistingsComponent } from './components/mylistings-component/mylisting
     AszfComponent,
     ImpresszumComponent,
     MylistingsComponent,
+    HistoryComponent,
   ],
   imports: [
     BrowserModule,

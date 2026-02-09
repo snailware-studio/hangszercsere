@@ -16,6 +16,7 @@ import { AdatvedelemComponent } from './components/adatvedelem-component/adatved
 import { AszfComponent } from './components/aszf-component/aszf-component';
 import { ImpresszumComponent } from './components/impresszum-component/impresszum-component';
 import { MylistingsComponent } from './components/mylistings-component/mylistings-component';
+import { HistoryComponent } from './components/history-component/history-component';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
@@ -33,7 +34,8 @@ export const routes: Routes = [
   { path: 'adatvedelem', component: AdatvedelemComponent },
   { path: 'aszf', component: AszfComponent },
   { path: 'impresszum', component: ImpresszumComponent },
-  { path: 'my-listings', component: MylistingsComponent }
+  { path: 'my-listings', component: MylistingsComponent },
+  { path: 'purchase-history', component: HistoryComponent }
 
 ];
 

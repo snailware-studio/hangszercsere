@@ -42,8 +42,8 @@ GetMessages(listingId: number, userId: number): Observable<any> {
   });
 }
 
-SendMessage(sent_from: number, sent_to: number, content: string, listing_id: number) {
-  this.ws.sendMessage(sent_from, sent_to, content, listing_id), {
+SendMessage(sent_from: number, sent_to: number, content: string, listing_id: number, reply: any = null) {
+  this.ws.sendMessage(sent_from, sent_to, content, listing_id,reply), {
     withCredentials: true
   };
 }

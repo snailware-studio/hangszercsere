@@ -33,7 +33,7 @@ export class ListingService {
     }
     else {
       return this.http.get<Listing>(`${this.apiUrl.substring(0, this.apiUrl.length - 1)}/${id}`, {
-        withCredentials: true 
+        withCredentials: true
       }).pipe(tap(data => this.cachedListing = data));
     }
   };
@@ -44,30 +44,47 @@ export class ListingService {
     });
   }
 
-GetListings(): Observable<any> {
-  let params = new HttpParams();
+  ListingByUserId(userId: number): Observable<any> {
+    return this.http.get(`${this.global.rootUrl}/api/listings/user/${userId}`, {
+    });
+  }
 
-  Object.entries(this.global.filters).forEach(([key, value]) => {
-    if (value !== null && value !== undefined && value !== '') {
-      params = params.set(key, value.toString());
-    }
-  });
+  getPurchaseHistory(): Observable<any> {
+    return this.http.get(`${this.global.rootUrl}/api/transactions/id`, {
+      withCredentials: true
+    });
+  }
 
-  return this.http.get(this.apiUrl, {
-    params,           
-    withCredentials: true
-  });
-}
+  GetListingsAdmin(): Observable<any> {
+    return this.http.get(`${this.global.rootUrl}/api/listings`, {
+      withCredentials: true
+    });
+  }
+
+  GetListings(): Observable<any> {
+    let params = new HttpParams();
+
+    Object.entries(this.global.filters).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '') {
+        params = params.set(key, value.toString());
+      }
+    });
+
+    return this.http.get(this.apiUrl, {
+      params,
+      withCredentials: true
+    });
+  }
 
   AddListing(listing: Listing): Observable<any> {
     return this.http.post(this.apiUrl, listing, {
-      withCredentials: true  
+      withCredentials: true
     });
   }
 
   RemoveListing(id: number) {
     return this.http.delete(`${this.apiUrl}/${id}`, {
-      withCredentials: true  
+      withCredentials: true
     });
   }
 
@@ -89,12 +106,12 @@ GetListings(): Observable<any> {
     };
 
     return this.http.put(`${this.apiUrl.substring(0, this.apiUrl.length - 1)}/update/${listing.id}`, newlisting, {
-      withCredentials: true  
+      withCredentials: true
     });
   }
 
   GetCategories(): Observable<any> {
-    return this.http.get(`${this.apiUrl.substring(0,this.apiUrl.length-12)}/categories`);
+    return this.http.get(`${this.apiUrl.substring(0, this.apiUrl.length - 12)}/categories`);
   }
 
   AddMedia(images: File[] | null, videos: File[] | null, listingId: number): Observable<any> {
@@ -117,7 +134,7 @@ GetListings(): Observable<any> {
     return this.http.post(`${this.apiUrl}/media`, formData, {
       reportProgress: true,
       observe: 'events',
-      withCredentials: true 
+      withCredentials: true
     });
   }
 
@@ -125,7 +142,7 @@ GetListings(): Observable<any> {
     return this.http.post(`${this.apiUrl}/media/update`, formData, {
       reportProgress: true,
       observe: 'events',
-      withCredentials: true 
+      withCredentials: true
     });
   }
 }

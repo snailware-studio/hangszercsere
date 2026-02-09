@@ -1,11 +1,11 @@
-<ng-container *ngIf="!isAdmin()">
+<ng-container *ngIf="!this.userservice.admin">
   <div class="w-full min-h-screen flex items-center justify-center
               text-light-text-primary dark:text-text-primary text-xl">
     You are not an admin!
   </div>
 </ng-container>
 
-<ng-container *ngIf="isAdmin()">
+<ng-container *ngIf="this.userservice.admin">
 
   <div class="w-full min-h-screen bg-light-site-bg dark:bg-site-bg py-10">
     <div class="max-w-6xl mx-auto px-4">
@@ -22,7 +22,7 @@
 
           <!-- Image -->
           <img *ngIf="listing.images?.length"
-               [src]="'https://hangszercsere.hu/uploads/' + listing.images[0]"
+               [src]="this.global.rootUrl + '/uploads/' + listing.image"
                class="w-full h-40 object-cover rounded-lg"
                alt="Listing Image">
 

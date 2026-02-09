@@ -53,5 +53,85 @@
       <span>Utoljára aktív: {{ user?.last_login | date:'mediumDate' }}</span>
     </div>
 
+<div *ngIf="this.listings.length > 0" class="p-6 max-w-xl lg:max-w-3xl mx-auto">
+
+  <h3 class="text-lg lg:text-xl font-semibold mb-4 text-center">
+    {{ user?.name }} hirdetései
+  </h3>
+
+  <div class="relative overflow-hidden rounded-2xl
+              border border-zinc-200 dark:border-[#3a3155]
+              bg-white dark:bg-[#241e34]
+              shadow-sm dark:shadow-purple-900/20">
+
+    <!-- SLIDES WRAPPER -->
+    <div
+      class="flex transition-transform duration-300 ease-out"
+      [style.transform]="'translateX(-' + carouselIndex * 100 + '%)'">
+
+      <!-- SLIDE -->
+      <div
+        *ngFor="let listing of listings"
+        class="w-full shrink-0">
+
+        <div class="relative aspect-[4/3] lg:aspect-[16/9]" (click)="OpenListing(listing)">
+          <img
+            [src]="rootUrl + '/uploads/' + listing.image_url"
+            class="w-full h-full object-cover"
+          />
+
+          <div class="absolute bottom-3 right-3
+                      bg-black/70 backdrop-blur
+                      text-white px-3 py-1 rounded-full text-sm font-medium">
+            {{ listing.price }} Ft
+          </div>
+        </div>
+
+        <div class="p-4 lg:p-6">
+          <h4 class="font-medium text-base lg:text-lg">
+            {{ listing.title }}
+          </h4>
+          <p class="text-sm lg:text-base text-gray-500 dark:text-purple-300/70">
+            <ng-container *ngIf="listing.description.length < 80">
+             {{ listing.description }}
+            </ng-container>
+            <ng-container *ngIf="listing.description.length > 80">
+              {{ listing.description.substring(0, 80) }}...
+            </ng-container>
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- LEFT BUTTON -->
+    <button
+      (click)="carouselIndex = carouselIndex > 0 ? carouselIndex - 1 : listings.length - 1"
+      class="absolute left-3 top-1/2 -translate-y-1/2
+             w-10 h-10 lg:w-12 lg:h-12
+             rounded-full
+             bg-black/70 backdrop-blur
+             text-white text-xl
+             flex items-center justify-center">
+      ‹
+    </button>
+
+    <!-- RIGHT BUTTON -->
+    <button
+      (click)="carouselIndex = carouselIndex < listings.length - 1 ? carouselIndex + 1 : 0"
+      class="absolute right-3 top-1/2 -translate-y-1/2
+             w-10 h-10 lg:w-12 lg:h-12
+             rounded-full
+             bg-black/70 backdrop-blur
+             text-white text-xl
+             flex items-center justify-center">
+      ›
+    </button>
+
   </div>
 </div>
+
+
+
+      </div>
+    </div>

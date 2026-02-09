@@ -2,6 +2,7 @@ import { Component,OnInit } from '@angular/core';
 import { Listing } from '../../services/listing-service/listing-service';
 import { ListingService } from '../../services/listing-service/listing-service';
 import { UserService } from '../../services/user-service/user-service';
+import { GlobalService } from '../../services/GlobalService/global-service';
 
 @Component({
   selector: 'app-admin-panel',
@@ -14,20 +15,15 @@ export class AdminPanel {
   listings: Listing[] = [];
 
   constructor(
-    private userservice: UserService,
+    public userservice: UserService,
     private listingservice: ListingService,
+    private global: GlobalService
   ){
 
   }
-
   ngOnInit():void
   {
-    this.listingservice.GetListings().subscribe((Data) => (this.listings = Data));
-  }
-
-  isAdmin(): boolean
-  {
-    return this.userservice.isAdmin();
+    this.listingservice.GetListingsAdmin().subscribe((Data) => (this.listings = Data));
   }
 
   RemoveListing(id:number): void

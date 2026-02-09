@@ -52,6 +52,9 @@
           <a (click)="GotoProfile(userService.getUserId());dropdown = !dropdown" class="dropdown-item"><i
               class="nf nf-fa-user"></i> Profil</a>
 
+          <a routerLink="/purchase-history" (click)="dropdown = !dropdown" class="dropdown-item"><i
+              class="nf nf-md-receipt"></i> Vásárlások</a>
+
           <a routerLink="/chat" class="dropdown-item" (click)="dropdown = !dropdown"><i class="nf nf-md-chat"></i>
             Üzenetek</a>
 

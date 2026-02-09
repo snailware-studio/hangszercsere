@@ -88,10 +88,14 @@ CREATE TABLE IF NOT EXISTS messages (
     listing_id INTEGER,
     content TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    reply_to INTEGER DEFAULT NULL,
+
     FOREIGN KEY (sent_from) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (sent_to) REFERENCES users(id) ON DELETE SET NULL,
-    FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE SET NULL
+    FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE SET NULL,
+    FOREIGN KEY (reply_to) REFERENCES messages(id) ON DELETE SET NULL
 );
+
 
 CREATE TABLE IF NOT EXISTS transactions (
     id INTEGER PRIMARY KEY,

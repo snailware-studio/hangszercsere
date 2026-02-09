@@ -26,6 +26,7 @@ export class ChatComponent {
   messages: any[] = [];
   threads: any[] = [];
   msg_content: string = '';
+  reply: any = null;
   listing_id: number = 0;
   listing: Listing = null;
   thread: any = [];
@@ -73,10 +74,12 @@ export class ChatComponent {
       this.user.currentUserId,
       this.chatter_id,
       this.msg_content,
-      this.listing_id
+      this.listing_id,
+      this.reply
     )
 
     this.msg_content = "";
+    this.reply = null;
 
     this.GetMessages(this.listing_id);
   }

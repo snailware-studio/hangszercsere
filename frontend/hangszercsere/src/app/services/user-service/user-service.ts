@@ -15,6 +15,7 @@ export class UserService {
 
   public currentUserId: number;
   public currentUser: any = null;
+  public admin = false;
 
   constructor(
     private http: HttpClient,
@@ -35,6 +36,7 @@ export class UserService {
       next: user => {
         this.currentUser = user;
         this.currentUserId = user?.id ?? null;
+        this.admin = user?.role === 'admin';
         this.cart.LoadListings().subscribe();
       },
       error: err => {
@@ -44,8 +46,6 @@ export class UserService {
     });
   }
 
-  
-
   RegisterUser(user: user): Observable<any> {
     return this.http.post(this.apiUrl, user);
   }
@@ -54,8 +54,8 @@ export class UserService {
     return this.currentUser?.name;
   }
 
-  DeleteAccount(userId:number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/delete`, {userId}, { withCredentials: true });
+  DeleteAccount(userId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/delete`, { userId }, { withCredentials: true });
   };
 
   LoginUser(name: string, password: string): Observable<any> {
@@ -64,7 +64,7 @@ export class UserService {
         if (res?.name) {
           console.log("logged in", res);
           this.currentUser = { name: res.name };
-          this.currentUserId = res?.id ?? null; 
+          this.currentUserId = res?.id ?? null;
           this.cart.LoadListings().subscribe();
           this.GetCurrentUser().subscribe(data => this.currentUser = data);
         }
@@ -102,13 +102,6 @@ export class UserService {
 
   UpdateUser(id: number, name: string, email: string, bio: string, location: string, password: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/update`, { id, name, email, bio, location, password }, { withCredentials: true });
-  }
-
-  isAdmin(): boolean {
-    if (this.currentUserId === 1) {
-      return true;
-    }
-    return false;
   }
 }
 

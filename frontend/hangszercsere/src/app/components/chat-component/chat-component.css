@@ -10,3 +10,16 @@
 .delete-icon:hover {
   color: red;
 }
+
+.reply-icon {
+  display: none;
+}
+
+.reply-icon:hover {
+  color: blue;
+}
+
+.message-container:hover .reply-icon {
+  display: inline-block;
+  cursor: pointer;
+}

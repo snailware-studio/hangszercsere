@@ -1,0 +1,74 @@
+<div class="p-6 max-w-4xl mx-auto">
+
+  <h2 class="text-2xl font-semibold mb-6">
+    Vásárlási előzmények
+  </h2>
+
+  <ng-container *ngIf="groupedHistory.length === 0">
+    <p class="text-gray-500 dark:text-purple-300/70">
+      Még nem vettél semmit.
+    </p>
+  </ng-container>
+
+  <div *ngFor="let group of groupedHistory" class="mb-8">
+
+    <div class="flex items-center gap-3 mb-3">
+      <div class="h-px flex-1 bg-zinc-300 dark:bg-[#3a3155]"></div>
+      <span class="text-sm text-gray-500 dark:text-purple-300/70">
+        {{ group.date }}
+      </span>
+      <div class="h-px flex-1 bg-zinc-300 dark:bg-[#3a3155]"></div>
+    </div>
+
+    <div
+      class="rounded-xl border border-zinc-200 dark:border-[#3a3155]
+             bg-white dark:bg-[#241e34] overflow-hidden">
+
+      <div
+        *ngFor="let item of group.items; let last = last"
+        class="flex justify-between items-center px-4 py-3 text-sm"
+        class:border-zinc-200
+        class:dark:border-[#3a3155]>
+
+        <div class="flex items-center gap-4">
+          <img
+            [src]="rootUrl + '/uploads/' + item.thumbnail"
+            alt="{{ item.listing_title }}"
+            class="w-12 h-12 object-cover rounded"
+          />
+          <div class="flex flex-col">
+            <span class="font-medium">{{ item.listing_title }}</span>
+            <span class="text-xs text-gray-400 dark:text-purple-300/60">
+              Eladó: {{ item.seller }}
+            </span>
+            <span class="text-xs text-gray-400 dark:text-purple-300/60 pt-2">
+              Dátum: {{ item.created_at }}
+            </span>
+          </div>
+        </div>
+
+        <div class="text-right">
+          <div class="font-semibold">{{ item.price }} Ft</div>
+          <div
+            class="text-xs"
+            [ngClass]="{
+              'text-green-500': item.status === 'completed',
+              'text-yellow-400': item.status === 'pending',
+              'text-red-400': item.status === 'cancelled'
+            }">
+            <ng-container *ngIf="item.status === 'completed'">
+              Sikeres
+            </ng-container>
+            <ng-container *ngIf="item.status === 'pending'">
+              Folyamatban
+            </ng-container>
+            <ng-container *ngIf="item.status === 'cancelled'">
+              Megszakítva
+            </ng-container>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

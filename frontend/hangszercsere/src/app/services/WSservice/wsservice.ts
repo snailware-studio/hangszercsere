@@ -51,7 +51,7 @@ export class WSservice {
   }
   public message = this.messagesubject.asObservable();
 
-  public sendMessage(userID: number, toUserID: number, message: string, listing: number) {
+  public sendMessage(userID: number, toUserID: number, message: string, listing: number,reply: number = null) {
     console.log(`ws-service: sending message to ${userID}`);
     if (this.socket.readyState === WebSocket.OPEN) {
       const msg = {
@@ -59,7 +59,8 @@ export class WSservice {
         userID,
         toUserID,
         message,
-        listing
+        listing,
+        reply_to: reply
       };
       this.socket.send(JSON.stringify(msg));
     }
