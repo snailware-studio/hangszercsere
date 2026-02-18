@@ -11,7 +11,7 @@ export class GlobalService {
   apiUrl = "https://hangszercsere.hu/api/";
 
   //set to 1/true if you want to use localhost as the api
-  public dev = 1;
+  public dev = 0;
   public show_cookie = true; // default true, and when users clicks ok then false
   
   public filters: Filters = {
