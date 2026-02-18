@@ -6,6 +6,13 @@
 
 @layer components {
 
+  img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
 
 .condition-badge {
   @apply absolute top-2 left-2 px-2 py-0.5 rounded-full font-semibold text-xs border
@@ -29,7 +36,7 @@
   }
 
   .nav-logo {
-    @apply font-mono font-bold text-lg cursor-pointer px-4 py-2 rounded shadow-sm
+    @apply font-mono font-bold cursor-pointer px-4 text-lg py-2 rounded shadow-sm
            text-light-text-primary dark:text-text-primary;
   }
 

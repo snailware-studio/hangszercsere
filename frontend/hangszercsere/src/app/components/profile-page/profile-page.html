@@ -74,7 +74,7 @@
         *ngFor="let listing of listings"
         class="w-full shrink-0">
 
-        <div class="relative aspect-[4/3] lg:aspect-[16/9]" (click)="OpenListing(listing)">
+        <div class="relative aspect-[4/3] lg:aspect-[16/9] cursor-pointer" (click)="OpenListing(listing)">
           <img
             [src]="rootUrl + '/uploads/' + listing.image_url"
             class="w-full h-full object-cover"
