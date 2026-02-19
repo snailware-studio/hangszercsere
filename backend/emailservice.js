@@ -5,7 +5,7 @@ dotenv.config({quiet:true});
 
 //Configure transporter
 const transporter = nodemailer.createTransport({
-  host: 'smtp.rackhost.hu', 
+  host: 'smtp-hoopler.alwaysdata.net', 
   port: 587,                  
   secure: false,              
   auth: {

@@ -13,8 +13,11 @@ export class PopupComponent {
     this.popupService.register(this);
   }
 
+    // title text for popup window
     text: string = 'test';
+    // dict of buttons and functions when clicked
     button_dict: any = {};
+    
     show: boolean = false;
 
 }
