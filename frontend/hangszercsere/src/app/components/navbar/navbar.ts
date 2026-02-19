@@ -1,9 +1,9 @@
 import { Component,OnInit } from '@angular/core';
 import { UserService } from '../../services/user-service/user-service';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { GlobalService } from '../../services/GlobalService/global-service';
 import { CartService } from '../../services/cart-service/cart-service';
-
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navbar',
@@ -20,19 +20,27 @@ export class Navbar {
     private cart: CartService
   ){
     this.rootUrl = this.global.rootUrl;
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe((e: NavigationEnd) => {
+        this.isMobileRoute = e.urlAfterRedirects.startsWith('/mobile');
+      });
   }
 
   rootUrl: string;
+  isMobileRoute = false;
 
-ngOnInit() {
 
-  const isDark = localStorage.getItem('darkMode');
-  if (isDark == 'true') {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
+
+  ngOnInit() {
+
+    const isDark = localStorage.getItem('darkMode');
+    if (isDark == 'true') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }
-}
 
   GotoProfile(id: number) {
     this.router.navigate(['/profile', id]);

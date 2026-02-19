@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
+    "start": "nodemon server.js",
     "test": "jest --verbose"
   },
   "keywords": [],
@@ -21,6 +22,7 @@
     "ngx-markdown": "^21.0.1",
     "node-fetch": "^2.7.0",
     "nodemailer": "^7.0.11",
+    "nodemon": "^3.1.11",
     "sharp": "^0.34.5",
     "sqlite3": "^5.1.7",
     "ws": "^8.18.3"

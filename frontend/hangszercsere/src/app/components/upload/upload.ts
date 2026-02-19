@@ -4,6 +4,7 @@ import { UserService } from '../../services/user-service/user-service';
 import { Router} from '@angular/router';
 import { HttpEventType } from '@angular/common/http';
 import { NotifService } from '../../services/notif-service/notif-service';
+import { PopupService } from '../../services/popup-service/popup-service';
 
 @Component({
   selector: 'app-upload',
@@ -16,11 +17,22 @@ export class Upload {
     private ListingService: ListingService,
     private userService: UserService,
     private router: Router,
-    private NotifService: NotifService
-  ) {}
+    private NotifService: NotifService,
+    private popup: PopupService,
+  )
+  {}
 
   ngOnInit(): void
-  { 
+  {
+    this.popup.Show(`
+      <p class="mt-3 opacity-80">
+        <i class="nf nf-fa-circle_check></i>
+      </p>
+    `, {
+      Bezárás: () => this.popup.close()
+    });
+
+
     if (!this.userService.isLoggedIn()) {
       this.NotifService.show('error',"You must be logged in!");
       this.router.navigate(['/login']);

@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { HttpEventType } from '@angular/common/http';
 import { GlobalService } from '../../services/GlobalService/global-service';
 import { NotifService } from '../../services/notif-service/notif-service';
+import { PopupService } from '../../services/popup-service/popup-service';
 
 @Component({
   selector: 'app-edit-listing-page',
@@ -114,7 +115,8 @@ export class EditListingPage {
   });
 }
 
-    ngOnInit() {
+  ngOnInit()
+  {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     console.log('getting listing with id:', id);
 

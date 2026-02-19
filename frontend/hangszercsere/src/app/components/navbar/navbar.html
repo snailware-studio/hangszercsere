@@ -48,38 +48,71 @@
         <div class="absolute right-0 mt-1 w-40 bg-light-card-bg dark:bg-card-bg
                     rounded shadow-lg overflow-hidden transition-all z-50" [class.hidden]="!dropdown">
 
-          <a (click)="GotoProfile(userService.getUserId());dropdown = !dropdown" class="dropdown-item"><i
-              class="nf nf-fa-user"></i> Profil</a>
+          <a (click)="GotoProfile(userService.getUserId());dropdown = !dropdown" class="dropdown-item">
+            <i class="nf nf-fa-user"></i> Profil
+          </a>
 
-          <a routerLink="/purchase-history" (click)="dropdown = !dropdown" class="dropdown-item"><i
-              class="nf nf-md-receipt"></i> Vásárlások</a>
+          <a routerLink="/purchase-history" (click)="dropdown = !dropdown" class="dropdown-item">
+            <i class="nf nf-md-receipt"></i> Vásárlások
+          </a>
 
-          <a routerLink="/chat" class="dropdown-item" (click)="dropdown = !dropdown"><i class="nf nf-md-chat"></i>
-            Üzenetek</a>
+          <a routerLink="/chat" class="dropdown-item" (click)="dropdown = !dropdown">
+            <i class="nf nf-md-chat"></i> Üzenetek
+          </a>
 
-          <a routerLink="/mobile" class="dropdown-item" (click)="dropdown = !dropdown"><i class="nf nf-oct-device_mobile"></i>
-            Mobil alkalmazás</a>
-
-          <a (click)="LogOut();dropdown = !dropdown" class="dropdown-item"><i class="nf nf-md-exit_to_app"></i>
-            Kijelentkezés</a>
-
+          <a (click)="LogOut();dropdown = !dropdown" class="dropdown-item">
+            <i class="nf nf-md-exit_to_app"></i> Kijelentkezés
+          </a>
 
         </div>
       </div>
 
-      <a routerLink="/my-listings" class="nav-item flex-shrink-0"><i class="nf nf-fa-list"></i><span class="hidden sm:inline-block">Hírdetéseim</span></a>
+      <a routerLink="/my-listings" class="nav-item flex-shrink-0">
+        <i class="nf nf-fa-list"></i>
+        <span class="hidden sm:inline-block">Hírdetéseim</span>
+      </a>
+
       <ng-container *ngIf="this.cart.cart.length > 0">
-        <a routerLink="/cart" class="nav-item flex-shrink-0"><i class="nf nf-fa-shopping_cart"></i><span class="hidden sm:inline-block">Kosár({{this.cart.cart.length}})</span></a>
+        <a routerLink="/cart" class="nav-item flex-shrink-0">
+          <i class="nf nf-fa-shopping_cart"></i>
+          <span class="hidden sm:inline-block">Kosár({{this.cart.cart.length}})</span>
+        </a>
       </ng-container>
 
       <ng-container *ngIf="this.cart.cart.length <= 0">
-        <a routerLink="/cart" class="nav-item flex-shrink-0"><i class="nf nf-fa-shopping_cart"></i><span class="hidden sm:inline-block">Kosár</span></a>
+        <a routerLink="/cart" class="nav-item flex-shrink-0">
+          <i class="nf nf-fa-shopping_cart"></i>
+          <span class="hidden sm:inline-block">Kosár</span>
+        </a>
       </ng-container>
 
     </ng-container>
 
   </div>
 </nav>
+
+<!-- MOBILE APP PROMO BAR – only on mobile and NOT on /mobile -->
+<div
+  *ngIf="!isMobileRoute"
+  class="flex sm:hidden w-full justify-center items-center gap-2 px-3 py-2 text-sm
+         bg-light-card-bg dark:bg-card-bg
+         border-b border-gray-200 dark:border-[#3a3155]
+         text-light-text-secondary dark:text-text-secondary">
+
+  <i class="nf nf-dev-android text-base"></i>
+
+  <span class="truncate">
+    Elérhető a Hangszercsere Androidra!
+  </span>
+
+  <a
+    routerLink="/mobile"
+    class="ml-1 underline font-semibold whitespace-nowrap
+           hover:text-light-text-primary dark:hover:text-text-primary transition-colors">
+    Letöltés
+  </a>
+
+</div>
 
 <app-login *ngIf="menu === 'login'" [isMenu]="true" (close)="closeMenu()">
 </app-login>
