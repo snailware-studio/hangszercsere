@@ -17,13 +17,11 @@ export class App {
   constructor(private ws: WSservice,
     private notif: NotifService,
     private user: UserService,
-    private popup: PopupService,
-    private cart: CartService
+    private cart: CartService,
   ) {
   }
 
   ngOnInit(): void {
-   // this.popup.Show('test', {close: () => this.popup.close()});
 
     this.ws.message.subscribe(data => {
       const message = JSON.parse(data);

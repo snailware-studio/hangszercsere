@@ -25,7 +25,7 @@ export class MylistingsComponent {
 
   rootUrl: string = 'https://hangszercsere.hu';
 
-  listings: Listing[] = [];
+  listings: any[] = [];
 
   LoadListings(): void {
     this.listingService.MyListings().subscribe(data => {

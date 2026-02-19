@@ -1,11 +1,35 @@
-<ng-container *ngIf="show">
-  <p>{{ text }}</p>
+<div
+  *ngIf="show"
+  class="fixed inset-0 z-50 flex items-center justify-center
+         bg-black/50 backdrop-blur-sm">
 
-  <button
-    *ngFor="let button of button_dict | keyvalue"
-    [attr.data-button]="button.key"
-    (click)="button.value()"
-  >
-    {{ button.key }}
-  </button>
-</ng-container>
+  <div
+    class="relative bg-light-card-bg dark:bg-card-bg
+           rounded-lg shadow-lg p-6 w-96 max-w-[90vw]">
+
+    <!-- HTML CONTENT -->
+    <div
+      class="mb-4 text-light-text-primary dark:text-text-primary text-sm leading-relaxed"
+      [innerHTML]="html">
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="flex flex-wrap gap-2 justify-end">
+
+      <button
+        *ngFor="let button of button_dict | keyvalue"
+        [attr.data-button]="button.key"
+        (click)="button.value()"
+        class="px-4 py-2 rounded font-semibold
+               bg-accent text-white
+               hover:bg-accent-hover
+               transition">
+
+        {{ button.key }}
+
+      </button>
+
+    </div>
+
+  </div>
+</div>

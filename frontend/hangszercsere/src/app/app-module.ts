@@ -31,6 +31,7 @@ import { ImpresszumComponent } from './components/impresszum-component/impresszu
 import { MarkdownModule } from 'ngx-markdown';
 import { MylistingsComponent } from './components/mylistings-component/mylistings-component';
 import { HistoryComponent } from './components/history-component/history-component';
+import { MobileAppView } from './components/mobile-app-view/mobile-app-view';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { HistoryComponent } from './components/history-component/history-compone
     ImpresszumComponent,
     MylistingsComponent,
     HistoryComponent,
+    MobileAppView,
   ],
   imports: [
     BrowserModule,

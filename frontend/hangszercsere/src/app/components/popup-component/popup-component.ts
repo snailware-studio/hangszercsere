@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { PopupService } from '../../services/popup-service/popup-service';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-popup-component',
@@ -13,11 +14,8 @@ export class PopupComponent {
     this.popupService.register(this);
   }
 
-    // title text for popup window
-    text: string = 'test';
-    // dict of buttons and functions when clicked
-    button_dict: any = {};
-    
-    show: boolean = false;
+  html: SafeHtml = '';
+  button_dict: any = {};
+  show: boolean = false;
 
 }
