@@ -25,8 +25,9 @@ export class Upload {
   ngOnInit(): void
   {
     this.popup.Show(`
+      <h1><i class="nf nf-fa-circle_check></i>fasz</h1>
       <p class="mt-3 opacity-80">
-        <i class="nf nf-fa-circle_check></i>
+        szia
       </p>
     `, {
       Bezárás: () => this.popup.close()

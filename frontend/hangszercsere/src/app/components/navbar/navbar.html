@@ -69,20 +69,20 @@
 
       <a routerLink="/my-listings" class="nav-item flex-shrink-0">
         <i class="nf nf-fa-list"></i>
-        <span class="hidden sm:inline-block">Hírdetéseim</span>
+        <span class="hidden sm:inline-block">‎ Hírdetéseim</span>
       </a>
 
       <ng-container *ngIf="this.cart.cart.length > 0">
         <a routerLink="/cart" class="nav-item flex-shrink-0">
           <i class="nf nf-fa-shopping_cart"></i>
-          <span class="hidden sm:inline-block">Kosár({{this.cart.cart.length}})</span>
+          <span class="hidden sm:inline-block">‎ Kosár({{this.cart.cart.length}})</span>
         </a>
       </ng-container>
 
       <ng-container *ngIf="this.cart.cart.length <= 0">
         <a routerLink="/cart" class="nav-item flex-shrink-0">
           <i class="nf nf-fa-shopping_cart"></i>
-          <span class="hidden sm:inline-block">Kosár</span>
+          <span class="hidden sm:inline-block">‎ Kosár</span>
         </a>
       </ng-container>
 
