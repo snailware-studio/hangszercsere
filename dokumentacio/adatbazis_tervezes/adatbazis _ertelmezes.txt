@@ -1,0 +1,173 @@
+====================
+USERS
+====================
+Leírás:
+Tárolja a rendszer felhasználóit és alapadataikat.
+
+Attribútumok:
+- id (PK) – egyedi azonosító
+- name – felhasználónév
+- pass_hash – jelszó hash formában
+- location – város vagy ország
+- rating – átlagos értékelés (0–5)
+- join_date – regisztráció dátuma
+- email – email cím
+- email_verified (BOOLEAN) – email ellenőrzés státusza
+- profile_url – profilkép elérési útja
+- bio – rövid bemutatkozás
+- role – felhasználói szerep (user/admin)
+- status – felhasználói státusz (active/inactive)
+- phone – telefonszám
+
+--------------------
+
+CARTS
+--------------------
+Leírás:
+Felhasználók kosarait tárolja, minden felhasználónak egy kosara lehet.
+
+Attribútumok:
+- id (PK) – kosár azonosító
+- user_id (FK → users.id) – kosár tulajdonosa
+- created_at – létrehozás ideje
+
+--------------------
+
+CART_ITEMS
+--------------------
+Leírás:
+A kosárban lévő hirdetések.
+
+Attribútumok:
+- id (PK) – rekord azonosító
+- cart_id (FK → carts.id)
+- listing_id (FK → listings.id)
+- added_at – hozzáadás ideje
+- UNIQUE(cart_id, listing_id) – egy hirdetés csak egyszer lehet egy kosárban
+
+--------------------
+
+CATEGORIES
+--------------------
+Leírás:
+Hirdetés kategóriák.
+
+Attribútumok:
+- id (PK)
+- name – kategória neve
+
+--------------------
+
+LISTINGS
+--------------------
+Leírás:
+Felhasználók hirdetései, hangszer-specifikus adatokkal és AI értékeléssel.
+Új hirdetés status=inactive, amíg AI feldolgozza.
+
+Attribútumok:
+- id (PK)
+- user_id (FK → users.id)
+- title – hirdetés címe
+- description – részletes leírás
+- price – ár
+- status – inactive/active/sold
+- created_at – létrehozás ideje
+- category_id (FK → categories.id)
+- condition – állapot (New / Very Good / Good / Satisfactory)
+- brand – gyártó
+- model – modell
+- ai_rating – AI értékelés 0–5
+- ai_reviewed (BOOLEAN) – AI feldolgozta-e
+- ai_feedback – AI visszajelzés
+
+--------------------
+
+MEDIA
+--------------------
+Leírás:
+Hirdetéshez tartozó képek és videók.
+
+Attribútumok:
+- id (PK)
+- listing_id (FK → listings.id)
+- url – média elérési útja
+- type – image/video
+
+--------------------
+
+MESSAGES
+--------------------
+Leírás:
+Felhasználók közötti üzenetek, hirdetéshez kapcsolódhat.
+
+Attribútumok:
+- id (PK)
+- sent_from (FK → users.id)
+- sent_to (FK → users.id)
+- listing_id (FK → listings.id)
+- content – üzenet szövege
+- created_at – létrehozás ideje
+
+--------------------
+
+TRANSACTIONS
+--------------------
+Leírás:
+Vásárlások és eladások.
+
+Attribútumok:
+- id (PK)
+- sent_from (FK → users.id)
+- sent_to (FK → users.id)
+- price – tranzakció értéke
+- status – pending/completed/cancelled
+- created_at – létrehozás ideje
+- completed_at – lezárás ideje
+
+--------------------
+
+REVIEWS
+--------------------
+Leírás:
+Értékelések tranzakció vagy hirdetés után.
+
+Attribútumok:
+- id (PK)
+- listing_id (FK → listings.id)
+- transaction_id (FK → transactions.id)
+- sent_from (FK → users.id)
+- sent_to (FK → users.id)
+- rating – pontszám 0–5
+- comment – szöveges visszajelzés
+- timestamp – értékelés ideje
+- anonymous (BOOLEAN) – anonim értékelés
+
+--------------------
+
+USER_STATS
+--------------------
+Leírás:
+Felhasználói statisztikák gyors lekéréshez.
+
+Attribútumok:
+- user_id (FK → users.id)
+- total_listings – összes hirdetés
+- total_sold – eladott hirdetések száma
+- total_spent – összesen elköltött pénz
+- total_earned – összesen keresett pénz
+- last_login – utolsó belépés ideje
+- active_listings – aktív hirdetések száma
+- rating_count – értékelések száma
+- total_reviews – összes értékelés
+
+--------------------
+
+AI_QUEUE
+--------------------
+Leírás:
+AI feldolgozásra váró hirdetések.
+
+Attribútumok:
+- id (PK)
+- listing_id (FK → listings.id) – egy hirdetés csak egyszer lehet benne
+- created_at – hozzáadás ideje
