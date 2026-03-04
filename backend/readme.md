@@ -14,3 +14,19 @@ A `3000` portot használja.
 npm install
 npm start
 ```
+
+### .env Fájl beállítása
+```
+#email creds
+EMAIL_USER=email@example.com
+EMAIL_PASS=password
+
+#frontend port vagy ip
+ORIGIN=http://localhost:4200
+
+#backend port vagy ip
+BACKEND=http://localhost:3000
+
+#api key AI-hoz
+API_KEY=apikey
+```
