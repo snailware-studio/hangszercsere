@@ -1,4 +1,6 @@
-# Hangszercsere.hu
+
+# Hangszercsere.hu <img src="https://hangszercsere.hu/favicon.png" alt="Hangszercsere ikon" width="64"/>
+
 
 ## Projekt leírás
 
