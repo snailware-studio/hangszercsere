@@ -6,6 +6,11 @@ backend/uploads/
 frontend/node_modules/
 frontend/dist/
 
+#docs
+vizsgaremek/vizsgaremek.docx
+dokumentacio/backend_teszt.docx
+dokumentacio/adatbazis_tervezes/adatbazis-sql-tesztek.docx
+
 #database
 backend/database.db
 
