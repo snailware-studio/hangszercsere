@@ -2,7 +2,7 @@
 # Hangszercsere.hu backend
 
 ## SQLite adatbázis
-A `database.db` fileban tárol és olvas, ha nincsen akkor első futtatáskor készít egyet.
+A `database.db` fileban tárol és olvas, ha nincsen, akkor első futtatáskor készít egyet.
 
 ## Multer file tárolás
 A `multer` npm csomag segítségével tárol fájlokat.
