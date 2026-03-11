@@ -15,7 +15,7 @@ A Hangszercsere.hu egy online piactér használt hangszerek adás-vételére. A 
 - A rendszer biztosítja, hogy a hirdetések áttekinthetőek és könnyen értelmezhetőek legyenek.
 
 ### AI-alapú értékelés
-- Az AI 0–5 csillag között értékeli a hirdetés szövegét az informatív jelleg alapján.
+- Az AI 0–5 csillag között értékeli a hirdetés szövegét az informatív jellege alapján.
 - Ellenőrzi, hogy a megadott ár reális-e, és javaslatot ad a korrekcióra, ha szükséges.
 - Tippeket ad a hirdetés javítására, például több információ hozzáadására vagy részletesebb képek/videók feltöltésére.
 
@@ -24,13 +24,13 @@ A Hangszercsere.hu egy online piactér használt hangszerek adás-vételére. A 
 - A felhasználók gyorsan megtalálják a számukra releváns termékeket.
 
 ### Felhasználók közötti kommunikáció
-- Lehetőség van chatelni az eladóval a hirdetésen belül, így a tranzakciók gördülékenyebbek.
+- Lehetőség van társalogni az eladóval a hirdetésen belül, így a tranzakciók gördülékenyebbek.
 
 ---
 
 ## Technológiák
 
-- **Frontend:** Angular
+- **Frontend:** Angular, Tailwind CSS
 - **Backend:** Node.js
 - **Adatbázis:** SQLite
 
@@ -40,7 +40,7 @@ A Hangszercsere.hu egy online piactér használt hangszerek adás-vételére. A 
 
 ### Ajánlórendszer
 - Az oldal a felhasználói viselkedés és korábbi keresések alapján személyre szabott hirdetéseket ajánl.
-- Például ha valaki gitárokat nézett, a rendszer a hasonló hangszereket, márkákat vagy árkategóriákat ajánlja.
+- Például, ha valaki gitárokat nézett, akkor a rendszer a hasonló hangszereket, márkákat vagy ár kategóriákat ajánlja.
 
 ### “Vinted-stílusú” ár ajánlatok
 - Lehetőség van alkudni a hirdetésekre, így a felhasználók ajánlatot tehetnek az eladónak az adott hangszerért.
