@@ -6,7 +6,7 @@ import { provideRouter } from '@angular/router';
 export const TEST_IMPORTS = [
   HttpClientTestingModule,
   RouterTestingModule,
-  FormsModule
+  FormsModule,
 ];
 
 export const TEST_PROVIDERS = [

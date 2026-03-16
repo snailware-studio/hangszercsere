@@ -30,7 +30,8 @@ export class Cart {
   {
     this.cart.Purchase().subscribe(
       {
-        next: () => this.LoadListings()
+        next: () => {this.LoadListings();
+      }
       });
   }
 

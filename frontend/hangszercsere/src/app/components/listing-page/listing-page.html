@@ -83,7 +83,7 @@
         </div>
 
         <div class="text-light-text-secondary dark:text-text-secondary flex flex-col gap-1">
-          <p (click)="GotoProfile(listing?.user_id)"><span class="font-semibold">Eladó:</span> <span class="button">{{
+          <p (click)="GotoProfile(listing?.user_id)"><span class="font-semibold">Eladó: </span> <span class="button">{{
               listing?.seller }}</span></p>
           <p><span class="font-semibold">Feltöltve:</span> {{ listing?.created_at | date:'mediumDate' }}</p>
         </div>

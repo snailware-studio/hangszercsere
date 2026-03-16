@@ -66,7 +66,8 @@ describe('WSservice', () => {
         userID: 123,
         toUserID: 456,
         message: 'Hello',
-        listing: 789
+        listing: 789,
+        reply_to: null
       })
     );
   });

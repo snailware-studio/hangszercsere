@@ -108,6 +108,7 @@ export class CartService {
               this.notif.show("error", `Listing ${result.listingID}: ${result.message}`);
             } else {
               this.notif.show("success", `Sikeres vásárlás!`);
+              this.cart = [];
             }
           });
         }

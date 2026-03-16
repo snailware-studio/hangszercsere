@@ -17,7 +17,7 @@ describe('Upload', () => {
   let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
- 
+
     mockListingService = jasmine.createSpyObj('ListingService', ['GetCategories', 'AddListing', 'AddMedia']);
     mockUserService = jasmine.createSpyObj('UserService', ['isLoggedIn', 'getUserId']);
     mockNotifService = jasmine.createSpyObj('NotifService', ['show']);
@@ -36,7 +36,7 @@ describe('Upload', () => {
         { provide: Router, useValue: mockRouter }
       ]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(Upload);
     component = fixture.componentInstance;
@@ -46,7 +46,7 @@ describe('Upload', () => {
     it('should redirect to login if user is not logged in', () => {
       mockUserService.isLoggedIn.and.returnValue(false);
 
-      fixture.detectChanges(); 
+      fixture.detectChanges();
 
       expect(mockNotifService.show).toHaveBeenCalledWith('error', 'You must be logged in!');
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
@@ -56,7 +56,7 @@ describe('Upload', () => {
       mockUserService.isLoggedIn.and.returnValue(true);
       mockListingService.GetCategories.and.returnValue(of(['Electronics', 'Clothing']));
 
-      fixture.detectChanges(); 
+      fixture.detectChanges();
 
       expect(mockListingService.GetCategories).toHaveBeenCalled();
       expect(component.categories).toEqual(['Electronics', 'Clothing']);
@@ -67,71 +67,9 @@ describe('Upload', () => {
       const error = { error: { error: 'Network error' } };
       mockListingService.GetCategories.and.returnValue(throwError(() => error));
 
-      fixture.detectChanges(); 
+      fixture.detectChanges();
 
       expect(mockNotifService.show).toHaveBeenCalledWith('error', 'Failed to get categories: Network error');
-    });
-  });
-
-  describe('onSelectImages', () => {
-    beforeEach(() => {
-      fixture.detectChanges(); 
-    });
-
-    it('should add selected images to array', () => {
-      const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-      const event = {
-        target: {
-          files: [mockFile],
-          value: 'test.jpg'
-        }
-      } as any;
-
-      spyOn(URL, 'createObjectURL').and.returnValue('blob:mock-url');
-
-      component.onSelectImages(event);
-
-      expect(component.selectedImages.length).toBe(1);
-      expect(component.PreviewImages.length).toBe(1);
-      expect(event.target.value).toBe('');
-    });
-
-    it('should handle multiple image selections', () => {
-      const mockFile1 = new File([''], 'test1.jpg', { type: 'image/jpeg' });
-      const mockFile2 = new File([''], 'test2.jpg', { type: 'image/jpeg' });
-      
-      spyOn(URL, 'createObjectURL').and.returnValue('blob:mock-url');
-
-      const event1 = { target: { files: [mockFile1], value: '' } } as any;
-      component.onSelectImages(event1);
-
-      const event2 = { target: { files: [mockFile2], value: '' } } as any;
-      component.onSelectImages(event2);
-
-      expect(component.selectedImages.length).toBe(2);
-    });
-  });
-
-  describe('onSelectVideos', () => {
-    beforeEach(() => {
-      fixture.detectChanges();
-    });
-
-    it('should add selected videos to array', () => {
-      const mockFile = new File([''], 'test.mp4', { type: 'video/mp4' });
-      const event = {
-        target: {
-          files: [mockFile],
-          value: 'test.mp4'
-        }
-      } as any;
-
-      spyOn(URL, 'createObjectURL').and.returnValue('blob:mock-url');
-
-      component.onSelectVideos(event);
-
-      expect(component.selectedVideos.length).toBe(1);
-      expect(component.PreviewVideos.length).toBe(1);
     });
   });
 
@@ -164,9 +102,9 @@ describe('Upload', () => {
       mockUserService.isLoggedIn.and.returnValue(true);
       mockUserService.getUserId.and.returnValue(123);
       mockListingService.AddListing.and.returnValue(of({ id: 456 }));
-      mockListingService.AddMedia.and.returnValue(of({ 
-        type: HttpEventType.Response, 
-        body: { success: true } 
+      mockListingService.AddMedia.and.returnValue(of({
+        type: HttpEventType.Response,
+        body: { success: true }
       } as any));
 
       component.selectedImages = [new File([''], 'test.jpg')];

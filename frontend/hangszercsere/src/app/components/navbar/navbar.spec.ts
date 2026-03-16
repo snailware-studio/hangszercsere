@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { GlobalService } from '../../services/GlobalService/global-service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
-import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
 
 describe('Navbar', () => {
   let component: Navbar;
@@ -16,14 +16,15 @@ describe('Navbar', () => {
 
   beforeEach(async () => {
     mockUserService = jasmine.createSpyObj('UserService', ['isLoggedIn', 'LogOut']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate'], {
+      events: of()
+    });
     mockGlobalService = { rootUrl: 'http://test.com' };
 
     await TestBed.configureTestingModule({
       declarations: [Navbar],
       imports: [HttpClientTestingModule, FormsModule],
       providers: [
-        provideRouter([]),
         { provide: UserService, useValue: mockUserService },
         { provide: Router, useValue: mockRouter },
         { provide: GlobalService, useValue: mockGlobalService }
